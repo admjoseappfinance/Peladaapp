@@ -524,13 +524,13 @@ display: none !important;
 <div class="report-box" id="relatorioPublico">
 <h3>Resumo Financeiro</h3>
 <div style="margin-bottom: 15px;">
-<h4 style="color:var(--primary-navy); margin-bottom:5px;">💵 Pagamentos do Último Jogo</h4>
-<div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhum pagamento registrado no último jogo.</div>
+<h4 style="color:var(--primary-navy); margin-bottom:5px;">💵 Pagamentos do Último Jogo Realizado</h4>
+<div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhum pagamento registrado no último jogo realizado.</div>
 </div>
 
 <div style="margin-bottom: 15px;">
-<h4 style="color:var(--primary-navy); margin-bottom:5px;">🧾 Despesas do Último Jogo</h4>
-<div id="relatorioDespesasUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhuma despesa registrada no último jogo.</div>
+<h4 style="color:var(--primary-navy); margin-bottom:5px;">🧾 Despesas do Último Jogo Realizado</h4>
+<div id="relatorioDespesasUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhuma despesa registrada no último jogo realizado.</div>
 </div>
 
 <hr style="border: 0; border-top: 1px solid #e2e8f0;">
@@ -640,7 +640,6 @@ async function carregarDaNuvem(mostrarAlerta) {
     const json = await resp.json();
     const record = json.record || {};
 
-    // Se já houver dados na nuvem, atualiza localmente
     if (record.jogos !== undefined || record.jogadoresElenco !== undefined || record.transacoes !== undefined || record.partidasHistorico !== undefined) {
       jogos = record.jogos || [];
       jogadoresElenco = record.jogadoresElenco || [];
@@ -665,7 +664,6 @@ async function carregarDaNuvem(mostrarAlerta) {
       renderizarProximoJogoPublico();
       atualizarRelatorio();
     } else if (jogos.length > 0 || jogadoresElenco.length > 0 || transacoes.length > 0 || partidasHistorico.length > 0) {
-      // Se o bin ainda estava vazio mas o Admin já tinha dados no celular, sobe os dados locais para a nuvem
       await salvarNaNuvem();
     }
 
@@ -1144,7 +1142,6 @@ var container = document.getElementById('proximoJogoPublico');
 if (!container) return;
 container.innerHTML = '';
 
-// Data atual no formato YYYY-MM-DD local
 var agora = new Date();
 var ano = agora.getFullYear();
 var mes = String(agora.getMonth() + 1).padStart(2, '0');
@@ -1500,10 +1497,30 @@ salvarTudo();
 }
 
 function atualizarRelatorio() {
-var ultimoJogoId = null;
+var ultimoJogoRealizadoId = null;
+
+// Data de hoje em YYYY-MM-DD
+var agora = new Date();
+var ano = agora.getFullYear();
+var mes = String(agora.getMonth() + 1).padStart(2, '0');
+var dia = String(agora.getDate()).padStart(2, '0');
+var hojeStr = ano + '-' + mes + '-' + dia;
+
 if (jogos.length > 0) {
-var jogosOrdenados = jogos.slice().sort(function(a,b) { return new Date(b.data) - new Date(a.data); });
-ultimoJogoId = jogosOrdenados[0].id;
+  // Filtra apenas jogos que já passaram (data <= hoje) ou que possuem pagamentos vinculados
+  var jogosRealizados = jogos.filter(function(j) {
+    var temPagamento = transacoes.some(function(t) { return t.jogoId == j.id; });
+    return j.data <= hojeStr || temPagamento;
+  });
+
+  if (jogosRealizados.length > 0) {
+    jogosRealizados.sort(function(a, b) { return new Date(b.data) - new Date(a.data); });
+    ultimoJogoRealizadoId = jogosRealizados[0].id;
+  } else {
+    // Caso não haja jogos passados, pega o mais antigo cadastrado
+    var copiaJogos = jogos.slice().sort(function(a, b) { return new Date(b.data) - new Date(a.data); });
+    ultimoJogoRealizadoId = copiaJogos[0].id;
+  }
 }
 
 var htmlPagUltimo = '';
@@ -1513,7 +1530,7 @@ var totalSaiUltimo = 0;
 
 for (var i = 0; i < transacoes.length; i++) {
 var t = transacoes[i];
-if (ultimoJogoId && t.jogoId == ultimoJogoId) {
+if (ultimoJogoRealizadoId && t.jogoId == ultimoJogoRealizadoId) {
 if (t.tipo === 'pagamento') {
 totalPagUltimo += Number(t.valor);
 htmlPagUltimo += '<div class="expense-detail"><span>' + t.desc + '</span><b class="positive">+' + formatarMoeda(t.valor) + '</b></div>';
@@ -1530,10 +1547,10 @@ var divSai = document.getElementById('relatorioDespesasUltimoJogo');
 var resSalPub = document.getElementById('resumoSaldoPublico');
 
 if (divPag) {
-divPag.innerHTML = htmlPagUltimo ? htmlPagUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Pagamentos: ' + formatarMoeda(totalPagUltimo) + '</div>' : 'Nenhum pagamento registrado no último jogo.';
+divPag.innerHTML = htmlPagUltimo ? htmlPagUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Pagamentos: ' + formatarMoeda(totalPagUltimo) + '</div>' : 'Nenhum pagamento registrado no último jogo realizado.';
 }
 if (divSai) {
-divSai.innerHTML = htmlSaiUltimo ? htmlSaiUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Despesas: ' + formatarMoeda(totalSaiUltimo) + '</div>' : 'Nenhuma despesa registrada no último jogo.';
+divSai.innerHTML = htmlSaiUltimo ? htmlSaiUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Despesas: ' + formatarMoeda(totalSaiUltimo) + '</div>' : 'Nenhuma despesa registrada no último jogo realizado.';
 }
 if (resSalPub) {
 resSalPub.innerText = formatarMoeda(calcularSaldo());
