@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Império Real FC | Match Center</title>
+<style>
+:root {
+--primary-navy: #0b1a30;
+--secondary-navy: #162a45;
+--gold-accent: #d4af37;
+--gold-hover: #b89628;
+--light-bg: #f4f6f9;
+--card-bg: #ffffff;
+--text-color: #1e293b;
+}
+
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+padding: 0;
+background: var(--light-bg);
+color: var(--text-color);
+}
+
+.header {
+background: linear-gradient(135deg, #06101e 0%, var(--primary-navy) 100%);
+color: var(--gold-accent);
+padding: 15px;
+text-align: center;
+font-weight: bold;
+font-size: 1.4rem;
+border-bottom: 3px solid var(--gold-accent);
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.header-left {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.header-logo {
+height: 45px;
+width: auto;
+object-fit: contain;
+}
+
+.admin-access-btn {
+background: rgba(212, 175, 55, 0.15);
+border: 1px solid var(--gold-accent);
+color: var(--gold-accent);
+padding: 6px 12px;
+border-radius: 6px;
+font-size: 0.8rem;
+font-weight: bold;
+cursor: pointer;
+transition: background 0.2s;
+}
+.admin-access-btn:hover {
+background: rgba(212, 175, 55, 0.3);
+}
+
+.admin-badge-bar {
+background: #1e293b;
+color: #e2e8f0;
+padding: 8px 15px;
+font-size: 0.85rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid #334155;
+}
+
+.balance-card {
+background: var(--card-bg);
+margin: 15px;
+padding: 20px;
+border-radius: 12px;
+text-align: center;
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+border: 1px solid #e2e8f0;
+}
+
+.balance-title {
+color: #64748b;
+font-size: 0.95rem;
+font-weight: 600;
+}
+
+.balance-value {
+font-size: 2.2rem;
+font-weight: bold;
+color: var(--primary-navy);
+margin-top: 5px;
+}
+
+.tabs {
+display: flex;
+background: var(--primary-navy);
+padding: 6px;
+gap: 3px;
+justify-content: flex-start;
+overflow-x: auto;
+}
+
+.tab-btn {
+flex: 1;
+min-width: 65px;
+padding: 10px 6px;
+border: 1px solid transparent;
+background: rgba(255,255,255,0.08);
+color: #cbd5e1;
+font-weight: bold;
+cursor: pointer;
+border-radius: 6px;
+font-size: 0.72rem;
+transition: all 0.2s;
+white-space: nowrap;
+}
+
+.tab-btn.active {
+background: var(--gold-accent);
+color: var(--primary-navy);
+border-color: var(--gold-accent);
+}
+
+.tab-content { display: none; padding: 15px; }
+.tab-content.active { display: block; }
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--secondary-navy); }
+input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+
+button.action-btn {
+width: 100%;
+padding: 12px;
+background: var(--gold-accent);
+color: var(--primary-navy);
+border: none;
+font-weight: bold;
+border-radius: 6px;
+cursor: pointer;
+font-size: 1rem;
+margin-top: 5px;
+transition: background 0.2s;
+}
+
+button.action-btn:active {
+background: var(--gold-hover);
+}
+
+.list-item {
+background: var(--card-bg);
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 8px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+border: 1px solid #e2e8f0;
+}
+
+.history-title { font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: var(--primary-navy); }
+.positive { color: #16a34a; font-weight: bold; }
+.negative { color: #dc2626; font-weight: bold; }
+.delete-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.edit-btn { background: var(--secondary-navy); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-weight: bold; }
+.pay-btn { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+.report-box { background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0; }
+.whatsapp-btn { background: #25d366; color: white; padding: 15px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 15px; text-align: center; width: 100%; box-sizing: border-box; }
+.expense-detail { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
+.badge-paid { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+.badge-exempt { background: #f3e8ff; color: #6b21a8; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; border: 1px solid #d8b4fe; }
+.call-list { background: #fff; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #e2e8f0; }
+.call-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+.call-item:last-child { border-bottom: none; }
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+
+.tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; min-height: 40px; }
+.player-tag { padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid; }
+.tag-ouro { background: #fef08a; color: #854d0e; border-color: #eab308; }
+.tag-prata { background: #e2e8f0; color: #475569; border-color: #94a3b8; }
+.tag-bronze { background: #ffedd5; color: #9a3412; border-color: #f97316; }
+.tag-goleiro-ouro { background: #f3e8ff; color: #6b21a8; border-color: #c084fc; }
+.tag-goleiro-prata { background: #e0f2fe; color: #0369a1; border-color: #38bdf8; }
+.player-tag-btn { background: rgba(0,0,0,0.1); border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; font-weight: bold; }
+
+.team-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+.team-header { font-weight: bold; color: var(--primary-navy); border-bottom: 2px solid var(--gold-accent); padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.team-group-title { font-weight: bold; color: var(--secondary-navy); margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+.team-player-item { padding: 5px 0; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 8px; }
+.badge-nivel { font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-right: 4px; }
+.badge-status { font-size: 0.70rem; padding: 1px 4px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-left: auto; }
+.status-marechal { background: #dcfce7; color: #15803d; }
+.status-intermediario { background: #fef9c3; color: #854d0e; }
+.status-recruta { background: #fee2e2; color: #991b1b; }
+
+.cronometro-box { background: white; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
+.tempo-display { font-size: 3.2rem; font-weight: bold; color: var(--primary-navy); margin: 5px 0; font-family: monospace; cursor: pointer; }
+.tempo-display:hover { color: var(--gold-hover); text-decoration: underline; }
+.placar-container { display: flex; justify-content: space-around; align-items: center; margin: 15px 0; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+.time-placar { text-align: center; flex: 1; }
+.time-placar h4 { margin: 0 0 5px 0; font-size: 1rem; }
+.gols-num { font-size: 2.2rem; font-weight: bold; color: var(--gold-hover); margin: 2px 0; }
+.gols-btn-group { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
+.btn-gol { padding: 6px 10px; background: var(--secondary-navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+.btn-menos-gol { padding: 6px 10px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+.cron-btn-group { display: flex; gap: 8px; margin-top: 15px; }
+.acrescimo-box { margin-top: 15px; background: #fffbeb; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+.elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 10px; }
+.elenco-scroll { max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.elenco-chip { padding: 5px 10px; border-radius: 16px; font-size: 0.82rem; font-weight: bold; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+.elenco-chip:hover { filter: brightness(0.95); }
+.elenco-chip.selecionado { opacity: 0.45; text-decoration: line-through; pointer-events: none; }
+.progress-bg { width: 100%; background: #e2e8f0; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden; }
+.progress-bar { height: 100%; background: #16a34a; transition: width 0.3s; }
+
+.artilharia-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 15px; text-align: left; }
+.artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
+.artilheiro-item:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-left">
+<img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+<span>Império Real FC</span>
+</div>
+<button class="admin-access-btn" id="btnAdminAccess" onclick="acionarPainelAdmin()">🔐 Área Admin</button>
+</div>
+
+<div id="adminBadgeBar" class="admin-badge-bar" style="display:none;">
+<span>🛡️ <b>Modo Administrador Ativo</b> (Gerenciamento Total)</span>
+<button onclick="sairModoAdmin()" style="background:#ef4444; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.75rem;">Sair do Admin</button>
+</div>
+
+<div class="balance-card">
+<div class="balance-title">Saldo Atual em Caixa</div>
+<div class="balance-value" id="saldoGeral">R$ 0,00</div>
+</div>
+
+<div class="tabs">
+<button class="tab-btn active" data-tab="jogos">Jogos</button>
+<button class="tab-btn admin-tab" data-tab="elenco" style="display:none;">Elenco</button>
+<button class="tab-btn admin-tab" data-tab="pagamentos" style="display:none;">Pagamentos</button>
+<button class="tab-btn admin-tab" data-tab="sorteio" style="display:none;">Sorteio</button>
+<button class="tab-btn admin-tab" data-tab="cronometro" style="display:none;">Cronômetro</button>
+<button class="tab-btn" data-tab="ranking">Ranking</button>
+<button class="tab-btn admin-tab" data-tab="saidas" style="display:none;">Saídas</button>
+<button class="tab-btn admin-tab" data-tab="metas" style="display:none;">Metas</button>
+<button class="tab-btn" data-tab="relatorio">Relatório</button>
+</div>
+
+<!-- Aba Jogos -->
+<div id="tab-jogos" class="tab-content active">
+<div id="formCadastroJogoArea" style="display:none;">
+<h3>Cadastrar Jogo</h3>
+<div class="form-group">
+<label>Nome do Jogo / Adversário</label>
+<input type="text" id="nomeJogo" placeholder="Ex: Racha de Quarta">
+</div>
+<div class="form-group">
+<label>Data</label>
+<input type="date" id="dataJogo">
+</div>
+
+<div class="form-group">
+<label>Selecionar do Elenco Salvo (Busca Rápida)</label>
+<div class="elenco-selector-box">
+<input type="text" id="buscaElencoNovo" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.9rem;">
+<div class="elenco-scroll" id="listaSelecaoElencoNovo"></div>
+</div>
+
+<label>Ou Adicionar Jogador Avulso</label>
+<div style="display: flex; gap: 5px; margin-bottom: 5px;">
+<input type="text" id="inputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
+<select id="inputNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<option value="ouro" selected style="color: #854d0e;">🥇 Ouro</option>
+<option value="prata" style="color: #475569;">🥈 Prata</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
+<option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
+</select>
+<select id="inputStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<option value="marechal" selected>⭐ Marechal</option>
+<option value="intermediario">⚡ Intermediário</option>
+<option value="recruta">🛡️ Recruta</option>
+</select>
+<button class="action-btn" style="margin:0; width: 50px;" id="btnAddJogadorTemporario">+</button>
+</div>
+
+<label style="margin-top: 10px;">Convocados Selecionados (<span id="contadorTemp">0</span>)</label>
+<div class="tags-container" id="containerJogadoresTemporarios"></div>
+</div>
+<button class="action-btn" id="btnSalvarJogo">Salvar Jogo</button>
+<hr style="margin:20px 0; border:0; border-top:1px solid #cbd5e1;">
+</div>
+
+<div class="history-title">Jogos Salvos & Convocados</div>
+<div id="listaJogos"></div>
+</div>
+
+<!-- Aba Elenco (Banco de Dados de Jogadores) -->
+<div id="tab-elenco" class="tab-content">
+<h3>Banco de Dados de Jogadores</h3>
+<p style="color: #64748b; font-size: 0.9rem;">Cadastre os jogadores fixos do clube para selecioná-los rapidamente nos jogos.</p>
+<div class="form-group">
+<label>Nome do Jogador</label>
+<input type="text" id="elencoNome" placeholder="Ex: Alef">
+</div>
+<div class="form-group" style="display: flex; gap: 10px;">
+<div style="flex: 1;">
+<label>Nível / Posição Padrão</label>
+<select id="elencoNivel" style="font-weight: bold; padding: 12px;">
+<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
+<option value="prata" selected style="color: #475569;">🥈 Prata</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
+<option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
+</select>
+</div>
+<div style="flex: 1;">
+<label>Categoria</label>
+<select id="elencoStatus" style="font-weight: bold; padding: 12px;">
+<option value="marechal">⭐ Marechal</option>
+<option value="intermediario">⚡ Intermediário</option>
+<option value="recruta">🛡️ Recruta</option>
+</select>
+</div>
+</div>
+<button class="action-btn" id="btnSalvarElenco">Cadastrar Jogador no Elenco</button>
+
+<!-- Área de Backup por Arquivo -->
+<div style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
+<h4 style="margin-top:0; color:var(--primary-navy);">💾 Segurança e Backup</h4>
+<div style="display: flex; gap: 10px;">
+<button class="action-btn" style="background:var(--secondary-navy); color:var(--gold-accent); margin:0;" id="btnExportarBackup">Exportar Backup</button>
+<button class="action-btn" style="background:#0284c7; color:white; margin:0;" id="btnImportarBackup">Importar Backup</button>
+<input type="file" id="inputFileBackup" style="display:none;" accept=".json">
+</div>
+</div>
+
+<div class="history-title">Jogadores Cadastrados (<span id="totalElencoCount">0</span>)</div>
+<input type="text" id="filtroListaElenco" placeholder="🔍 Buscar no elenco..." style="margin-bottom: 10px; padding: 10px;">
+<div id="listaElencoCadastrado"></div>
+</div>
+
+<!-- Aba Pagamentos -->
+<div id="tab-pagamentos" class="tab-content">
+<h3>Registrar Pagamento</h3>
+<div class="form-group">
+<label>Selecione o Jogo</label>
+<select id="selectJogoPagamento"><option value="">Selecione um jogo...</option></select>
+</div>
+
+<div id="areaConvocados" style="display:none;">
+<div class="history-title">Dar Baixa nos Convocados <small style="color:#6b21a8; font-weight:normal;">(🧤 Goleiros são isentos)</small></div>
+<div class="call-list" id="listaConvocadosBaixa"></div>
+</div>
+
+<div class="history-title" style="margin-top:25px;">Pagamento Avulso / Extra</div>
+<div class="form-group"><label>Nome do Jogador</label><input type="text" id="nomeJogador"></div>
+<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorPagamento" value="10.00" step="0.01"></div>
+<button class="action-btn" id="btnConfirmarPagamento">Confirmar Pagamento Avulso</button>
+
+<div class="history-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span>Histórico de Pagamentos</span>
+<button id="btnExportarPagamentosTxt" style="background: var(--secondary-navy); color: var(--gold-accent); border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">📤 Exportar Lista (Nome e Valor)</button>
+</div>
+<div id="listaPagamentos"></div>
+</div>
+
+<!-- Aba Sorteio -->
+<div id="tab-sorteio" class="tab-content">
+<h3>Sorteador de Times Inteligente</h3>
+<p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide os Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
+<div class="form-group">
+<label>Selecione o Jogo</label>
+<select id="selectJogoSorteio"><option value="">Selecione um jogo...</option></select>
+</div>
+<div class="form-group">
+<label>Quantidade de Times</label>
+<select id="qtdTimes">
+<option value="2">2 Times</option>
+<option value="3">3 Times</option>
+<option value="4">4 Times</option>
+</select>
+</div>
+<button class="action-btn" id="btnSortearTimes">🎲 Sortear Times Justos</button>
+
+<div id="resultadoSorteio" style="margin-top: 20px;"></div>
+</div>
+
+<!-- Aba Cronômetro / Partida -->
+<div id="tab-cronometro" class="tab-content">
+<div class="cronometro-box">
+<h3 id="labelPeriodo" style="margin-top:0; color:var(--primary-navy);">1º Tempo (30 min)</h3>
+<div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
+<small style="color:#64748b; display:block; margin-bottom:10px;">💡 Toque no relógio acima para ajustar o tempo manualmente.</small>
+
+<div class="placar-container">
+<div class="time-placar">
+<h4 style="color:#dc2626;">🔴 Vermelho</h4>
+<div class="gols-num" id="golsVermelho">0</div>
+<div class="gols-btn-group">
+<button class="btn-menos-gol" id="btnMenosVermelho">-</button>
+<button class="btn-gol" id="btnGolVermelho">+ Gol</button>
+</div>
+</div>
+<div style="font-weight:bold; font-size:1.5rem; color:#64748b;">X</div>
+<div class="time-placar">
+<h4 style="color:#2563eb;">🔵 Azul</h4>
+<div class="gols-num" id="golsAzul">0</div>
+<div class="gols-btn-group">
+<button class="btn-menos-gol" id="btnMenosAzul">-</button>
+<button class="btn-gol" id="btnGolAzul">+ Gol</button>
+</div>
+</div>
+</div>
+
+<!-- Artilharia Rápida -->
+<div class="artilharia-box">
+<h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.95rem;">⚽ Artilharia da Partida (Toque rápido)</h4>
+<div id="painelArtilhariaRapida"><i>Realize o sorteio ou selecione um jogo para carregar os jogadores.</i></div>
+</div>
+
+<div class="cron-btn-group">
+<button class="action-btn" id="btnIniciarCron" style="background:#16a34a; color:white; margin:0;">▶ Iniciar</button>
+<button class="action-btn" id="btnPausarCron" style="background:#ca8a04; color:white; margin:0;">⏸ Pausar</button>
+<button class="action-btn" id="btnZerarCron" style="background:#dc2626; color:white; margin:0;">⏹ Zerar</button>
+</div>
+
+<div class="acrescimo-box">
+<span style="font-weight:bold; color:#854d0e; font-size:0.95rem;">Acréscimo: <span id="displayAcrescimo">0</span> min</span>
+<div style="display:flex; gap:5px;">
+<button id="btnMenosAcrescimo" style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">-1</button>
+<button id="btnMaisAcrescimo" style="padding:6px 12px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+1</button>
+</div>
+</div>
+
+<button class="action-btn" id="btnTrocarTempo" style="background:var(--secondary-navy); color:var(--gold-accent); margin-top:12px;">🔄 Alternar para o 2º Tempo</button>
+<button class="action-btn" id="btnSalvarPartida" style="background:var(--gold-accent); color:var(--primary-navy); margin-top:8px;">💾 Salvar Partida no Histórico</button>
+</div>
+
+<div class="history-title">Histórico de Partidas (Vermelho x Azul)</div>
+<div id="listaHistoricoPartidas"></div>
+</div>
+
+<!-- Aba Ranking -->
+<div id="tab-ranking" class="tab-content">
+<h3>🏆 Ranking de Artilheiros do Clube</h3>
+<p style="color: #64748b; font-size: 0.9rem;">Contagem oficial de gols somados de todas as partidas salvas no histórico.</p>
+<div id="listaRankingArtilheiros" style="margin-top: 15px;"></div>
+</div>
+
+<!-- Aba Saídas -->
+<div id="tab-saidas" class="tab-content">
+<h3>Nova Despesa</h3>
+<div class="form-group">
+<label>Vincular ao Jogo (Opcional)</label>
+<select id="selectJogoSaida"><option value="">Geral</option></select>
+</div>
+<div class="form-group"><label>Descrição</label><input type="text" id="descSaida" placeholder="Ex: Aluguel da quadra"></div>
+<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorSaida" step="0.01" placeholder="0.00"></div>
+<button class="action-btn" style="background: #ef4444; color: white;" id="btnRegistrarSaida">Registrar Saída</button>
+
+<div class="history-title">Histórico de Saídas</div>
+<div id="listaSaidas"></div>
+</div>
+
+<!-- Aba Metas -->
+<div id="tab-metas" class="tab-content">
+<h3>Nova Meta Financeira</h3>
+<div class="form-group"><label>Nome da Meta</label><input type="text" id="nomeMeta" placeholder="Ex: Compra de Bolas Novas"></div>
+<div class="form-group"><label>Valor Alvo (R$)</label><input type="number" id="valorMeta" step="0.01" placeholder="300.00"></div>
+<button class="action-btn" id="btnSalvarMeta">Criar Meta</button>
+
+<div class="history-title">Progresso das Metas</div>
+<div id="listaMetas"></div>
+</div>
+
+<!-- Aba Relatório -->
+<div id="tab-relatorio" class="tab-content">
+<div class="report-box">
+<h3>Resumo Financeiro</h3>
+<p>Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
+<hr style="border: 0; border-top: 1px solid #e2e8f0;">
+<h4>Detalhamento de Saídas:</h4>
+<div id="listaDetalheSaidas"></div>
+<p>Total de Saídas: <span id="resumoSaidas" class="negative">R$ 0,00</span></p>
+<hr style="margin-top: 15px; border: 0; border-top: 1px solid #e2e8f0;">
+<h4>Saldo Final: <span id="resumoSaldo">R$ 0,00</span></h4>
+<a href="#" class="whatsapp-btn" id="btnWpp" target="_blank">Enviar Resumo no WhatsApp</a>
+</div>
+</div>
+
+<!-- Modal para PIN de Admin -->
+<div class="modal" id="modalPinAdmin">
+<div class="modal-content" style="text-align: center;">
+<h3>🔐 Acesso Administrativo</h3>
+<p style="font-size:0.9rem; color:#64748b;">Digite o PIN de administrador para desbloquear o gerenciamento:</p>
+<div class="form-group" style="margin-top:15px;">
+<input type="password" id="inputPinAdmin" placeholder="••••" maxlength="6" style="text-align:center; font-size:1.5rem; letter-spacing:5px;">
+</div>
+<button class="action-btn" onclick="verificarPinAdmin()">Entrar como Admin</button>
+<button class="action-btn" style="background:#64748b; color:white; margin-top:8px;" onclick="fecharModalPin()">Cancelar</button>
+</div>
+</div>
+
+<!-- Modal para Editar Convocados -->
+<div class="modal" id="modalEditarLista">
+<div class="modal-content">
+<h3>Editar Convocados</h3>
+<input type="hidden" id="editJogoId">
+<div class="form-group">
+<label>Selecionar do Elenco Salvo:</label>
+<div class="elenco-selector-box">
+<input type="text" id="buscaElencoEdit" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.9rem;">
+<div class="elenco-scroll" id="listaSelecaoElencoEdit"></div>
+</div>
+
+<label>Adicionar Novo Avulso:</label>
+<div style="display: flex; gap: 5px; margin-bottom: 5px;">
+<input type="text" id="editInputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
+<select id="editNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
+<option value="prata" selected style="color: #475569;">🥈 Prata</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
+<option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
+</select>
+<select id="editStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<option value="marechal" selected>⭐ Marechal</option>
+<option value="intermediario">⚡ Intermediário</option>
+<option value="recruta">🛡️ Recruta</option>
+</select>
+<button class="action-btn" style="margin:0; width: 50px;" id="btnEditAddJogador">+</button>
+</div>
+<label style="margin-top: 10px;">Convocados Atuais do Jogo:</label>
+<div class="tags-container" id="containerEditJogadores" style="margin-top: 5px;"></div>
+</div>
+<button class="action-btn" id="btnSalvarEdicaoLista">Salvar Alterações</button>
+<button class="action-btn" style="background:#64748b; color: white; margin-top:8px;" id="btnFecharModal">Cancelar</button>
+</div>
+</div>
+
+<!-- Modal para Editar Partida Salva no Histórico -->
+<div class="modal" id="modalEditarPartidaHist">
+<div class="modal-content">
+<h3>✏️ Editar Partida Salva</h3>
+<input type="hidden" id="editPartId">
+<div class="form-group">
+<label>Gols Vermelho</label>
+<input type="number" id="editPartGolsV" min="0">
+</div>
+<div class="form-group">
+<label>Gols Azul</label>
+<input type="number" id="editPartGolsA" min="0">
+</div>
+<div class="form-group">
+<label>Data</label>
+<input type="text" id="editPartData">
+</div>
+<div class="form-group">
+<label>⚽ Artilheiros (Gols por Jogador)</label>
+<div id="containerEditArtilhariaHist" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #cbd5e1; max-height:200px; overflow-y:auto;"></div>
+</div>
+<button class="action-btn" id="btnSalvarEdicaoPartida">Salvar Alterações da Partida</button>
+<button class="action-btn" style="background:#64748b; color: white; margin-top:8px;" id="btnFecharModalPartida">Cancelar</button>
+</div>
+</div>
+
+<script>
+var PIN_ADMIN_PADRAO = "1234"; // PIN padrão para desbloquear a gestão
+var ehAdmin = localStorage.getItem('imperio_admin_ativo') === 'true';
+
+function lerDadosSeguro(chavePrincipal, chavesAntigas) {
+  var todasChaves = [chavePrincipal].concat(chavesAntigas || []);
+  for (var i = 0; i < todasChaves.length; i++) {
+    try {
+      var raw = localStorage.getItem(todasChaves[i]);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (todasChaves[i] !== chavePrincipal) {
+            localStorage.setItem(chavePrincipal, JSON.stringify(parsed));
+          }
+          return parsed;
+        }
+      }
+    } catch (e) {}
+  }
+  return [];
+}
+
+var jogos = lerDadosSeguro('jogos_imperio_real', ['imp_jogos', 'jogos']);
+var jogadoresElenco = lerDadosSeguro('jogadores_imperio_real', ['imp_elenco', 'elenco', 'jogadores']);
+var transacoes = lerDadosSeguro('transacoes_imperio_real', ['imp_transacoes', 'transacoes']);
+var metas = lerDadosSeguro('metas_imperio_real', ['imp_metas', 'metas']);
+var partidasHistorico = lerDadosSeguro('partidas_imperio_real', ['imp_partidas', 'partidas']);
+
+var temporarioJogadores = [];
+var edicaoJogadores = [];
+
+var partidaSalvaLocal = JSON.parse(localStorage.getItem('partida_atual_imperio_real')) || {};
+var tempoRestante = partidaSalvaLocal.tempoRestante !== undefined ? partidaSalvaLocal.tempoRestante : (30 * 60);
+var periodoAtual = partidaSalvaLocal.periodoAtual || 1;
+var acrescimoMinutos = partidaSalvaLocal.acrescimoMinutos || 0;
+var golsVermelho = partidaSalvaLocal.golsVermelho || 0;
+var golsAzul = partidaSalvaLocal.golsAzul || 0;
+var artilhariaAtual = partidaSalvaLocal.artilhariaAtual || {};
+
+var timerInterval = null;
+var rodando = false;
+
+function salvarEstadoPartida() {
+  var estado = {
+    tempoRestante: tempoRestante,
+    periodoAtual: periodoAtual,
+    acrescimoMinutos: acrescimoMinutos,
+    golsVermelho: golsVermelho,
+    golsAzul: golsAzul,
+    artilhariaAtual: artilhariaAtual
+  };
+  localStorage.setItem('partida_atual_imperio_real', JSON.stringify(estado));
+}
+
+function salvarTudo() {
+localStorage.setItem('jogos_imperio_real', JSON.stringify(jogos));
+localStorage.setItem('jogadores_imperio_real', JSON.stringify(jogadoresElenco));
+localStorage.setItem('transacoes_imperio_real', JSON.stringify(transacoes));
+localStorage.setItem('metas_imperio_real', JSON.stringify(metas));
+localStorage.setItem('partidas_imperio_real', JSON.stringify(partidasHistorico));
+renderizar();
+}
+
+function formatarMoeda(v) {
+return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
+}
+
+function atualizarModoVisualizacao() {
+var adminTabs = document.querySelectorAll('.admin-tab');
+var formCadJogo = document.getElementById('formCadastroJogoArea');
+var bar = document.getElementById('adminBadgeBar');
+var btnAccess = document.getElementById('btnAdminAccess');
+
+for (var i = 0; i < adminTabs.length; i++) {
+adminTabs[i].style.display = ehAdmin ? 'block' : 'none';
+}
+
+if (formCadJogo) formCadJogo.style.display = ehAdmin ? 'block' : 'none';
+if (bar) bar.style.display = ehAdmin ? 'flex' : 'none';
+if (btnAccess) btnAccess.style.display = ehAdmin ? 'none' : 'block';
+
+// Se o usuário estiver numa aba restrita e perder o admin, joga para 'jogos'
+var tabAtiva = document.querySelector('.tab-content.active');
+if (tabAtiva && !ehAdmin) {
+var idTab = tabAtiva.id.replace('tab-', '');
+if (['elenco', 'pagamentos', 'sorteio', 'cronometro', 'saidas', 'metas'].indexOf(idTab) !== -1) {
+switchTab('jogos');
+}
+}
+}
+
+function acionarPainelAdmin() {
+if (ehAdmin) return;
+var modal = document.getElementById('modalPinAdmin');
+if (modal) {
+modal.style.display = 'flex';
+var inp = document.getElementById('inputPinAdmin');
+if (inp) { inp.value = ''; inp.focus(); }
+}
+}
+
+function fecharModalPin() {
+var modal = document.getElementById('modalPinAdmin');
+if (modal) modal.style.display = 'none';
+}
+
+function verificarPinAdmin() {
+var inp = document.getElementById('inputPinAdmin');
+if (inp && inp.value === PIN_ADMIN_PADRAO) {
+ehAdmin = true;
+localStorage.setItem('imperio_admin_ativo', 'true');
+fecharModalPin();
+atualizarModoVisualizacao();
+alert('Modo Administrador ativado com sucesso!');
+} else {
+alert('PIN incorreto!');
+}
+}
+
+function sairModoAdmin() {
+ehAdmin = false;
+localStorage.setItem('imperio_admin_ativo', 'false');
+atualizarModoVisualizacao();
+switchTab('jogos');
+alert('Você saiu do modo administrador.');
+}
+
+function switchTab(tabId) {
+var btns = document.querySelectorAll('.tab-btn');
+var contents = document.querySelectorAll('.tab-content');
+
+for (var i = 0; i < btns.length; i++) {
+if (btns[i].getAttribute('data-tab') === tabId) {
+btns[i].classList.add('active');
+} else {
+btns[i].classList.remove('active');
+}
+}
+
+for (var j = 0; j < contents.length; j++) {
+if (contents[j].id === 'tab-' + tabId) {
+contents[j].classList.add('active');
+} else {
+contents[j].classList.remove('active');
+}
+}
+
+if (tabId === 'jogos') renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+if (tabId === 'elenco') renderizarElenco();
+if (tabId === 'relatorio') atualizarRelatorio();
+if (tabId === 'pagamentos') carregarListaBaixaConvocados();
+if (tabId === 'sorteio') carregarSelectSorteio();
+if (tabId === 'cronometro') {
+renderizarHistoricoPartidas();
+renderizarPainelArtilharia();
+atualizarDisplayTempo();
+var gV = document.getElementById('golsVermelho');
+var gA = document.getElementById('golsAzul');
+var dispAc = document.getElementById('displayAcrescimo');
+var labelP = document.getElementById('labelPeriodo');
+if (gV) gV.innerText = golsVermelho;
+if (gA) gA.innerText = golsAzul;
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+if (labelP) labelP.innerText = periodoAtual + 'º Tempo (30 min)';
+}
+if (tabId === 'ranking') {
+renderizarRankingArtilheiros();
+}
+}
+
+function obterClasseNivel(nivel) {
+if (nivel === 'ouro') return 'tag-ouro';
+if (nivel === 'prata') return 'tag-prata';
+if (nivel === 'bronze') return 'tag-bronze';
+if (nivel === 'goleiro-ouro') return 'tag-goleiro-ouro';
+return 'tag-goleiro-prata';
+}
+
+function ehGoleiro(pObj) {
+if (!pObj || typeof pObj === 'string') return false;
+var niv = (pObj.nivel || '').toLowerCase();
+return niv === 'goleiro-ouro' || niv === 'goleiro-prata' || niv.indexOf('goleiro') !== -1;
+}
+
+function renderizarTags(container, arrayLista, eEdicao) {
+if (!container) return;
+container.innerHTML = '';
+if (!eEdicao) {
+var contador = document.getElementById('contadorTemp');
+if (contador) contador.textContent = arrayLista.length;
+}
+
+for (var i = 0; i < arrayLista.length; i++) {
+(function(index) {
+var p = arrayLista[index];
+var nivel = p.nivel || 'prata';
+var status = p.status || 'marechal';
+
+var tag = document.createElement('div');
+tag.className = 'player-tag ' + obterClasseNivel(nivel);
+
+var span = document.createElement('span');
+span.textContent = p.nome + ' (' + nivel.replace('-', ' ').toUpperCase() + ' - ' + status.toUpperCase() + ')';
+
+var tagContainer = container;
+var btn = document.createElement('button');
+btn.className = 'player-tag-btn';
+btn.textContent = '×';
+btn.onclick = function() {
+arrayLista.splice(index, 1);
+renderizarTags(tagContainer, arrayLista, eEdicao);
+if (eEdicao) {
+renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
+} else {
+renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+}
+};
+
+tag.appendChild(span);
+if (ehAdmin) {
+tag.appendChild(btn);
+}
+tagContainer.appendChild(tag);
+})(i);
+}
+}
+
+function renderizarSelecaoElenco(containerId, listaDestino, inputBuscaId, eEdicao) {
+var container = document.getElementById(containerId);
+var inputBusca = document.getElementById(inputBuscaId);
+if (!container) return;
+
+var termo = inputBusca ? inputBusca.value.trim().toLowerCase() : '';
+container.innerHTML = '';
+
+if (jogadoresElenco.length === 0) {
+container.innerHTML = '<small style="color:#64748b;">Nenhum jogador cadastrado na aba Elenco.</small>';
+return;
+}
+
+var ordenados = jogadoresElenco.slice().sort(function(a, b) {
+return a.nome.localeCompare(b.nome);
+});
+
+var exibidos = 0;
+for (var i = 0; i < ordenados.length; i++) {
+(function(jogador) {
+if (termo && jogador.nome.toLowerCase().indexOf(termo) === -1) return;
+exibidos++;
+
+var jaSelecionado = listaDestino.some(function(item) {
+return item.nome.toLowerCase() === jogador.nome.toLowerCase();
+});
+
+var chip = document.createElement('div');
+chip.className = 'elenco-chip ' + obterClasseNivel(jogador.nivel) + (jaSelecionado ? ' selecionado' : '');
+chip.textContent = '+ ' + jogador.nome;
+chip.onclick = function() {
+if (ehAdmin && !jaSelecionado) {
+listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal' });
+var tagContainer = eEdicao
+? document.getElementById('containerEditJogadores')
+: document.getElementById('containerJogadoresTemporarios');
+renderizarTags(tagContainer, listaDestino, eEdicao);
+renderizarSelecaoElenco(containerId, listaDestino, inputBuscaId, eEdicao);
+}
+};
+container.appendChild(chip);
+})(ordenados[i]);
+}
+
+if (exibidos === 0) {
+container.innerHTML = '<small style="color:#64748b;">Nenhum jogador encontrado com esse nome.</small>';
+}
+}
+
+function renderizarElenco() {
+var container = document.getElementById('listaElencoCadastrado');
+var countEl = document.getElementById('totalElencoCount');
+var filtroEl = document.getElementById('filtroListaElenco');
+if (!container) return;
+
+var termo = filtroEl ? filtroEl.value.trim().toLowerCase() : '';
+if (countEl) countEl.textContent = jogadoresElenco.length;
+container.innerHTML = '';
+
+if (jogadoresElenco.length === 0) {
+container.innerHTML = '<i>Nenhum jogador cadastrado no banco de dados ainda.</i>';
+return;
+}
+
+var ordenados = jogadoresElenco.slice().sort(function(a, b) {
+return a.nome.localeCompare(b.nome);
+});
+
+for (var i = 0; i < ordenados.length; i++) {
+(function(p) {
+if (termo && p.nome.toLowerCase().indexOf(termo) === -1) return;
+
+var st = p.status || 'marechal';
+var statusBadgeClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
+var statusBadgeText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
+
+var item = document.createElement('div');
+item.className = 'list-item';
+
+var info = document.createElement('div');
+info.style.display = 'flex';
+info.style.alignItems = 'center';
+info.style.gap = '8px';
+info.innerHTML =
+'<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>' +
+'<b>' + p.nome + '</b>' +
+'<span class="badge-status ' + statusBadgeClass + '">' + statusBadgeText + '</span>';
+
+var itemEl = item;
+var actions = document.createElement('div');
+actions.style.display = 'flex';
+actions.style.gap = '5px';
+
+var selectNivel = document.createElement('select');
+selectNivel.style.padding = '4px';
+selectNivel.style.fontSize = '0.8rem';
+selectNivel.style.width = 'auto';
+selectNivel.disabled = !ehAdmin;
+selectNivel.innerHTML =
+'<option value="ouro"' + (p.nivel === 'ouro' ? ' selected' : '') + '>Ouro</option>' +
+'<option value="prata"' + (p.nivel === 'prata' ? ' selected' : '') + '>Prata</option>' +
+'<option value="bronze"' + (p.nivel === 'bronze' ? ' selected' : '') + '>Bronze</option>' +
+'<option value="goleiro-ouro"' + (p.nivel === 'goleiro-ouro' ? ' selected' : '') + '>Gol. Ouro</option>' +
+'<option value="goleiro-prata"' + (p.nivel === 'goleiro-prata' ? ' selected' : '') + '>Gol. Prata</option>';
+
+selectNivel.onchange = function() {
+if (!ehAdmin) return;
+for (var idx = 0; idx < jogadoresElenco.length; idx++) {
+if (jogadoresElenco[idx].id === p.id) {
+jogadoresElenco[idx].nivel = this.value;
+break;
+}
+}
+salvarTudo();
+renderizarElenco();
+};
+
+var selectStatus = document.createElement('select');
+selectStatus.style.padding = '4px';
+selectStatus.style.fontSize = '0.8rem';
+selectStatus.style.width = 'auto';
+selectStatus.disabled = !ehAdmin;
+selectStatus.innerHTML =
+'<option value="marechal"' + (st === 'marechal' ? ' selected' : '') + '>Marechal</option>' +
+'<option value="intermediario"' + (st === 'intermediario' ? ' selected' : '') + '>Intermediário</option>' +
+'<option value="recruta"' + (st === 'recruta' ? ' selected' : '') + '>Recruta</option>';
+
+selectStatus.onchange = function() {
+if (!ehAdmin) return;
+for (var idx = 0; idx < jogadoresElenco.length; idx++) {
+if (jogadoresElenco[idx].id === p.id) {
+jogadoresElenco[idx].status = this.value;
+break;
+}
+}
+salvarTudo();
+renderizarElenco();
+};
+
+var btnDel = document.createElement('button');
+btnDel.className = 'delete-btn';
+btnDel.textContent = 'X';
+btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
+btnDel.onclick = function() {
+if (!ehAdmin) return;
+if (!confirm('Remover ' + p.nome + ' do elenco?')) return;
+jogadoresElenco = jogadoresElenco.filter(function(item) { return item.id !== p.id; });
+salvarTudo();
+renderizarElenco();
+};
+
+actions.appendChild(selectNivel);
+actions.appendChild(selectStatus);
+actions.appendChild(btnDel);
+itemEl.appendChild(info);
+itemEl.appendChild(actions);
+container.appendChild(itemEl);
+})(ordenados[i]);
+}
+}
+
+function calcularSaldo() {
+var ent = 0, sai = 0;
+for (var i = 0; i < transacoes.length; i++) {
+if (transacoes[i].tipo === 'pagamento') ent += Number(transacoes[i].valor);
+if (transacoes[i].tipo === 'saida') sai += Number(transacoes[i].valor);
+}
+return ent - sai;
+}
+
+function carregarSelectSorteio() {
+var sel = document.getElementById('selectJogoSorteio');
+if (!sel) return;
+var valAntigo = sel.value;
+sel.innerHTML = '<option value="">Selecione um jogo...</option>';
+for (var i = 0; i < jogos.length; i++) {
+var opt = document.createElement('option');
+opt.value = jogos[i].id;
+opt.textContent = jogos[i].nome + ' (' + jogos[i].data + ')';
+sel.appendChild(opt);
+}
+sel.value = valAntigo;
+}
+
+function renderizar() {
+var selPag = document.getElementById('selectJogoPagamento');
+var selSai = document.getElementById('selectJogoSaida');
+
+var valPag = selPag ? selPag.value : '';
+var valSai = selSai ? selSai.value : '';
+
+if (selPag) {
+selPag.innerHTML = '<option value="">Selecione um jogo...</option>';
+for (var i = 0; i < jogos.length; i++) {
+var opt1 = document.createElement('option');
+opt1.value = jogos[i].id;
+opt1.textContent = jogos[i].nome + ' (' + jogos[i].data + ')';
+selPag.appendChild(opt1);
+}
+selPag.value = valPag;
+}
+
+if (selSai) {
+selSai.innerHTML = '<option value="">Geral</option>';
+for (var i = 0; i < jogos.length; i++) {
+var opt2 = document.createElement('option');
+opt2.value = jogos[i].id;
+opt2.textContent = jogos[i].nome + ' (' + jogos[i].data + ')';
+selSai.appendChild(opt2);
+}
+selSai.value = valSai;
+}
+
+var saldoAtual = calcularSaldo();
+var saldoGEl = document.getElementById('saldoGeral');
+if (saldoGEl) saldoGEl.innerText = formatarMoeda(saldoAtual);
+
+var listaJogos = document.getElementById('listaJogos');
+if (listaJogos) {
+listaJogos.innerHTML = '';
+var jogosOrdenados = jogos.slice().sort(function(a,b) { return new Date(b.data) - new Date(a.data); });
+
+for (var j = 0; j < jogosOrdenados.length; j++) {
+(function(jogo) {
+var item = document.createElement('div');
+item.className = 'list-item';
+
+var info = document.createElement('div');
+info.innerHTML = '<b>' + jogo.nome + '</b><br><small style="color:#64748b;">' + jogo.data + ' - ' + (jogo.convocados ? jogo.convocados.length : 0) + ' convocados</small>';
+
+var btns = document.createElement('div');
+
+var btnEdit = document.createElement('button');
+btnEdit.className = 'edit-btn';
+btnEdit.textContent = 'Editar';
+btnEdit.style.display = ehAdmin ? 'inline-block' : 'none';
+btnEdit.onclick = function() { if (ehAdmin) abrirModalEditar(jogo.id); };
+
+var btnDel = document.createElement('button');
+btnDel.className = 'delete-btn';
+btnDel.textContent = 'X';
+btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
+btnDel.onclick = function() { if (ehAdmin) excluirJogo(jogo.id); };
+
+btns.appendChild(btnEdit);
+btns.appendChild(btnDel);
+item.appendChild(info);
+item.appendChild(btns);
+listaJogos.appendChild(item);
+})(jogosOrdenados[j]);
+}
+}
+
+var listaPag = document.getElementById('listaPagamentos');
+var listaSai = document.getElementById('listaSaidas');
+if (listaPag) listaPag.innerHTML = '';
+if (listaSai) listaSai.innerHTML = '';
+
+var tInvertidas = transacoes.slice().reverse();
+for (var k = 0; k < tInvertidas.length; k++) {
+(function(t) {
+var item = document.createElement('div');
+item.className = 'list-item';
+
+var jogo = null;
+for (var x = 0; x < jogos.length; x++) {
+if (jogos[x].id == t.jogoId) { jogo = jogos[x]; break; }
+}
+
+var tagJogo = jogo ? '<br><small style="color:#64748b;">⚽ ' + jogo.nome + '</small>' : '';
+
+var desc = document.createElement('div');
+desc.innerHTML = t.desc + tagJogo;
+
+var right = document.createElement('div');
+var span = document.createElement('span');
+span.className = t.tipo === 'saida' ? 'negative' : 'positive';
+span.textContent = (t.tipo === 'saida' ? '- ' : '+ ') + formatarMoeda(t.valor);
+
+var btnDel = document.createElement('button');
+btnDel.className = 'delete-btn';
+btnDel.style.padding = '2px 6px';
+btnDel.style.marginLeft = '8px';
+btnDel.textContent = 'X';
+btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
+btnDel.onclick = function() { if (ehAdmin) excluirTransacao(t.id); };
+
+right.appendChild(span);
+right.appendChild(btnDel);
+item.appendChild(desc);
+item.appendChild(right);
+
+if (t.tipo === 'pagamento' && listaPag) listaPag.appendChild(item);
+if (t.tipo === 'saida' && listaSai) listaSai.appendChild(item);
+})(tInvertidas[k]);
+}
+
+var listaMetas = document.getElementById('listaMetas');
+if (listaMetas) {
+listaMetas.innerHTML = '';
+for (var m = 0; m < metas.length; m++) {
+(function(meta) {
+var pct = Math.min(100, Math.max(0, (saldoAtual / meta.valor) * 100)).toFixed(0);
+var box = document.createElement('div');
+box.style.cssText = 'background:white; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #e2e8f0;';
+
+var btnDelDisplay = ehAdmin ? '<button class="delete-btn" id="del-m-' + meta.id + '">X</button>' : '';
+
+box.innerHTML =
+'<div style="display:flex; justify-content:space-between; align-items:center;">' +
+'<b>' + meta.nome + '</b>' +
+btnDelDisplay +
+'</div>' +
+'<div style="margin-top:5px; font-size:0.9rem; color:#64748b;">' +
+'Alvo: ' + formatarMoeda(meta.valor) + ' | Progresso: <b style="color:var(--primary-navy);">' + pct + '%</b>' +
+'</div>' +
+'<div class="progress-bg"><div class="progress-bar" style="width:' + pct + '%;"></div></div>';
+
+listaMetas.appendChild(box);
+if (ehAdmin) {
+var delBtnMeta = document.getElementById('del-m-' + meta.id);
+if (delBtnMeta) {
+delBtnMeta.onclick = function() { excluirMeta(meta.id); };
+}
+}
+})(metas[m]);
+}
+}
+
+renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+}
+
+function carregarListaBaixaConvocados() {
+var selPag = document.getElementById('selectJogoPagamento');
+if (!selPag) return;
+var jogoId = selPag.value;
+var area = document.getElementById('areaConvocados');
+var lista = document.getElementById('listaConvocadosBaixa');
+
+if (!jogoId) {
+if (area) area.style.display = 'none';
+return;
+}
+
+var jogo = null;
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == jogoId) { jogo = jogos[i]; break; }
+}
+
+if (!jogo || !jogo.convocados || jogo.convocados.length === 0) {
+if (area) area.style.display = 'block';
+if (lista) lista.innerHTML = '<i>Nenhum convocado cadastrado para este jogo.</i>';
+return;
+}
+
+if (area) area.style.display = 'block';
+if (lista) lista.innerHTML = '';
+
+for (var j = 0; j < jogo.convocados.length; j++) {
+(function(pObj) {
+var nome = typeof pObj === 'string' ? pObj : pObj.nome;
+var isGol = ehGoleiro(pObj);
+
+if (!isGol) {
+for (var idxEl = 0; idxEl < jogadoresElenco.length; idxEl++) {
+if (jogadoresElenco[idxEl].nome.toLowerCase() === nome.toLowerCase() && ehGoleiro(jogadoresElenco[idxEl])) {
+isGol = true;
+break;
+}
+}
+}
+
+var jaPago = false;
+for (var k = 0; k < transacoes.length; k++) {
+if (transacoes[k].jogoId == jogoId && transacoes[k].tipo === 'pagamento' && transacoes[k].jogador === nome) {
+jaPago = true;
+break;
+}
+}
+
+var item = document.createElement('div');
+item.className = 'call-item';
+
+var span = document.createElement('span');
+span.innerHTML = '<b>' + nome + '</b>' + (isGol ? ' <small style="color:#6b21a8;">(🧤 Goleiro)</small>' : '');
+item.appendChild(span);
+
+if (isGol) {
+var badgeExempt = document.createElement('span');
+badgeExempt.className = 'badge-exempt';
+badgeExempt.textContent = '🧤 Isento';
+item.appendChild(badgeExempt);
+} else if (jaPago) {
+var badge = document.createElement('span');
+badge.className = 'badge-paid';
+badge.textContent = '✓ Pago';
+item.appendChild(badge);
+} else if (ehAdmin) {
+var btn = document.createElement('button');
+btn.className = 'pay-btn';
+btn.textContent = 'Dar Baixa (R$ 10)';
+btn.onclick = function() {
+if (!ehAdmin) return;
+transacoes.push({
+id: Date.now(),
+tipo: 'pagamento',
+desc: 'Pagamento: ' + nome,
+valor: 10.00,
+jogoId: jogoId,
+jogador: nome
+});
+salvarTudo();
+carregarListaBaixaConvocados();
+};
+item.appendChild(btn);
+} else {
+var lblPend = document.createElement('span');
+lblPend.style.cssText = 'color:#dc2626; font-size:0.85rem; font-weight:bold;';
+lblPend.textContent = 'Pendente';
+item.appendChild(lblPend);
+}
+
+if (lista) lista.appendChild(item);
+})(jogo.convocados[j]);
+}
+}
+
+function abrirModalEditar(id) {
+if (!ehAdmin) return;
+var jogo = null;
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == id) { jogo = jogos[i]; break; }
+}
+if (!jogo) return;
+
+var editJogoId = document.getElementById('editJogoId');
+if (editJogoId) editJogoId.value = id;
+
+edicaoJogadores = (jogo.convocados || []).map(function(p) {
+return typeof p === 'string' ? { nome: p, nivel: 'prata', status: 'marechal' } : Object.assign({}, p);
+});
+
+var buscaEdit = document.getElementById('buscaElencoEdit');
+if (buscaEdit) buscaEdit.value = '';
+
+renderizarTags(document.getElementById('containerEditJogadores'), edicaoJogadores, true);
+renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
+
+var modal = document.getElementById('modalEditarLista');
+if (modal) modal.style.display = 'flex';
+}
+
+function excluirJogo(id) {
+if (!ehAdmin) return;
+if (!confirm('Deseja excluir este jogo?')) return;
+jogos = jogos.filter(function(j) { return j.id != id; });
+salvarTudo();
+carregarSelectSorteio();
+}
+
+function excluirTransacao(id) {
+if (!ehAdmin) return;
+transacoes = transacoes.filter(function(t) { return t.id != id; });
+salvarTudo();
+carregarListaBaixaConvocados();
+}
+
+function excluirMeta(id) {
+if (!ehAdmin) return;
+metas = metas.filter(function(m) { return m.id != id; });
+salvarTudo();
+}
+
+function atualizarRelatorio() {
+var ent = 0, sai = 0;
+var htmlSaidas = '';
+var txtSaidas = '';
+
+for (var i = 0; i < transacoes.length; i++) {
+var t = transacoes[i];
+if (t.tipo === 'pagamento') ent += Number(t.valor);
+if (t.tipo === 'saida') {
+var v = Number(t.valor);
+sai += v;
+htmlSaidas += '<div class="expense-detail"><span>' + t.desc + '</span><b>-' + formatarMoeda(v) + '</b></div>';
+txtSaidas += '\n- ' + t.desc + ': -' + formatarMoeda(v);
+}
+}
+
+var saldo = ent - sai;
+var resEnt = document.getElementById('resumoEntradas');
+var resSai = document.getElementById('resumoSaidas');
+var listDet = document.getElementById('listaDetalheSaidas');
+var resSal = document.getElementById('resumoSaldo');
+var btnWpp = document.getElementById('btnWpp');
+
+if (resEnt) resEnt.innerText = formatarMoeda(ent);
+if (resSai) resSai.innerText = formatarMoeda(sai);
+if (listDet) listDet.innerHTML = htmlSaidas || 'Nenhuma saída registrada.';
+if (resSal) resSal.innerText = formatarMoeda(saldo);
+
+var texto = 'RELATÓRIO FINANCEIRO - IMPÉRIO REAL FC\n\nTotal Arrecadado: ' + formatarMoeda(ent) + '\nSaídas:' + (txtSaidas || '\nNenhuma') + '\n\nTotal Saídas: ' + formatarMoeda(sai) + '\nSaldo Atual: ' + formatarMoeda(saldo);
+if (btnWpp) btnWpp.href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+}
+
+function atualizarDisplayTempo() {
+var min = Math.floor(tempoRestante / 60);
+var seg = tempoRestante % 60;
+var disp = document.getElementById('displayTempo');
+if (disp) {
+disp.innerText = (min < 10 ? '0' : '') + min + ':' + (seg < 10 ? '0' : '') + seg;
+}
+}
+
+function renderizarHistoricoPartidas() {
+var container = document.getElementById('listaHistoricoPartidas');
+if (!container) return;
+container.innerHTML = '';
+
+if (partidasHistorico.length === 0) {
+container.innerHTML = '<i>Nenhuma partida salva no histórico ainda.</i>';
+return;
+}
+
+var historicoInvertido = partidasHistorico.slice().reverse();
+for (var i = 0; i < historicoInvertido.length; i++) {
+(function(p) {
+var item = document.createElement('div');
+item.className = 'list-item';
+
+var textoArtilheiros = '';
+if (p.artilharia && Object.keys(p.artilharia).length > 0) {
+textoArtilheiros = '<br><small style="color:var(--secondary-navy);">⚽ Gols: ';
+var partes = [];
+for (var jog in p.artilharia) {
+if (p.artilharia[jog] > 0) partes.push(jog + ' (' + p.artilharia[jog] + ')');
+}
+textoArtilheiros += partes.join(', ') + '</small>';
+}
+
+var btnsAdminPart = ehAdmin ? 
+'<div style="display:flex; gap:5px;">' +
+'<button class="edit-btn" id="edit-part-' + p.id + '">Editar</button>' +
+'<button class="delete-btn" id="del-part-' + p.id + '">X</button>' +
+'</div>' : '';
+
+item.innerHTML =
+'<div>' +
+'<b>🔴 Vermelho ' + p.golsVermelho + ' x ' + p.golsAzul + ' Azul 🔵</b>' +
+textoArtilheiros + '<br>' +
+'<small style="color:#64748b;">📅 ' + p.data + '</small>' +
+'</div>' +
+btnsAdminPart;
+container.appendChild(item);
+
+if (ehAdmin) {
+var btnEditP = document.getElementById('edit-part-' + p.id);
+if (btnEditP) {
+btnEditP.onclick = function() { abrirModalEditarPartida(p.id); };
+}
+
+var btnDelP = document.getElementById('del-part-' + p.id);
+if (btnDelP) {
+btnDelP.onclick = function() { excluirPartida(p.id); };
+}
+}
+})(historicoInvertido[i]);
+}
+}
+
+function abrirModalEditarPartida(id) {
+if (!ehAdmin) return;
+var partida = null;
+for (var i = 0; i < partidasHistorico.length; i++) {
+if (partidasHistorico[i].id == id) { partida = partidasHistorico[i]; break; }
+}
+if (!partida) return;
+
+document.getElementById('editPartId').value = id;
+document.getElementById('editPartGolsV').value = partida.golsVermelho;
+document.getElementById('editPartGolsA').value = partida.golsAzul;
+document.getElementById('editPartData').value = partida.data;
+
+var containerArt = document.getElementById('containerEditArtilhariaHist');
+containerArt.innerHTML = '';
+
+var jogadoresDisponiveis = {};
+for (var i = 0; i < jogadoresElenco.length; i++) {
+jogadoresDisponiveis[jogadoresElenco[i].nome] = 0;
+}
+if (partida.artilharia) {
+for (var j in partida.artilharia) {
+jogadoresDisponiveis[j] = partida.artilharia[j];
+}
+}
+
+for (var jog in jogadoresDisponiveis) {
+(function(nomeJog, qtdAtual) {
+var row = document.createElement('div');
+row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid #e2e8f0;';
+
+var label = document.createElement('span');
+label.innerHTML = '<b>' + nomeJog + '</b>';
+
+var inputGols = document.createElement('input');
+inputGols.type = 'number';
+inputGols.min = '0';
+inputGols.value = qtdAtual;
+inputGols.style.cssText = 'width:70px; padding:6px; text-align:center; font-weight:bold;';
+inputGols.setAttribute('data-jogador', nomeJog);
+
+row.appendChild(label);
+row.appendChild(inputGols);
+containerArt.appendChild(row);
+})(jog, jogadoresDisponiveis[jog]);
+}
+
+var modal = document.getElementById('modalEditarPartidaHist');
+if (modal) modal.style.display = 'flex';
+}
+
+function excluirPartida(id) {
+if (!ehAdmin) return;
+if (!confirm('Deseja excluir esta partida do histórico?')) return;
+partidasHistorico = partidasHistorico.filter(function(p) { return p.id != id; });
+salvarTudo();
+renderizarHistoricoPartidas();
+renderizarRankingArtilheiros();
+}
+
+function renderizarRankingArtilheiros() {
+var container = document.getElementById('listaRankingArtilheiros');
+if (!container) return;
+
+var contagemGols = {};
+for (var i = 0; i < partidasHistorico.length; i++) {
+var art = partidasHistorico[i].artilharia || {};
+for (var jog in art) {
+if (art[jog] > 0) {
+contagemGols[jog] = (contagemGols[jog] || 0) + art[jog];
+}
+}
+}
+
+var rankingArray = [];
+for (var jog in contagemGols) {
+rankingArray.push({ nome: jog, gols: contagemGols[jog] });
+}
+
+rankingArray.sort(function(a, b) {
+return b.gols - a.gols;
+});
+
+if (rankingArray.length === 0) {
+container.innerHTML = '<i>Nenhum gol registrado nas partidas salvas ainda.</i>';
+return;
+}
+
+container.innerHTML = '';
+for (var i = 0; i < rankingArray.length; i++) {
+var item = rankingArray[i];
+var posicao = i + 1;
+var iconePos = posicao === 1 ? '🥇' : (posicao === 2 ? '🥈' : (posicao === 3 ? '🥉' : '⚽'));
+
+var div = document.createElement('div');
+div.className = 'list-item';
+div.innerHTML =
+'<div style="display:flex; align-items:center; gap:10px;">' +
+'<span style="font-size:1.2rem; font-weight:bold; min-width:30px;">' + iconePos + ' #' + posicao + '</span>' +
+'<b>' + item.nome + '</b>' +
+'</div>' +
+'<span style="font-weight:bold; color:var(--primary-navy); font-size:1.1rem;">' + item.gols + ' gol' + (item.gols > 1 ? 's' : '') + '</span>';
+container.appendChild(div);
+}
+}
+
+function renderizarPainelArtilharia() {
+var container = document.getElementById('painelArtilhariaRapida');
+if (!container) return;
+
+var listaJogadoresPainel = [];
+var selSorteio = document.getElementById('selectJogoSorteio');
+var jogoId = selSorteio ? selSorteio.value : '';
+
+if (jogoId) {
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == jogoId && jogos[i].convocados) {
+listaJogadoresPainel = jogos[i].convocados;
+break;
+}
+}
+}
+
+if (listaJogadoresPainel.length === 0) {
+listaJogadoresPainel = jogadoresElenco;
+}
+
+if (listaJogadoresPainel.length === 0) {
+container.innerHTML = '<i>Nenhum jogador disponível. Selecione um jogo na aba Sorteio ou cadastre no Elenco.</i>';
+return;
+}
+
+container.innerHTML = '';
+for (var i = 0; i < listaJogadoresPainel.length; i++) {
+(function(p) {
+var nome = typeof p === 'string' ? p : p.nome;
+if (artilhariaAtual[nome] === undefined) {
+artilhariaAtual[nome] = 0;
+}
+
+var row = document.createElement('div');
+row.className = 'artilheiro-item';
+
+var label = document.createElement('span');
+label.innerHTML = '<b>' + nome + '</b>';
+
+var contDiv = document.createElement('div');
+contDiv.style.display = 'flex';
+contDiv.style.alignItems = 'center';
+contDiv.style.gap = '8px';
+
+var scoreSpan = document.createElement('span');
+scoreSpan.style.fontWeight = 'bold';
+scoreSpan.style.color = 'var(--primary-navy)';
+scoreSpan.style.minWidth = '25px';
+scoreSpan.style.textAlign = 'center';
+scoreSpan.textContent = artilhariaAtual[nome];
+
+var btnMenos = document.createElement('button');
+btnMenos.style.cssText = 'padding:4px 8px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
+btnMenos.textContent = '-';
+btnMenos.onclick = function() {
+if (!ehAdmin) return;
+if (artilhariaAtual[nome] > 0) {
+artilhariaAtual[nome]--;
+scoreSpan.textContent = artilhariaAtual[nome];
+salvarEstadoPartida();
+}
+};
+
+var btnMais = document.createElement('button');
+btnMais.style.cssText = 'padding:4px 8px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
+btnMais.textContent = '+1 Gol';
+btnMais.onclick = function() {
+if (!ehAdmin) return;
+artilhariaAtual[nome]++;
+scoreSpan.textContent = artilhariaAtual[nome];
+salvarEstadoPartida();
+};
+
+if (ehAdmin) {
+contDiv.appendChild(btnMenos);
+}
+contDiv.appendChild(scoreSpan);
+if (ehAdmin) {
+contDiv.appendChild(btnMais);
+}
+
+row.appendChild(label);
+row.appendChild(contDiv);
+container.appendChild(row);
+})(listaJogadoresPainel[i]);
+}
+}
+
+window.onload = function() {
+var tabBtns = document.querySelectorAll('.tab-btn');
+for (var i = 0; i < tabBtns.length; i++) {
+tabBtns[i].onclick = function() {
+switchTab(this.getAttribute('data-tab'));
+};
+}
+
+var dispTempo = document.getElementById('displayTempo');
+if (dispTempo) {
+dispTempo.onclick = function() {
+if (!ehAdmin) return;
+var atualMin = Math.floor(tempoRestante / 60);
+var novoMin = prompt('Digite o novo tempo em minutos para o cronômetro:', atualMin);
+if (novoMin !== null && !isNaN(novoMin) && novoMin.trim() !== '') {
+tempoRestante = parseInt(novoMin, 10) * 60;
+atualizarDisplayTempo();
+salvarEstadoPartida();
+alert('Tempo atualizado para ' + novoMin + ' minutos!');
+}
+};
+}
+
+var btnExpTxt = document.getElementById('btnExportarPagamentosTxt');
+if (btnExpTxt) {
+btnExpTxt.onclick = function() {
+var pagamentosApenas = [];
+for (var i = 0; i < transacoes.length; i++) {
+if (transacoes[i].tipo === 'pagamento') {
+var nomeJog = transacoes[i].jogador || transacoes[i].desc.replace('Pagamento: ', '');
+pagamentosApenas.push(nomeJog + ' - R$ ' + Number(transacoes[i].valor).toFixed(2).replace('.', ','));
+}
+}
+
+if (pagamentosApenas.length === 0) {
+alert('Nenhum pagamento registrado para exportar.');
+return;
+}
+
+var textoTxt = "=== LISTA DE PAGAMENTOS - IMPÉRIO REAL FC ===\n\n" + pagamentosApenas.join('\n');
+var dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(textoTxt);
+var downloadAnchor = document.createElement('a');
+downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("download", "lista_pagamentos_" + new Date().toLocaleDateString('pt-BR').replace(/\//g, '-') + ".txt");
+document.body.appendChild(downloadAnchor);
+downloadAnchor.click();
+downloadAnchor.remove();
+alert('Lista exportada com sucesso!');
+};
+}
+
+var btnExp = document.getElementById('btnExportarBackup');
+if (btnExp) {
+btnExp.onclick = function() {
+if (!ehAdmin) return;
+var dadosBackup = {
+jogos: jogos,
+jogadoresElenco: jogadoresElenco,
+transacoes: transacoes,
+metas: metas,
+partidasHistorico: partidasHistorico,
+versao: "1.0"
+};
+var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosBackup));
+var downloadAnchor = document.createElement('a');
+downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("download", "imperio_real_backup_" + new Date().toLocaleDateString('pt-BR').replace(/\//g, '-') + ".json");
+document.body.appendChild(downloadAnchor);
+downloadAnchor.click();
+downloadAnchor.remove();
+alert('Backup exportado com sucesso!');
+};
+}
+
+var btnImp = document.getElementById('btnImportarBackup');
+if (btnImp) {
+btnImp.onclick = function() {
+if (!ehAdmin) return;
+var fileInput = document.getElementById('inputFileBackup');
+if (fileInput) fileInput.click();
+};
+}
+
+var inputFile = document.getElementById('inputFileBackup');
+if (inputFile) {
+inputFile.onchange = function(e) {
+if (!ehAdmin) return;
+var file = e.target.files[0];
+if (!file) return;
+var reader = new FileReader();
+reader.onload = function(evt) {
+try {
+var importado = JSON.parse(evt.target.result);
+if (importado && (importado.jogos || importado.jogadoresElenco || importado.elenco || importado.transacoes)) {
+jogos = importado.jogos || [];
+jogadoresElenco = importado.jogadoresElenco || importado.elenco || [];
+transacoes = importado.transacoes || [];
+metas = importado.metas || [];
+partidasHistorico = importado.partidasHistorico || importado.partidas || [];
+salvarTudo();
+renderizarElenco();
+carregarSelectSorteio();
+renderizarHistoricoPartidas();
+renderizarPainelArtilharia();
+renderizarRankingArtilheiros();
+alert('Backup restaurado com sucesso!');
+} else {
+alert('Arquivo de backup inválido.');
+}
+} catch (err) {
+alert('Erro ao ler o arquivo de backup.');
+}
+};
+reader.readAsText(file);
+};
+}
+
+var buscaElNovo = document.getElementById('buscaElencoNovo');
+if (buscaElNovo) {
+buscaElNovo.oninput = function() {
+renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+};
+}
+
+var buscaElEdit = document.getElementById('buscaElencoEdit');
+if (buscaElEdit) {
+buscaElEdit.oninput = function() {
+renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
+};
+}
+
+var filtroEl = document.getElementById('filtroListaElenco');
+if (filtroEl) {
+filtroEl.oninput = function() {
+renderizarElenco();
+};
+}
+
+var btnSalvarEl = document.getElementById('btnSalvarElenco');
+if (btnSalvarEl) {
+btnSalvarEl.onclick = function() {
+if (!ehAdmin) return;
+var inputNome = document.getElementById('elencoNome');
+var selNivel = document.getElementById('elencoNivel');
+var selStatus = document.getElementById('elencoStatus');
+var nome = inputNome ? inputNome.value.trim() : '';
+
+if (!nome) {
+alert('Digite o nome do jogador.');
+return;
+}
+
+var jaExiste = jogadoresElenco.some(function(p) {
+return p.nome.toLowerCase() === nome.toLowerCase();
+});
+
+if (jaExiste) {
+alert('Este jogador já está cadastrado no elenco.');
+return;
+}
+
+jogadoresElenco.push({
+id: Date.now(),
+nome: nome,
+nivel: selNivel ? selNivel.value : 'prata',
+status: selStatus ? selStatus.value : 'marechal'
+});
+
+if (inputNome) inputNome.value = '';
+salvarTudo();
+renderizarElenco();
+};
+}
+
+var btnAddTemp = document.getElementById('btnAddJogadorTemporario');
+if (btnAddTemp) {
+btnAddTemp.onclick = function() {
+if (!ehAdmin) return;
+var input = document.getElementById('inputNomeJogador');
+var nivelSel = document.getElementById('inputNivelJogador');
+var statusSel = document.getElementById('inputStatusJogador');
+var nome = input ? input.value.trim() : '';
+if (nome) {
+temporarioJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal' });
+if (input) input.value = '';
+renderizarTags(document.getElementById('containerJogadoresTemporarios'), temporarioJogadores, false);
+renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+}
+};
+}
+
+var btnEditAdd = document.getElementById('btnEditAddJogador');
+if (btnEditAdd) {
+btnEditAdd.onclick = function() {
+if (!ehAdmin) return;
+var input = document.getElementById('editInputNomeJogador');
+var nivelSel = document.getElementById('editNivelJogador');
+var statusSel = document.getElementById('editStatusJogador');
+var nome = input ? input.value.trim() : '';
+if (nome) {
+edicaoJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal' });
+if (input) input.value = '';
+renderizarTags(document.getElementById('containerEditJogadores'), edicaoJogadores, true);
+renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
+}
+};
+}
+
+var btnSalvarJ = document.getElementById('btnSalvarJogo');
+if (btnSalvarJ) {
+btnSalvarJ.onclick = function() {
+if (!ehAdmin) return;
+var nomeInput = document.getElementById('nomeJogo');
+var dataInput = document.getElementById('dataJogo');
+var nome = nomeInput ? nomeInput.value.trim() : '';
+var data = dataInput ? dataInput.value : '';
+
+if (!nome || !data) {
+alert('Preencha o nome do jogo e a data.');
+return;
+}
+
+jogos.push({
+id: Date.now(),
+nome: nome,
+data: data,
+convocados: temporarioJogadores.slice()
+});
+
+if (nomeInput) nomeInput.value = '';
+if (dataInput) dataInput.value = '';
+var buscaNovo = document.getElementById('buscaElencoNovo');
+if (buscaNovo) buscaNovo.value = '';
+
+temporarioJogadores = [];
+renderizarTags(document.getElementById('containerJogadoresTemporarios'), temporarioJogadores, false);
+salvarTudo();
+carregarSelectSorteio();
+};
+}
+
+var btnSalvarEd = document.getElementById('btnSalvarEdicaoLista');
+if (btnSalvarEd) {
+btnSalvarEd.onclick = function() {
+if (!ehAdmin) return;
+var editId = document.getElementById('editJogoId');
+var id = editId ? editId.value : '';
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == id) {
+jogos[i].convocados = edicaoJogadores.slice();
+break;
+}
+}
+salvarTudo();
+var modal = document.getElementById('modalEditarLista');
+if (modal) modal.style.display = 'none';
+carregarListaBaixaConvocados();
+};
+}
+
+var btnFecharM = document.getElementById('btnFecharModal');
+if (btnFecharM) {
+btnFecharM.onclick = function() {
+var modal = document.getElementById('modalEditarLista');
+if (modal) modal.style.display = 'none';
+};
+}
+
+var btnSalvarEdPart = document.getElementById('btnSalvarEdicaoPartida');
+if (btnSalvarEdPart) {
+btnSalvarEdPart.onclick = function() {
+if (!ehAdmin) return;
+var partId = document.getElementById('editPartId').value;
+var novoGolsV = parseInt(document.getElementById('editPartGolsV').value, 10);
+var novoGolsA = parseInt(document.getElementById('editPartGolsA').value, 10);
+var novaData = document.getElementById('editPartData').value;
+
+for (var i = 0; i < partidasHistorico.length; i++) {
+if (partidasHistorico[i].id == partId) {
+partidasHistorico[i].golsVermelho = isNaN(novoGolsV) ? 0 : novoGolsV;
+partidasHistorico[i].golsAzul = isNaN(novoGolsA) ? 0 : novoGolsA;
+partidasHistorico[i].data = novaData || partidasHistorico[i].data;
+
+var novaArtilharia = {};
+var inputsArt = document.querySelectorAll('#containerEditArtilhariaHist input');
+for (var j = 0; j < inputsArt.length; j++) {
+var inp = inputsArt[j];
+var jogNome = inp.getAttribute('data-jogador');
+var valGols = parseInt(inp.value, 10);
+if (!isNaN(valGols) && valGols > 0) {
+novaArtilharia[jogNome] = valGols;
+}
+}
+partidasHistorico[i].artilharia = novaArtilharia;
+break;
+}
+}
+
+salvarTudo();
+renderizarHistoricoPartidas();
+renderizarRankingArtilheiros();
+var modalHist = document.getElementById('modalEditarPartidaHist');
+if (modalHist) modalHist.style.display = 'none';
+alert('Partida atualizada com sucesso!');
+};
+}
+
+var btnFecharMPart = document.getElementById('btnFecharModalPartida');
+if (btnFecharMPart) {
+btnFecharMPart.onclick = function() {
+var modalHist = document.getElementById('modalEditarPartidaHist');
+if (modalHist) modalHist.style.display = 'none';
+};
+}
+
+var btnConfPag = document.getElementById('btnConfirmarPagamento');
+if (btnConfPag) {
+btnConfPag.onclick = function() {
+if (!ehAdmin) return;
+var jogadorInput = document.getElementById('nomeJogador');
+var valorInput = document.getElementById('valorPagamento');
+var selectJogoPag = document.getElementById('selectJogoPagamento');
+
+var jogador = jogadorInput ? jogadorInput.value.trim() : '';
+var valor = valorInput ? parseFloat(valorInput.value) : NaN;
+var jogoId = selectJogoPag ? selectJogoPag.value : '';
+
+if (!jogador || isNaN(valor)) {
+alert('Informe o nome do jogador e o valor.');
+return;
+}
+
+transacoes.push({
+id: Date.now(),
+tipo: 'pagamento',
+desc: 'Pagamento: ' + jogador,
+valor: valor,
+jogoId: jogoId,
+jogador: jogador
+});
+
+if (jogadorInput) jogadorInput.value = '';
+salvarTudo();
+carregarListaBaixaConvocados();
+};
+}
+
+var btnRegSaida = document.getElementById('btnRegistrarSaida');
+if (btnRegSaida) {
+btnRegSaida.onclick = function() {
+if (!ehAdmin) return;
+var descInput = document.getElementById('descSaida');
+var valorInput = document.getElementById('valorSaida');
+var selectJogoSai = document.getElementById('selectJogoSaida');
+
+var desc = descInput ? descInput.value.trim() : '';
+var valor = valorInput ? parseFloat(valorInput.value) : NaN;
+var jogoId = selectJogoSai ? selectJogoSai.value : '';
+
+if (!desc || isNaN(valor)) {
+alert('Informe a descrição e o valor da saída.');
+return;
+}
+
+transacoes.push({
+id: Date.now(),
+tipo: 'saida',
+desc: desc,
+valor: valor,
+jogoId: jogoId
+});
+
+if (descInput) descInput.value = '';
+if (valorInput) valorInput.value = '';
+salvarTudo();
+};
+}
+
+var btnSalvarM = document.getElementById('btnSalvarMeta');
+if (btnSalvarM) {
+btnSalvarM.onclick = function() {
+if (!ehAdmin) return;
+var nomeInput = document.getElementById('nomeMeta');
+var valorInput = document.getElementById('valorMeta');
+var nome = nomeInput ? nomeInput.value.trim() : '';
+var valor = valorInput ? parseFloat(valorInput.value) : NaN;
+
+if (!nome || isNaN(valor)) {
+alert('Informe o nome da meta e o valor alvo.');
+return;
+}
+
+metas.push({
+id: Date.now(),
+nome: nome,
+valor: valor
+});
+
+if (nomeInput) nomeInput.value = '';
+if (valorInput) valorInput.value = '';
+salvarTudo();
+};
+}
+
+var btnIniC = document.getElementById('btnIniciarCron');
+if (btnIniC) {
+btnIniC.onclick = function() {
+if (!ehAdmin) return;
+if (!rodando) {
+rodando = true;
+timerInterval = setInterval(function() {
+if (tempoRestante > 0) {
+tempoRestante--;
+atualizarDisplayTempo();
+salvarEstadoPartida();
+} else {
+clearInterval(timerInterval);
+rodando = false;
+alert('Fim do tempo regulamentar!');
+}
+}, 1000);
+}
+};
+}
+
+var btnPausC = document.getElementById('btnPausarCron');
+if (btnPausC) {
+btnPausC.onclick = function() {
+if (!ehAdmin) return;
+clearInterval(timerInterval);
+rodando = false;
+salvarEstadoPartida();
+};
+}
+
+var btnZerC = document.getElementById('btnZerarCron');
+if (btnZerC) {
+btnZerC.onclick = function() {
+if (!ehAdmin) return;
+if (!confirm('Deseja zerar o cronômetro e os gols da partida atual?')) return;
+clearInterval(timerInterval);
+rodando = false;
+tempoRestante = 30 * 60;
+acrescimoMinutos = 0;
+golsVermelho = 0;
+golsAzul = 0;
+for (var k in artilhariaAtual) { artilhariaAtual[k] = 0; }
+var dispAc = document.getElementById('displayAcrescimo');
+var gV = document.getElementById('golsVermelho');
+var gA = document.getElementById('golsAzul');
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+if (gV) gV.innerText = golsVermelho;
+if (gA) gA.innerText = golsAzul;
+atualizarDisplayTempo();
+renderizarPainelArtilharia();
+salvarEstadoPartida();
+};
+}
+
+var btnMaisAc = document.getElementById('btnMaisAcrescimo');
+if (btnMaisAc) {
+btnMaisAc.onclick = function() {
+if (!ehAdmin) return;
+acrescimoMinutos++;
+tempoRestante += 60;
+var dispAc = document.getElementById('displayAcrescimo');
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+atualizarDisplayTempo();
+salvarEstadoPartida();
+};
+}
+
+var btnMenosAc = document.getElementById('btnMenosAcrescimo');
+if (btnMenosAc) {
+btnMenosAc.onclick = function() {
+if (!ehAdmin) return;
+if (acrescimoMinutos > 0) {
+acrescimoMinutos--;
+tempoRestante -= 60;
+var dispAc = document.getElementById('displayAcrescimo');
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+atualizarDisplayTempo();
+salvarEstadoPartida();
+}
+};
+}
+
+var btnTrocarT = document.getElementById('btnTrocarTempo');
+if (btnTrocarT) {
+btnTrocarT.onclick = function() {
+if (!ehAdmin) return;
+clearInterval(timerInterval);
+rodando = false;
+tempoRestante = 30 * 60;
+acrescimoMinutos = 0;
+var dispAc = document.getElementById('displayAcrescimo');
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+
+if (periodoAtual === 1) {
+periodoAtual = 2;
+var labelP = document.getElementById('labelPeriodo');
+if (labelP) labelP.innerText = '2º Tempo (30 min)';
+this.innerText = '🔄 Reiniciar para o 1º Tempo';
+} else {
+periodoAtual = 1;
+var labelP = document.getElementById('labelPeriodo');
+if (labelP) labelP.innerText = '1º Tempo (30 min)';
+this.innerText = '🔄 Alternar para o 2º Tempo';
+}
+atualizarDisplayTempo();
+salvarEstadoPartida();
+};
+}
+
+var btnGolV = document.getElementById('btnGolVermelho');
+if (btnGolV) {
+btnGolV.onclick = function() {
+if (!ehAdmin) return;
+golsVermelho++;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+};
+}
+
+var btnMenV = document.getElementById('btnMenosVermelho');
+if (btnMenV) {
+btnMenV.onclick = function() {
+if (!ehAdmin) return;
+if (golsVermelho > 0) {
+golsVermelho--;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+}
+};
+}
+
+var btnGolA = document.getElementById('btnGolAzul');
+if (btnGolA) {
+btnGolA.onclick = function() {
+if (!ehAdmin) return;
+golsAzul++;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+};
+}
+
+var btnMenA = document.getElementById('btnMenosAzul');
+if (btnMenA) {
+btnMenA.onclick = function() {
+if (!ehAdmin) return;
+if (golsAzul > 0) {
+golsAzul--;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+}
+};
+}
+
+var btnSalvarP = document.getElementById('btnSalvarPartida');
+if (btnSalvarP) {
+btnSalvarP.onclick = function() {
+if (!ehAdmin) return;
+var dataHoje = new Date().toLocaleDateString('pt-BR');
+var artilhariaCopia = Object.assign({}, artilhariaAtual);
+partidasHistorico.push({
+id: Date.now(),
+data: dataHoje,
+golsVermelho: golsVermelho,
+golsAzul: golsAzul,
+artilharia: artilhariaCopia
+});
+salvarTudo();
+renderizarHistoricoPartidas();
+renderizarRankingArtilheiros();
+
+tempoRestante = 30 * 60;
+periodoAtual = 1;
+acrescimoMinutos = 0;
+golsVermelho = 0;
+golsAzul = 0;
+for (var k in artilhariaAtual) { artilhariaAtual[k] = 0; }
+var dispAc = document.getElementById('displayAcrescimo');
+var gV = document.getElementById('golsVermelho');
+var gA = document.getElementById('golsAzul');
+var labelP = document.getElementById('labelPeriodo');
+if (dispAc) dispAc.innerText = acrescimoMinutos;
+if (gV) gV.innerText = golsVermelho;
+if (gA) gA.innerText = golsAzul;
+if (labelP) labelP.innerText = '1º Tempo (30 min)';
+atualizarDisplayTempo();
+renderizarPainelArtilharia();
+salvarEstadoPartida();
+
+alert('Partida salva com sucesso no histórico e ranking atualizado!');
+};
+}
+
+var btnSortear = document.getElementById('btnSortearTimes');
+if (btnSortear) {
+btnSortear.onclick = function() {
+if (!ehAdmin) return;
+var jogoId = document.getElementById('selectJogoSorteio').value;
+var qtdTimes = parseInt(document.getElementById('qtdTimes').value, 10);
+var resDiv = document.getElementById('resultadoSorteio');
+
+if (!jogoId) {
+alert('Selecione um jogo para sortear.');
+return;
+}
+
+var jogo = null;
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == jogoId) { jogo = jogos[i]; break; }
+}
+
+if (!jogo || !jogo.convocados || jogo.convocados.length === 0) {
+alert('Este jogo não possui convocados cadastrados.');
+return;
+}
+
+var listaJogadores = jogo.convocados.map(function(p) {
+return {
+nome: typeof p === 'string' ? p : p.nome,
+nivel: typeof p === 'string' ? 'prata' : (p.nivel || 'prata'),
+status: typeof p === 'string' ? 'marechal' : (p.status || 'marechal')
+};
+});
+
+for (var i = 0; i < listaJogadores.length; i++) {
+var nomeJog = listaJogadores[i].nome;
+if (artilhariaAtual[nomeJog] === undefined) {
+artilhariaAtual[nomeJog] = 0;
+}
+}
+renderizarPainelArtilharia();
+salvarEstadoPartida();
+
+var potesGoleiros = { ouro: [], prata: [] };
+var potesLinha = { ouro: [], prata: [], bronze: [] };
+
+for (var i = 0; i < listaJogadores.length; i++) {
+var p = listaJogadores[i];
+if (p.nivel === 'goleiro-ouro') potesGoleiros.ouro.push(p);
+else if (p.nivel === 'goleiro-prata') potesGoleiros.prata.push(p);
+else if (p.nivel === 'ouro') potesLinha.ouro.push(p);
+else if (p.nivel === 'prata') potesLinha.prata.push(p);
+else potesLinha.bronze.push(p);
+}
+
+function embaralhar(array) {
+for (var i = array.length - 1; i > 0; i--) {
+var j = Math.floor(Math.random() * (i + 1));
+var temp = array[i];
+array[i] = array[j];
+array[j] = temp;
+}
+return array;
+}
+
+potesGoleiros.ouro = embaralhar(potesGoleiros.ouro);
+potesGoleiros.prata = embaralhar(potesGoleiros.prata);
+potesLinha.ouro = embaralhar(potesLinha.ouro);
+potesLinha.prata = embaralhar(potesLinha.prata);
+potesLinha.bronze = embaralhar(potesLinha.bronze);
+
+var times = [];
+for (var t = 0; t < qtdTimes; t++) {
+times.push({
+nome: 'Time ' + (t + 1),
+goleiro: null,
+titularesLinha: [],
+reservas: []
+});
+}
+
+var todosGoleiros = potesGoleiros.ouro.concat(potesGoleiros.prata);
+for (var i = 0; i < todosGoleiros.length; i++) {
+var timeIdx = i % qtdTimes;
+if (!times[timeIdx].goleiro) {
+times[timeIdx].goleiro = todosGoleiros[i];
+} else {
+todosGoleiros[i].posicaoExtra = 'Goleiro';
+times[timeIdx].reservas.push(todosGoleiros[i]);
+}
+}
+
+var ouroDistribuido = [];
+for (var t = 0; t < qtdTimes; t++) { ouroDistribuido.push([]); }
+var tOuroIdx = 0;
+for (var i = 0; i < potesLinha.ouro.length; i++) {
+ouroDistribuido[tOuroIdx].push(potesLinha.ouro[i]);
+tOuroIdx = (tOuroIdx + 1) % qtdTimes;
+}
+
+var demaisLinha = potesLinha.prata.concat(potesLinha.bronze);
+var demDistribuido = [];
+for (var t = 0; t < qtdTimes; t++) { demDistribuido.push([]); }
+var tDemIdx = 0;
+for (var i = 0; i < demaisLinha.length; i++) {
+demDistribuido[tDemIdx].push(demaisLinha[i]);
+tDemIdx = (tDemIdx + 1) % qtdTimes;
+}
+
+var pesoStatus = function(st) {
+if (st === 'marechal') return 3;
+if (st === 'intermediario') return 2;
+return 1;
+};
+
+for (var t = 0; t < qtdTimes; t++) {
+var poolTime = ouroDistribuido[t].concat(demDistribuido[t]);
+poolTime.sort(function(a, b) {
+return pesoStatus(b.status) - pesoStatus(a.status);
+});
+
+for (var i = 0; i < poolTime.length; i++) {
+if (times[t].titularesLinha.length < 5) {
+times[t].titularesLinha.push(poolTime[i]);
+} else {
+times[t].reservas.push(poolTime[i]);
+}
+}
+}
+
+var html = '<h4 style="color:var(--primary-navy);">Times Sorteados com Sucesso!</h4>';
+var textoWpp = '⚽ SORTEIO DE TIMES - IMPÉRIO REAL FC\nJogo: ' + jogo.nome + '\n';
+
+for (var t = 0; t < times.length; t++) {
+var time = times[t];
+var totalJogadores = (time.goleiro ? 1 : 0) + time.titularesLinha.length + time.reservas.length;
+
+html += '<div class="team-card">';
+html += '<div class="team-header"><span>🏆 ' + time.nome + '</span> <small>' + totalJogadores + ' jogadores</small></div>';
+textoWpp += '\n*' + time.nome + '*:\n';
+
+if (time.goleiro) {
+html += '<div class="team-group-title">🧤 Goleiro Titular</div>';
+html += '<div class="team-player-item">';
+html += '<span class="badge-nivel ' + obterClasseNivel(time.goleiro.nivel) + '">' + time.goleiro.nivel.replace('-', ' ') + '</span>';
+html += '<span>' + time.goleiro.nome + '</span>';
+html += '<span class="badge-status status-marechal">Goleiro</span>';
+html += '</div>';
+textoWpp += '- 🧤 ' + time.goleiro.nome + ' (Goleiro)\n';
+}
+
+if (time.titularesLinha.length > 0) {
+html += '<div class="team-group-title">🏃‍♂️ Titulares de Linha (' + time.titularesLinha.length + ')</div>';
+for (var j = 0; j < time.titularesLinha.length; j++) {
+var p = time.titularesLinha[j];
+var st = p.status || 'marechal';
+var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
+var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
+html += '<div class="team-player-item">';
+html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span>' + p.nome + '</span>';
+html += '<span class="badge-status ' + statusClass + '">' + statusText + '</span>';
+html += '</div>';
+textoWpp += '- ' + p.nome + ' (' + p.nivel.toUpperCase() + ' - ' + statusText + ')\n';
+}
+}
+
+if (time.reservas.label !== undefined || time.reservas.length > 0) {
+html += '<div class="team-group-title">🛋️ Banco de Reservas (' + time.reservas.length + ')</div>';
+for (var r = 0; r < time.reservas.length; r++) {
+var p = time.reservas[r];
+var st = p.status || 'recruta';
+var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
+var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
+html += '<div class="team-player-item">';
+html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span>' + p.nome + '</span>';
+if (p.posicaoExtra) {
+html += '<span class="badge-status status-marechal">Goleiro</span>';
+} else {
+html += '<span class="badge-status ' + statusClass + '">' + statusText + '</span>';
+}
+html += '</div>';
+textoWpp += '- (Reserva) ' + p.nome + '\n';
+}
+}
+html += '</div>';
+}
+
+var linkWpp = 'https://wa.me/?text=' + encodeURIComponent(textoWpp);
+html += '<a href="' + linkWpp + '" class="whatsapp-btn" target="_blank">📲 Compartilhar Times no WhatsApp</a>';
+
+if (resDiv) resDiv.innerHTML = html;
+};
+}
+
+var selPag = document.getElementById('selectJogoPagamento');
+if (selPag) {
+selPag.onchange = carregarListaBaixaConvocados;
+}
+
+var selSorteio = document.getElementById('selectJogoSorteio');
+if (selSorteio) {
+selSorteio.onchange = renderizarPainelArtilharia;
+}
+
+renderizar();
+renderizarElenco();
+carregarSelectSorteio();
+renderizarHistoricoPartidas();
+renderizarPainelArtilharia();
+renderizarRankingArtilheiros();
+atualizarDisplayTempo();
+atualizarModoVisualizacao();
+
+var gVInit = document.getElementById('golsVermelho');
+var gAInit = document.getElementById('golsAzul');
+var dispAcInit = document.getElementById('displayAcrescimo');
+var labelPInit = document.getElementById('labelPeriodo');
+if (gVInit) gVInit.innerText = golsVermelho;
+if (gAInit) gAInit.innerText = golsAzul;
+if (dispAcInit) dispAcInit.innerText = acrescimoMinutos;
+if (labelPInit) labelPInit.innerText = periodoAtual + 'º Tempo (30 min)';
+};
+</script>
+</body>
+</html>
