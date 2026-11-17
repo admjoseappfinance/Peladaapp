@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Império Real FC | Match Center</title>
+<title>Império Real FC</title>
 <style>
 :root {
 --primary-navy: #0b1a30;
@@ -34,46 +34,36 @@ border-bottom: 3px solid var(--gold-accent);
 display: flex;
 align-items: center;
 justify-content: space-between;
-gap: 12px;
 box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .header-left {
 display: flex;
 align-items: center;
-gap: 12px;
+gap: 10px;
 }
 
 .header-logo {
-height: 45px;
+height: 40px;
 width: auto;
 object-fit: contain;
 }
 
-.admin-access-btn {
+.admin-toggle-btn {
 background: rgba(212, 175, 55, 0.15);
-border: 1px solid var(--gold-accent);
 color: var(--gold-accent);
+border: 1px solid var(--gold-accent);
 padding: 6px 12px;
 border-radius: 6px;
 font-size: 0.8rem;
 font-weight: bold;
 cursor: pointer;
-transition: background 0.2s;
-}
-.admin-access-btn:hover {
-background: rgba(212, 175, 55, 0.3);
+transition: all 0.2s;
 }
 
-.admin-badge-bar {
-background: #1e293b;
-color: #e2e8f0;
-padding: 8px 15px;
-font-size: 0.85rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-border-bottom: 1px solid #334155;
+.admin-toggle-btn.ativo {
+background: var(--gold-accent);
+color: var(--primary-navy);
 }
 
 .balance-card {
@@ -227,21 +217,21 @@ border: 1px solid #e2e8f0;
 .artilharia-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 15px; text-align: left; }
 .artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
 .artilheiro-item:last-child { border-bottom: none; }
+
+/* Controles de Visibilidade Admin/Jogador */
+body.modo-jogador [data-admin-only] {
+display: none !important;
+}
 </style>
 </head>
-<body>
+<body class="modo-jogador">
 
 <div class="header">
 <div class="header-left">
 <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
 <span>Império Real FC</span>
 </div>
-<button class="admin-access-btn" id="btnAdminAccess" onclick="acionarPainelAdmin()">🔐 Área Admin</button>
-</div>
-
-<div id="adminBadgeBar" class="admin-badge-bar" style="display:none;">
-<span>🛡️ <b>Modo Administrador Ativo</b> (Gerenciamento Total)</span>
-<button onclick="sairModoAdmin()" style="background:#ef4444; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.75rem;">Sair do Admin</button>
+<button class="admin-toggle-btn" id="btnToggleAdmin" onclick="alternarModoAdmin()">🔐 Área Admin</button>
 </div>
 
 <div class="balance-card">
@@ -251,20 +241,21 @@ border: 1px solid #e2e8f0;
 
 <div class="tabs">
 <button class="tab-btn active" data-tab="jogos">Jogos</button>
-<button class="tab-btn admin-tab" data-tab="elenco" style="display:none;">Elenco</button>
-<button class="tab-btn admin-tab" data-tab="pagamentos" style="display:none;">Pagamentos</button>
-<button class="tab-btn admin-tab" data-tab="sorteio" style="display:none;">Sorteio</button>
-<button class="tab-btn admin-tab" data-tab="cronometro" style="display:none;">Cronômetro</button>
 <button class="tab-btn" data-tab="ranking">Ranking</button>
-<button class="tab-btn admin-tab" data-tab="saidas" style="display:none;">Saídas</button>
-<button class="tab-btn admin-tab" data-tab="metas" style="display:none;">Metas</button>
 <button class="tab-btn" data-tab="relatorio">Relatório</button>
+<!-- Abas exclusivas de Admin -->
+<button class="tab-btn" data-tab="elenco" data-admin-only>Elenco</button>
+<button class="tab-btn" data-tab="pagamentos" data-admin-only>Pagamentos</button>
+<button class="tab-btn" data-tab="sorteio" data-admin-only>Sorteio</button>
+<button class="tab-btn" data-tab="cronometro" data-admin-only>Cronômetro</button>
+<button class="tab-btn" data-tab="saidas" data-admin-only>Saídas</button>
+<button class="tab-btn" data-tab="metas" data-admin-only>Metas</button>
 </div>
 
-<!-- Aba Jogos -->
+<!-- Aba Jogos (Agora exibe Partidas Realizadas para Jogadores e Gestão de Jogos Futuros para Admin) -->
 <div id="tab-jogos" class="tab-content active">
-<div id="formCadastroJogoArea" style="display:none;">
-<h3>Cadastrar Jogo</h3>
+<div data-admin-only>
+<h3>Cadastrar Jogo / Convocação</h3>
 <div class="form-group">
 <label>Nome do Jogo / Adversário</label>
 <input type="text" id="nomeJogo" placeholder="Ex: Racha de Quarta">
@@ -303,15 +294,19 @@ border: 1px solid #e2e8f0;
 <div class="tags-container" id="containerJogadoresTemporarios"></div>
 </div>
 <button class="action-btn" id="btnSalvarJogo">Salvar Jogo</button>
-<hr style="margin:20px 0; border:0; border-top:1px solid #cbd5e1;">
+
+<div class="history-title">Gerenciar Jogos Futuros / Convocados</div>
+<div id="listaJogos"></div>
+<hr style="margin: 25px 0; border: 0; border-top: 1px solid #cbd5e1;">
 </div>
 
-<div class="history-title">Jogos Salvos & Convocados</div>
-<div id="listaJogos"></div>
+<h3>⚽ Histórico de Partidas Realizadas</h3>
+<p style="color: #64748b; font-size: 0.9rem;">Placares, artilheiros e detalhes dos jogos já disputados.</p>
+<div id="listaPartidasPublicas"></div>
 </div>
 
 <!-- Aba Elenco (Banco de Dados de Jogadores) -->
-<div id="tab-elenco" class="tab-content">
+<div id="tab-elenco" class="tab-content" data-admin-only>
 <h3>Banco de Dados de Jogadores</h3>
 <p style="color: #64748b; font-size: 0.9rem;">Cadastre os jogadores fixos do clube para selecioná-los rapidamente nos jogos.</p>
 <div class="form-group">
@@ -340,7 +335,6 @@ border: 1px solid #e2e8f0;
 </div>
 <button class="action-btn" id="btnSalvarElenco">Cadastrar Jogador no Elenco</button>
 
-<!-- Área de Backup por Arquivo -->
 <div style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
 <h4 style="margin-top:0; color:var(--primary-navy);">💾 Segurança e Backup</h4>
 <div style="display: flex; gap: 10px;">
@@ -356,7 +350,7 @@ border: 1px solid #e2e8f0;
 </div>
 
 <!-- Aba Pagamentos -->
-<div id="tab-pagamentos" class="tab-content">
+<div id="tab-pagamentos" class="tab-content" data-admin-only>
 <h3>Registrar Pagamento</h3>
 <div class="form-group">
 <label>Selecione o Jogo</label>
@@ -381,7 +375,7 @@ border: 1px solid #e2e8f0;
 </div>
 
 <!-- Aba Sorteio -->
-<div id="tab-sorteio" class="tab-content">
+<div id="tab-sorteio" class="tab-content" data-admin-only>
 <h3>Sorteador de Times Inteligente</h3>
 <p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide os Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
 <div class="form-group">
@@ -402,7 +396,7 @@ border: 1px solid #e2e8f0;
 </div>
 
 <!-- Aba Cronômetro / Partida -->
-<div id="tab-cronometro" class="tab-content">
+<div id="tab-cronometro" class="tab-content" data-admin-only>
 <div class="cronometro-box">
 <h3 id="labelPeriodo" style="margin-top:0; color:var(--primary-navy);">1º Tempo (30 min)</h3>
 <div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
@@ -464,7 +458,7 @@ border: 1px solid #e2e8f0;
 </div>
 
 <!-- Aba Saídas -->
-<div id="tab-saidas" class="tab-content">
+<div id="tab-saidas" class="tab-content" data-admin-only>
 <h3>Nova Despesa</h3>
 <div class="form-group">
 <label>Vincular ao Jogo (Opcional)</label>
@@ -479,7 +473,7 @@ border: 1px solid #e2e8f0;
 </div>
 
 <!-- Aba Metas -->
-<div id="tab-metas" class="tab-content">
+<div id="tab-metas" class="tab-content" data-admin-only>
 <h3>Nova Meta Financeira</h3>
 <div class="form-group"><label>Nome da Meta</label><input type="text" id="nomeMeta" placeholder="Ex: Compra de Bolas Novas"></div>
 <div class="form-group"><label>Valor Alvo (R$)</label><input type="number" id="valorMeta" step="0.01" placeholder="300.00"></div>
@@ -489,31 +483,23 @@ border: 1px solid #e2e8f0;
 <div id="listaMetas"></div>
 </div>
 
-<!-- Aba Relatório -->
+<!-- Aba Relatório (Atualizada com Pagamentos do último jogo, Despesas do último jogo e Saldo total) -->
 <div id="tab-relatorio" class="tab-content">
 <div class="report-box">
 <h3>Resumo Financeiro</h3>
-<p>Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
-<hr style="border: 0; border-top: 1px solid #e2e8f0;">
-<h4>Detalhamento de Saídas:</h4>
-<div id="listaDetalheSaidas"></div>
-<p>Total de Saídas: <span id="resumoSaidas" class="negative">R$ 0,00</span></p>
-<hr style="margin-top: 15px; border: 0; border-top: 1px solid #e2e8f0;">
-<h4>Saldo Final: <span id="resumoSaldo">R$ 0,00</span></h4>
-<a href="#" class="whatsapp-btn" id="btnWpp" target="_blank">Enviar Resumo no WhatsApp</a>
-</div>
+
+<div style="margin-bottom: 15px;">
+<h4 style="color:var(--primary-navy); margin-bottom:5px;">💵 Pagamentos do Último Jogo</h4>
+<div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhum pagamento registrado no último jogo.</div>
 </div>
 
-<!-- Modal para PIN de Admin -->
-<div class="modal" id="modalPinAdmin">
-<div class="modal-content" style="text-align: center;">
-<h3>🔐 Acesso Administrativo</h3>
-<p style="font-size:0.9rem; color:#64748b;">Digite o PIN de administrador para desbloquear o gerenciamento:</p>
-<div class="form-group" style="margin-top:15px;">
-<input type="password" id="inputPinAdmin" placeholder="••••" maxlength="6" style="text-align:center; font-size:1.5rem; letter-spacing:5px;">
+<div style="margin-bottom: 15px;">
+<h4 style="color:var(--primary-navy); margin-bottom:5px;">🧾 Despesas do Último Jogo</h4>
+<div id="relatorioDespesasUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhuma despesa registrada no último jogo.</div>
 </div>
-<button class="action-btn" onclick="verificarPinAdmin()">Entrar como Admin</button>
-<button class="action-btn" style="background:#64748b; color:white; margin-top:8px;" onclick="fecharModalPin()">Cancelar</button>
+
+<hr style="border: 0; border-top: 1px solid #e2e8f0;">
+<h3 style="margin-top:15px;">Saldo Total em Caixa: <span id="resumoSaldo" class="positive">R$ 0,00</span></h3>
 </div>
 </div>
 
@@ -581,8 +567,35 @@ border: 1px solid #e2e8f0;
 </div>
 
 <script>
-var PIN_ADMIN_PADRAO = "1234"; // PIN padrão para desbloquear a gestão
-var ehAdmin = localStorage.getItem('imperio_admin_ativo') === 'true';
+var modoAdminAtivo = false;
+
+function alternarModoAdmin() {
+if (!modoAdminAtivo) {
+var senha = prompt("Digite o PIN de Administrador:");
+if (senha === "1571") {
+modoAdminAtivo = true;
+document.body.classList.remove('modo-jogador');
+var btn = document.getElementById('btnToggleAdmin');
+btn.classList.add('ativo');
+btn.innerText = '🔓 Admin Ativo';
+alert('Área Administrativa desbloqueada com sucesso!');
+} else if (senha !== null) {
+alert('PIN incorreto!');
+}
+} else {
+modoAdminAtivo = false;
+document.body.classList.add('modo-jogador');
+var btn = document.getElementById('btnToggleAdmin');
+btn.classList.remove('ativo');
+btn.innerText = '🔐 Área Admin';
+// Se estiver em aba restrita, volta para a aba Jogos
+var abaAtiva = document.querySelector('.tab-btn.active');
+if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
+switchTab('jogos');
+}
+alert('Área Administrativa bloqueada (Modo Jogador).');
+}
+}
 
 function lerDadosSeguro(chavePrincipal, chavesAntigas) {
   var todasChaves = [chavePrincipal].concat(chavesAntigas || []);
@@ -648,66 +661,6 @@ function formatarMoeda(v) {
 return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
 }
 
-function atualizarModoVisualizacao() {
-var adminTabs = document.querySelectorAll('.admin-tab');
-var formCadJogo = document.getElementById('formCadastroJogoArea');
-var bar = document.getElementById('adminBadgeBar');
-var btnAccess = document.getElementById('btnAdminAccess');
-
-for (var i = 0; i < adminTabs.length; i++) {
-adminTabs[i].style.display = ehAdmin ? 'block' : 'none';
-}
-
-if (formCadJogo) formCadJogo.style.display = ehAdmin ? 'block' : 'none';
-if (bar) bar.style.display = ehAdmin ? 'flex' : 'none';
-if (btnAccess) btnAccess.style.display = ehAdmin ? 'none' : 'block';
-
-// Se o usuário estiver numa aba restrita e perder o admin, joga para 'jogos'
-var tabAtiva = document.querySelector('.tab-content.active');
-if (tabAtiva && !ehAdmin) {
-var idTab = tabAtiva.id.replace('tab-', '');
-if (['elenco', 'pagamentos', 'sorteio', 'cronometro', 'saidas', 'metas'].indexOf(idTab) !== -1) {
-switchTab('jogos');
-}
-}
-}
-
-function acionarPainelAdmin() {
-if (ehAdmin) return;
-var modal = document.getElementById('modalPinAdmin');
-if (modal) {
-modal.style.display = 'flex';
-var inp = document.getElementById('inputPinAdmin');
-if (inp) { inp.value = ''; inp.focus(); }
-}
-}
-
-function fecharModalPin() {
-var modal = document.getElementById('modalPinAdmin');
-if (modal) modal.style.display = 'none';
-}
-
-function verificarPinAdmin() {
-var inp = document.getElementById('inputPinAdmin');
-if (inp && inp.value === PIN_ADMIN_PADRAO) {
-ehAdmin = true;
-localStorage.setItem('imperio_admin_ativo', 'true');
-fecharModalPin();
-atualizarModoVisualizacao();
-alert('Modo Administrador ativado com sucesso!');
-} else {
-alert('PIN incorreto!');
-}
-}
-
-function sairModoAdmin() {
-ehAdmin = false;
-localStorage.setItem('imperio_admin_ativo', 'false');
-atualizarModoVisualizacao();
-switchTab('jogos');
-alert('Você saiu do modo administrador.');
-}
-
 function switchTab(tabId) {
 var btns = document.querySelectorAll('.tab-btn');
 var contents = document.querySelectorAll('.tab-content');
@@ -728,7 +681,10 @@ contents[j].classList.remove('active');
 }
 }
 
-if (tabId === 'jogos') renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+if (tabId === 'jogos') {
+renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+renderizarPartidasPublicas();
+}
 if (tabId === 'elenco') renderizarElenco();
 if (tabId === 'relatorio') atualizarRelatorio();
 if (tabId === 'pagamentos') carregarListaBaixaConvocados();
@@ -785,13 +741,12 @@ tag.className = 'player-tag ' + obterClasseNivel(nivel);
 var span = document.createElement('span');
 span.textContent = p.nome + ' (' + nivel.replace('-', ' ').toUpperCase() + ' - ' + status.toUpperCase() + ')';
 
-var tagContainer = container;
 var btn = document.createElement('button');
 btn.className = 'player-tag-btn';
 btn.textContent = '×';
 btn.onclick = function() {
 arrayLista.splice(index, 1);
-renderizarTags(tagContainer, arrayLista, eEdicao);
+renderizarTags(container, arrayLista, eEdicao);
 if (eEdicao) {
 renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
 } else {
@@ -800,10 +755,8 @@ renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaEle
 };
 
 tag.appendChild(span);
-if (ehAdmin) {
 tag.appendChild(btn);
-}
-tagContainer.appendChild(tag);
+container.appendChild(tag);
 })(i);
 }
 }
@@ -839,7 +792,7 @@ var chip = document.createElement('div');
 chip.className = 'elenco-chip ' + obterClasseNivel(jogador.nivel) + (jaSelecionado ? ' selecionado' : '');
 chip.textContent = '+ ' + jogador.nome;
 chip.onclick = function() {
-if (ehAdmin && !jaSelecionado) {
+if (!jaSelecionado) {
 listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal' });
 var tagContainer = eEdicao
 ? document.getElementById('containerEditJogadores')
@@ -896,7 +849,6 @@ info.innerHTML =
 '<b>' + p.nome + '</b>' +
 '<span class="badge-status ' + statusBadgeClass + '">' + statusBadgeText + '</span>';
 
-var itemEl = item;
 var actions = document.createElement('div');
 actions.style.display = 'flex';
 actions.style.gap = '5px';
@@ -905,7 +857,6 @@ var selectNivel = document.createElement('select');
 selectNivel.style.padding = '4px';
 selectNivel.style.fontSize = '0.8rem';
 selectNivel.style.width = 'auto';
-selectNivel.disabled = !ehAdmin;
 selectNivel.innerHTML =
 '<option value="ouro"' + (p.nivel === 'ouro' ? ' selected' : '') + '>Ouro</option>' +
 '<option value="prata"' + (p.nivel === 'prata' ? ' selected' : '') + '>Prata</option>' +
@@ -914,7 +865,6 @@ selectNivel.innerHTML =
 '<option value="goleiro-prata"' + (p.nivel === 'goleiro-prata' ? ' selected' : '') + '>Gol. Prata</option>';
 
 selectNivel.onchange = function() {
-if (!ehAdmin) return;
 for (var idx = 0; idx < jogadoresElenco.length; idx++) {
 if (jogadoresElenco[idx].id === p.id) {
 jogadoresElenco[idx].nivel = this.value;
@@ -929,14 +879,12 @@ var selectStatus = document.createElement('select');
 selectStatus.style.padding = '4px';
 selectStatus.style.fontSize = '0.8rem';
 selectStatus.style.width = 'auto';
-selectStatus.disabled = !ehAdmin;
 selectStatus.innerHTML =
 '<option value="marechal"' + (st === 'marechal' ? ' selected' : '') + '>Marechal</option>' +
 '<option value="intermediario"' + (st === 'intermediario' ? ' selected' : '') + '>Intermediário</option>' +
 '<option value="recruta"' + (st === 'recruta' ? ' selected' : '') + '>Recruta</option>';
 
 selectStatus.onchange = function() {
-if (!ehAdmin) return;
 for (var idx = 0; idx < jogadoresElenco.length; idx++) {
 if (jogadoresElenco[idx].id === p.id) {
 jogadoresElenco[idx].status = this.value;
@@ -950,9 +898,7 @@ renderizarElenco();
 var btnDel = document.createElement('button');
 btnDel.className = 'delete-btn';
 btnDel.textContent = 'X';
-btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
 btnDel.onclick = function() {
-if (!ehAdmin) return;
 if (!confirm('Remover ' + p.nome + ' do elenco?')) return;
 jogadoresElenco = jogadoresElenco.filter(function(item) { return item.id !== p.id; });
 salvarTudo();
@@ -962,9 +908,9 @@ renderizarElenco();
 actions.appendChild(selectNivel);
 actions.appendChild(selectStatus);
 actions.appendChild(btnDel);
-itemEl.appendChild(info);
-itemEl.appendChild(actions);
-container.appendChild(itemEl);
+item.appendChild(info);
+item.appendChild(actions);
+container.appendChild(item);
 })(ordenados[i]);
 }
 }
@@ -990,6 +936,43 @@ opt.textContent = jogos[i].nome + ' (' + jogos[i].data + ')';
 sel.appendChild(opt);
 }
 sel.value = valAntigo;
+}
+
+function renderizarPartidasPublicas() {
+var container = document.getElementById('listaPartidasPublicas');
+if (!container) return;
+container.innerHTML = '';
+
+if (partidasHistorico.length === 0) {
+container.innerHTML = '<i>Nenhuma partida realizada registrada no histórico ainda.</i>';
+return;
+}
+
+var historicoInvertido = partidasHistorico.slice().reverse();
+for (var i = 0; i < historicoInvertido.length; i++) {
+(function(p) {
+var item = document.createElement('div');
+item.className = 'list-item';
+
+var textoArtilheiros = '';
+if (p.artilharia && Object.keys(p.artilharia).length > 0) {
+textoArtilheiros = '<br><small style="color:var(--secondary-navy);">⚽ Gols: ';
+var partes = [];
+for (var jog in p.artilharia) {
+if (p.artilharia[jog] > 0) partes.push(jog + ' (' + p.artilharia[jog] + ')');
+}
+textoArtilheiros += partes.join(', ') + '</small>';
+}
+
+item.innerHTML =
+'<div style="width:100%;">' +
+'<b>🔴 Vermelho ' + p.golsVermelho + ' x ' + p.golsAzul + ' Azul 🔵</b>' +
+textoArtilheiros + '<br>' +
+'<small style="color:#64748b;">📅 ' + p.data + '</small>' +
+'</div>';
+container.appendChild(item);
+})(historicoInvertido[i]);
+}
 }
 
 function renderizar() {
@@ -1043,14 +1026,12 @@ var btns = document.createElement('div');
 var btnEdit = document.createElement('button');
 btnEdit.className = 'edit-btn';
 btnEdit.textContent = 'Editar';
-btnEdit.style.display = ehAdmin ? 'inline-block' : 'none';
-btnEdit.onclick = function() { if (ehAdmin) abrirModalEditar(jogo.id); };
+btnEdit.onclick = function() { abrirModalEditar(jogo.id); };
 
 var btnDel = document.createElement('button');
 btnDel.className = 'delete-btn';
 btnDel.textContent = 'X';
-btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
-btnDel.onclick = function() { if (ehAdmin) excluirJogo(jogo.id); };
+btnDel.onclick = function() { excluirJogo(jogo.id); };
 
 btns.appendChild(btnEdit);
 btns.appendChild(btnDel);
@@ -1092,8 +1073,7 @@ btnDel.className = 'delete-btn';
 btnDel.style.padding = '2px 6px';
 btnDel.style.marginLeft = '8px';
 btnDel.textContent = 'X';
-btnDel.style.display = ehAdmin ? 'inline-block' : 'none';
-btnDel.onclick = function() { if (ehAdmin) excluirTransacao(t.id); };
+btnDel.onclick = function() { excluirTransacao(t.id); };
 
 right.appendChild(span);
 right.appendChild(btnDel);
@@ -1114,12 +1094,10 @@ var pct = Math.min(100, Math.max(0, (saldoAtual / meta.valor) * 100)).toFixed(0)
 var box = document.createElement('div');
 box.style.cssText = 'background:white; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #e2e8f0;';
 
-var btnDelDisplay = ehAdmin ? '<button class="delete-btn" id="del-m-' + meta.id + '">X</button>' : '';
-
 box.innerHTML =
 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
 '<b>' + meta.nome + '</b>' +
-btnDelDisplay +
+'<button class="delete-btn" id="del-m-' + meta.id + '">X</button>' +
 '</div>' +
 '<div style="margin-top:5px; font-size:0.9rem; color:#64748b;">' +
 'Alvo: ' + formatarMoeda(meta.valor) + ' | Progresso: <b style="color:var(--primary-navy);">' + pct + '%</b>' +
@@ -1127,17 +1105,16 @@ btnDelDisplay +
 '<div class="progress-bg"><div class="progress-bar" style="width:' + pct + '%;"></div></div>';
 
 listaMetas.appendChild(box);
-if (ehAdmin) {
 var delBtnMeta = document.getElementById('del-m-' + meta.id);
 if (delBtnMeta) {
 delBtnMeta.onclick = function() { excluirMeta(meta.id); };
-}
 }
 })(metas[m]);
 }
 }
 
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+renderizarPartidasPublicas();
 }
 
 function carregarListaBaixaConvocados() {
@@ -1205,12 +1182,11 @@ var badge = document.createElement('span');
 badge.className = 'badge-paid';
 badge.textContent = '✓ Pago';
 item.appendChild(badge);
-} else if (ehAdmin) {
+} else {
 var btn = document.createElement('button');
 btn.className = 'pay-btn';
 btn.textContent = 'Dar Baixa (R$ 10)';
 btn.onclick = function() {
-if (!ehAdmin) return;
 transacoes.push({
 id: Date.now(),
 tipo: 'pagamento',
@@ -1223,11 +1199,6 @@ salvarTudo();
 carregarListaBaixaConvocados();
 };
 item.appendChild(btn);
-} else {
-var lblPend = document.createElement('span');
-lblPend.style.cssText = 'color:#dc2626; font-size:0.85rem; font-weight:bold;';
-lblPend.textContent = 'Pendente';
-item.appendChild(lblPend);
 }
 
 if (lista) lista.appendChild(item);
@@ -1236,7 +1207,6 @@ if (lista) lista.appendChild(item);
 }
 
 function abrirModalEditar(id) {
-if (!ehAdmin) return;
 var jogo = null;
 for (var i = 0; i < jogos.length; i++) {
 if (jogos[i].id == id) { jogo = jogos[i]; break; }
@@ -1261,7 +1231,6 @@ if (modal) modal.style.display = 'flex';
 }
 
 function excluirJogo(id) {
-if (!ehAdmin) return;
 if (!confirm('Deseja excluir este jogo?')) return;
 jogos = jogos.filter(function(j) { return j.id != id; });
 salvarTudo();
@@ -1269,48 +1238,55 @@ carregarSelectSorteio();
 }
 
 function excluirTransacao(id) {
-if (!ehAdmin) return;
 transacoes = transacoes.filter(function(t) { return t.id != id; });
 salvarTudo();
 carregarListaBaixaConvocados();
 }
 
 function excluirMeta(id) {
-if (!ehAdmin) return;
 metas = metas.filter(function(m) { return m.id != id; });
 salvarTudo();
 }
 
 function atualizarRelatorio() {
-var ent = 0, sai = 0;
-var htmlSaidas = '';
-var txtSaidas = '';
+var ultimoJogoId = null;
+if (jogos.length > 0) {
+var jogosOrdenados = jogos.slice().sort(function(a,b) { return new Date(b.data) - new Date(a.data); });
+ultimoJogoId = jogosOrdenados[0].id;
+}
+
+var htmlPagUltimo = '';
+var htmlSaiUltimo = '';
+var totalPagUltimo = 0;
+var totalSaiUltimo = 0;
 
 for (var i = 0; i < transacoes.length; i++) {
 var t = transacoes[i];
-if (t.tipo === 'pagamento') ent += Number(t.valor);
+if (ultimoJogoId && t.jogoId == ultimoJogoId) {
+if (t.tipo === 'pagamento') {
+totalPagUltimo += Number(t.valor);
+htmlPagUltimo += '<div class="expense-detail"><span>' + t.desc + '</span><b class="positive">+' + formatarMoeda(t.valor) + '</b></div>';
+}
 if (t.tipo === 'saida') {
-var v = Number(t.valor);
-sai += v;
-htmlSaidas += '<div class="expense-detail"><span>' + t.desc + '</span><b>-' + formatarMoeda(v) + '</b></div>';
-txtSaidas += '\n- ' + t.desc + ': -' + formatarMoeda(v);
+totalSaiUltimo += Number(t.valor);
+htmlSaiUltimo += '<div class="expense-detail"><span>' + t.desc + '</span><b class="negative">-' + formatarMoeda(t.valor) + '</b></div>';
+}
 }
 }
 
-var saldo = ent - sai;
-var resEnt = document.getElementById('resumoEntradas');
-var resSai = document.getElementById('resumoSaidas');
-var listDet = document.getElementById('listaDetalheSaidas');
+var divPag = document.getElementById('relatorioPagamentosUltimoJogo');
+var divSai = document.getElementById('relatorioDespesasUltimoJogo');
 var resSal = document.getElementById('resumoSaldo');
-var btnWpp = document.getElementById('btnWpp');
 
-if (resEnt) resEnt.innerText = formatarMoeda(ent);
-if (resSai) resSai.innerText = formatarMoeda(sai);
-if (listDet) listDet.innerHTML = htmlSaidas || 'Nenhuma saída registrada.';
-if (resSal) resSal.innerText = formatarMoeda(saldo);
-
-var texto = 'RELATÓRIO FINANCEIRO - IMPÉRIO REAL FC\n\nTotal Arrecadado: ' + formatarMoeda(ent) + '\nSaídas:' + (txtSaidas || '\nNenhuma') + '\n\nTotal Saídas: ' + formatarMoeda(sai) + '\nSaldo Atual: ' + formatarMoeda(saldo);
-if (btnWpp) btnWpp.href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+if (divPag) {
+divPag.innerHTML = htmlPagUltimo ? htmlPagUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Pagamentos: ' + formatarMoeda(totalPagUltimo) + '</div>' : 'Nenhum pagamento registrado no último jogo.';
+}
+if (divSai) {
+divSai.innerHTML = htmlSaiUltimo ? htmlSaiUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Despesas: ' + formatarMoeda(totalSaiUltimo) + '</div>' : 'Nenhuma despesa registrada no último jogo.';
+}
+if (resSal) {
+resSal.innerText = formatarMoeda(calcularSaldo());
+}
 }
 
 function atualizarDisplayTempo() {
@@ -1348,22 +1324,18 @@ if (p.artilharia[jog] > 0) partes.push(jog + ' (' + p.artilharia[jog] + ')');
 textoArtilheiros += partes.join(', ') + '</small>';
 }
 
-var btnsAdminPart = ehAdmin ? 
-'<div style="display:flex; gap:5px;">' +
-'<button class="edit-btn" id="edit-part-' + p.id + '">Editar</button>' +
-'<button class="delete-btn" id="del-part-' + p.id + '">X</button>' +
-'</div>' : '';
-
 item.innerHTML =
 '<div>' +
 '<b>🔴 Vermelho ' + p.golsVermelho + ' x ' + p.golsAzul + ' Azul 🔵</b>' +
 textoArtilheiros + '<br>' +
 '<small style="color:#64748b;">📅 ' + p.data + '</small>' +
 '</div>' +
-btnsAdminPart;
+'<div style="display:flex; gap:5px;">' +
+'<button class="edit-btn" id="edit-part-' + p.id + '">Editar</button>' +
+'<button class="delete-btn" id="del-part-' + p.id + '">X</button>' +
+'</div>';
 container.appendChild(item);
 
-if (ehAdmin) {
 var btnEditP = document.getElementById('edit-part-' + p.id);
 if (btnEditP) {
 btnEditP.onclick = function() { abrirModalEditarPartida(p.id); };
@@ -1373,13 +1345,11 @@ var btnDelP = document.getElementById('del-part-' + p.id);
 if (btnDelP) {
 btnDelP.onclick = function() { excluirPartida(p.id); };
 }
-}
 })(historicoInvertido[i]);
 }
 }
 
 function abrirModalEditarPartida(id) {
-if (!ehAdmin) return;
 var partida = null;
 for (var i = 0; i < partidasHistorico.length; i++) {
 if (partidasHistorico[i].id == id) { partida = partidasHistorico[i]; break; }
@@ -1430,12 +1400,12 @@ if (modal) modal.style.display = 'flex';
 }
 
 function excluirPartida(id) {
-if (!ehAdmin) return;
 if (!confirm('Deseja excluir esta partida do histórico?')) return;
 partidasHistorico = partidasHistorico.filter(function(p) { return p.id != id; });
 salvarTudo();
 renderizarHistoricoPartidas();
 renderizarRankingArtilheiros();
+renderizarPartidasPublicas();
 }
 
 function renderizarRankingArtilheiros() {
@@ -1540,7 +1510,6 @@ var btnMenos = document.createElement('button');
 btnMenos.style.cssText = 'padding:4px 8px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
 btnMenos.textContent = '-';
 btnMenos.onclick = function() {
-if (!ehAdmin) return;
 if (artilhariaAtual[nome] > 0) {
 artilhariaAtual[nome]--;
 scoreSpan.textContent = artilhariaAtual[nome];
@@ -1552,19 +1521,14 @@ var btnMais = document.createElement('button');
 btnMais.style.cssText = 'padding:4px 8px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
 btnMais.textContent = '+1 Gol';
 btnMais.onclick = function() {
-if (!ehAdmin) return;
 artilhariaAtual[nome]++;
 scoreSpan.textContent = artilhariaAtual[nome];
 salvarEstadoPartida();
 };
 
-if (ehAdmin) {
 contDiv.appendChild(btnMenos);
-}
 contDiv.appendChild(scoreSpan);
-if (ehAdmin) {
 contDiv.appendChild(btnMais);
-}
 
 row.appendChild(label);
 row.appendChild(contDiv);
@@ -1584,7 +1548,6 @@ switchTab(this.getAttribute('data-tab'));
 var dispTempo = document.getElementById('displayTempo');
 if (dispTempo) {
 dispTempo.onclick = function() {
-if (!ehAdmin) return;
 var atualMin = Math.floor(tempoRestante / 60);
 var novoMin = prompt('Digite o novo tempo em minutos para o cronômetro:', atualMin);
 if (novoMin !== null && !isNaN(novoMin) && novoMin.trim() !== '') {
@@ -1627,7 +1590,6 @@ alert('Lista exportada com sucesso!');
 var btnExp = document.getElementById('btnExportarBackup');
 if (btnExp) {
 btnExp.onclick = function() {
-if (!ehAdmin) return;
 var dadosBackup = {
 jogos: jogos,
 jogadoresElenco: jogadoresElenco,
@@ -1650,7 +1612,6 @@ alert('Backup exportado com sucesso!');
 var btnImp = document.getElementById('btnImportarBackup');
 if (btnImp) {
 btnImp.onclick = function() {
-if (!ehAdmin) return;
 var fileInput = document.getElementById('inputFileBackup');
 if (fileInput) fileInput.click();
 };
@@ -1659,7 +1620,6 @@ if (fileInput) fileInput.click();
 var inputFile = document.getElementById('inputFileBackup');
 if (inputFile) {
 inputFile.onchange = function(e) {
-if (!ehAdmin) return;
 var file = e.target.files[0];
 if (!file) return;
 var reader = new FileReader();
@@ -1678,6 +1638,7 @@ carregarSelectSorteio();
 renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
+renderizarPartidasPublicas();
 alert('Backup restaurado com sucesso!');
 } else {
 alert('Arquivo de backup inválido.');
@@ -1714,7 +1675,6 @@ renderizarElenco();
 var btnSalvarEl = document.getElementById('btnSalvarElenco');
 if (btnSalvarEl) {
 btnSalvarEl.onclick = function() {
-if (!ehAdmin) return;
 var inputNome = document.getElementById('elencoNome');
 var selNivel = document.getElementById('elencoNivel');
 var selStatus = document.getElementById('elencoStatus');
@@ -1750,7 +1710,6 @@ renderizarElenco();
 var btnAddTemp = document.getElementById('btnAddJogadorTemporario');
 if (btnAddTemp) {
 btnAddTemp.onclick = function() {
-if (!ehAdmin) return;
 var input = document.getElementById('inputNomeJogador');
 var nivelSel = document.getElementById('inputNivelJogador');
 var statusSel = document.getElementById('inputStatusJogador');
@@ -1767,7 +1726,6 @@ renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaEle
 var btnEditAdd = document.getElementById('btnEditAddJogador');
 if (btnEditAdd) {
 btnEditAdd.onclick = function() {
-if (!ehAdmin) return;
 var input = document.getElementById('editInputNomeJogador');
 var nivelSel = document.getElementById('editNivelJogador');
 var statusSel = document.getElementById('editStatusJogador');
@@ -1784,7 +1742,6 @@ renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoE
 var btnSalvarJ = document.getElementById('btnSalvarJogo');
 if (btnSalvarJ) {
 btnSalvarJ.onclick = function() {
-if (!ehAdmin) return;
 var nomeInput = document.getElementById('nomeJogo');
 var dataInput = document.getElementById('dataJogo');
 var nome = nomeInput ? nomeInput.value.trim() : '';
@@ -1817,7 +1774,6 @@ carregarSelectSorteio();
 var btnSalvarEd = document.getElementById('btnSalvarEdicaoLista');
 if (btnSalvarEd) {
 btnSalvarEd.onclick = function() {
-if (!ehAdmin) return;
 var editId = document.getElementById('editJogoId');
 var id = editId ? editId.value : '';
 for (var i = 0; i < jogos.length; i++) {
@@ -1844,7 +1800,6 @@ if (modal) modal.style.display = 'none';
 var btnSalvarEdPart = document.getElementById('btnSalvarEdicaoPartida');
 if (btnSalvarEdPart) {
 btnSalvarEdPart.onclick = function() {
-if (!ehAdmin) return;
 var partId = document.getElementById('editPartId').value;
 var novoGolsV = parseInt(document.getElementById('editPartGolsV').value, 10);
 var novoGolsA = parseInt(document.getElementById('editPartGolsA').value, 10);
@@ -1874,6 +1829,7 @@ break;
 salvarTudo();
 renderizarHistoricoPartidas();
 renderizarRankingArtilheiros();
+renderizarPartidasPublicas();
 var modalHist = document.getElementById('modalEditarPartidaHist');
 if (modalHist) modalHist.style.display = 'none';
 alert('Partida atualizada com sucesso!');
@@ -1891,7 +1847,6 @@ if (modalHist) modalHist.style.display = 'none';
 var btnConfPag = document.getElementById('btnConfirmarPagamento');
 if (btnConfPag) {
 btnConfPag.onclick = function() {
-if (!ehAdmin) return;
 var jogadorInput = document.getElementById('nomeJogador');
 var valorInput = document.getElementById('valorPagamento');
 var selectJogoPag = document.getElementById('selectJogoPagamento');
@@ -1923,7 +1878,6 @@ carregarListaBaixaConvocados();
 var btnRegSaida = document.getElementById('btnRegistrarSaida');
 if (btnRegSaida) {
 btnRegSaida.onclick = function() {
-if (!ehAdmin) return;
 var descInput = document.getElementById('descSaida');
 var valorInput = document.getElementById('valorSaida');
 var selectJogoSai = document.getElementById('selectJogoSaida');
@@ -1954,7 +1908,6 @@ salvarTudo();
 var btnSalvarM = document.getElementById('btnSalvarMeta');
 if (btnSalvarM) {
 btnSalvarM.onclick = function() {
-if (!ehAdmin) return;
 var nomeInput = document.getElementById('nomeMeta');
 var valorInput = document.getElementById('valorMeta');
 var nome = nomeInput ? nomeInput.value.trim() : '';
@@ -1980,7 +1933,6 @@ salvarTudo();
 var btnIniC = document.getElementById('btnIniciarCron');
 if (btnIniC) {
 btnIniC.onclick = function() {
-if (!ehAdmin) return;
 if (!rodando) {
 rodando = true;
 timerInterval = setInterval(function() {
@@ -2001,7 +1953,6 @@ alert('Fim do tempo regulamentar!');
 var btnPausC = document.getElementById('btnPausarCron');
 if (btnPausC) {
 btnPausC.onclick = function() {
-if (!ehAdmin) return;
 clearInterval(timerInterval);
 rodando = false;
 salvarEstadoPartida();
@@ -2011,7 +1962,6 @@ salvarEstadoPartida();
 var btnZerC = document.getElementById('btnZerarCron');
 if (btnZerC) {
 btnZerC.onclick = function() {
-if (!ehAdmin) return;
 if (!confirm('Deseja zerar o cronômetro e os gols da partida atual?')) return;
 clearInterval(timerInterval);
 rodando = false;
@@ -2035,7 +1985,6 @@ salvarEstadoPartida();
 var btnMaisAc = document.getElementById('btnMaisAcrescimo');
 if (btnMaisAc) {
 btnMaisAc.onclick = function() {
-if (!ehAdmin) return;
 acrescimoMinutos++;
 tempoRestante += 60;
 var dispAc = document.getElementById('displayAcrescimo');
@@ -2048,7 +1997,6 @@ salvarEstadoPartida();
 var btnMenosAc = document.getElementById('btnMenosAcrescimo');
 if (btnMenosAc) {
 btnMenosAc.onclick = function() {
-if (!ehAdmin) return;
 if (acrescimoMinutos > 0) {
 acrescimoMinutos--;
 tempoRestante -= 60;
@@ -2063,7 +2011,6 @@ salvarEstadoPartida();
 var btnTrocarT = document.getElementById('btnTrocarTempo');
 if (btnTrocarT) {
 btnTrocarT.onclick = function() {
-if (!ehAdmin) return;
 clearInterval(timerInterval);
 rodando = false;
 tempoRestante = 30 * 60;
@@ -2090,7 +2037,6 @@ salvarEstadoPartida();
 var btnGolV = document.getElementById('btnGolVermelho');
 if (btnGolV) {
 btnGolV.onclick = function() {
-if (!ehAdmin) return;
 golsVermelho++;
 var gV = document.getElementById('golsVermelho');
 if (gV) gV.innerText = golsVermelho;
@@ -2101,7 +2047,6 @@ salvarEstadoPartida();
 var btnMenV = document.getElementById('btnMenosVermelho');
 if (btnMenV) {
 btnMenV.onclick = function() {
-if (!ehAdmin) return;
 if (golsVermelho > 0) {
 golsVermelho--;
 var gV = document.getElementById('golsVermelho');
@@ -2114,7 +2059,6 @@ salvarEstadoPartida();
 var btnGolA = document.getElementById('btnGolAzul');
 if (btnGolA) {
 btnGolA.onclick = function() {
-if (!ehAdmin) return;
 golsAzul++;
 var gA = document.getElementById('golsAzul');
 if (gA) gA.innerText = golsAzul;
@@ -2125,7 +2069,6 @@ salvarEstadoPartida();
 var btnMenA = document.getElementById('btnMenosAzul');
 if (btnMenA) {
 btnMenA.onclick = function() {
-if (!ehAdmin) return;
 if (golsAzul > 0) {
 golsAzul--;
 var gA = document.getElementById('golsAzul');
@@ -2138,7 +2081,6 @@ salvarEstadoPartida();
 var btnSalvarP = document.getElementById('btnSalvarPartida');
 if (btnSalvarP) {
 btnSalvarP.onclick = function() {
-if (!ehAdmin) return;
 var dataHoje = new Date().toLocaleDateString('pt-BR');
 var artilhariaCopia = Object.assign({}, artilhariaAtual);
 partidasHistorico.push({
@@ -2151,6 +2093,7 @@ artilharia: artilhariaCopia
 salvarTudo();
 renderizarHistoricoPartidas();
 renderizarRankingArtilheiros();
+renderizarPartidasPublicas();
 
 tempoRestante = 30 * 60;
 periodoAtual = 1;
@@ -2177,7 +2120,6 @@ alert('Partida salva com sucesso no histórico e ranking atualizado!');
 var btnSortear = document.getElementById('btnSortearTimes');
 if (btnSortear) {
 btnSortear.onclick = function() {
-if (!ehAdmin) return;
 var jogoId = document.getElementById('selectJogoSorteio').value;
 var qtdTimes = parseInt(document.getElementById('qtdTimes').value, 10);
 var resDiv = document.getElementById('resultadoSorteio');
@@ -2383,8 +2325,8 @@ carregarSelectSorteio();
 renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
+renderizarPartidasPublicas();
 atualizarDisplayTempo();
-atualizarModoVisualizacao();
 
 var gVInit = document.getElementById('golsVermelho');
 var gAInit = document.getElementById('golsAzul');
