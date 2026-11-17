@@ -218,8 +218,13 @@ border: 1px solid #e2e8f0;
 .artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
 .artilheiro-item:last-child { border-bottom: none; }
 
-/* Controles de Visibilidade Admin/Jogador */
-body.modo-jogador [data-admin-only] {
+/* Controles de Visibilidade por Permissão */
+body.modo-jogador [data-admin-only],
+body.modo-jogador [data-juiz-only] {
+display: none !important;
+}
+
+body.modo-juiz [data-admin-only]:not([data-juiz-liberado]) {
 display: none !important;
 }
 </style>
@@ -231,7 +236,7 @@ display: none !important;
 <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
 <span>Império Real FC</span>
 </div>
-<button class="admin-toggle-btn" id="btnToggleAdmin" onclick="alternarModoAdmin()">🔐 Área Admin</button>
+<button class="admin-toggle-btn" id="btnToggleAdmin" onclick="pedirSenhaAdmin()">🔐 Área Admin</button>
 </div>
 
 <div class="balance-card">
@@ -243,11 +248,11 @@ display: none !important;
 <button class="tab-btn active" data-tab="jogos">Jogos</button>
 <button class="tab-btn" data-tab="ranking">Ranking</button>
 <button class="tab-btn" data-tab="relatorio">Relatório</button>
-<!-- Abas exclusivas de Admin -->
+<!-- Abas exclusivas de Admin / Juiz -->
+<button class="tab-btn" data-tab="sorteio" data-admin-only data-juiz-only data-juiz-liberado>Sorteio</button>
+<button class="tab-btn" data-tab="cronometro" data-admin-only data-juiz-only data-juiz-liberado>Cronômetro</button>
 <button class="tab-btn" data-tab="elenco" data-admin-only>Elenco</button>
 <button class="tab-btn" data-tab="pagamentos" data-admin-only>Pagamentos</button>
-<button class="tab-btn" data-tab="sorteio" data-admin-only>Sorteio</button>
-<button class="tab-btn" data-tab="cronometro" data-admin-only>Cronômetro</button>
 <button class="tab-btn" data-tab="saidas" data-admin-only>Saídas</button>
 <button class="tab-btn" data-tab="metas" data-admin-only>Metas</button>
 </div>
@@ -378,7 +383,7 @@ display: none !important;
 </div>
 
 <!-- Aba Sorteio -->
-<div id="tab-sorteio" class="tab-content" data-admin-only>
+<div id="tab-sorteio" class="tab-content" data-admin-only data-juiz-liberado>
 <h3>Sorteador de Times Inteligente</h3>
 <p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide os Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
 <div class="form-group">
@@ -399,7 +404,7 @@ display: none !important;
 </div>
 
 <!-- Aba Cronômetro / Partida -->
-<div id="tab-cronometro" class="tab-content" data-admin-only>
+<div id="tab-cronometro" class="tab-content" data-admin-only data-juiz-liberado>
 <div class="cronometro-box">
 <h3 style="margin-top:0; color:var(--primary-navy);">⏱️ Controle da Partida & Artilharia</h3>
 <div class="form-group" style="text-align:left;">
@@ -492,11 +497,11 @@ display: none !important;
 <div id="listaMetas"></div>
 </div>
 
-<!-- Aba Relatório -->
+<!-- Aba Relatório (Público simplificado por padrão, Completo para o Admin) -->
 <div id="tab-relatorio" class="tab-content">
-<div class="report-box">
+<!-- Visão Pública (Simplificada) -->
+<div class="report-box" id="relatorioPublico">
 <h3>Resumo Financeiro</h3>
-
 <div style="margin-bottom: 15px;">
 <h4 style="color:var(--primary-navy); margin-bottom:5px;">💵 Pagamentos do Último Jogo</h4>
 <div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhum pagamento registrado no último jogo.</div>
@@ -508,7 +513,20 @@ display: none !important;
 </div>
 
 <hr style="border: 0; border-top: 1px solid #e2e8f0;">
-<h3 style="margin-top:15px;">Saldo Total em Caixa: <span id="resumoSaldo" class="positive">R$ 0,00</span></h3>
+<h3 style="margin-top:15px;">Saldo Total em Caixa: <span id="resumoSaldoPublico" class="positive">R$ 0,00</span></h3>
+</div>
+
+<!-- Visão Admin Completa (Exclusiva para Administrador) -->
+<div class="report-box" id="relatorioAdminCompleto" style="display:none;" data-admin-only>
+<h3>Resumo Financeiro Completo (Admin)</h3>
+<p>Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
+<hr style="border: 0; border-top: 1px solid #e2e8f0;">
+<h4>Detalhamento de Saídas:</h4>
+<div id="listaDetalheSaidas"></div>
+<p>Total de Saídas: <span id="resumoSaidas" class="negative">R$ 0,00</span></p>
+<hr style="margin-top: 15px; border: 0; border-top: 1px solid #e2e8f0;">
+<h4>Saldo Final: <span id="resumoSaldoAdmin">R$ 0,00</span></h4>
+<a href="#" class="whatsapp-btn" id="btnWpp" target="_blank">Enviar Resumo no WhatsApp</a>
 </div>
 </div>
 
@@ -576,24 +594,33 @@ display: none !important;
 </div>
 
 <script>
-var modoAdminAtivo = false;
+var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
 
-function alternarModoAdmin() {
-if (!modoAdminAtivo) {
-var senha = prompt("Digite o PIN de Administrador:");
+function pedirSenhaAdmin() {
+if (nivelAcesso === 'jogador') {
+var senha = prompt("Digite a senha de acesso (Admin ou Juiz):");
 if (senha === "1571") {
-modoAdminAtivo = true;
-document.body.classList.remove('modo-jogador');
+nivelAcesso = 'admin';
+document.body.className = '';
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '🔓 Admin Ativo';
-alert('Área Administrativa desbloqueada com sucesso!');
+alert('Área Administrativa Total desbloqueada!');
+switchTab('jogos');
+} else if (senha === "0101") {
+nivelAcesso = 'juiz';
+document.body.className = 'modo-juiz';
+var btn = document.getElementById('btnToggleAdmin');
+btn.classList.add('ativo');
+btn.innerText = '⚽ Modo Juiz';
+alert('Modo Juiz liberado (Sorteio e Cronômetro)!');
+switchTab('cronometro');
 } else if (senha !== null) {
-alert('PIN incorreto!');
+alert('Senha incorreta!');
 }
 } else {
-modoAdminAtivo = false;
-document.body.classList.add('modo-jogador');
+nivelAcesso = 'jogador';
+document.body.className = 'modo-jogador';
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
 btn.innerText = '🔐 Área Admin';
@@ -601,7 +628,7 @@ var abaAtiva = document.querySelector('.tab-btn.active');
 if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
 switchTab('jogos');
 }
-alert('Área Administrativa bloqueada (Modo Jogador).');
+alert('Sessão encerrada (Modo Público).');
 }
 }
 
@@ -661,7 +688,6 @@ function salvarEstadoPartida() {
   localStorage.setItem('partida_atual_imperio_real', JSON.stringify(estado));
 }
 
-// Sincronização do cronômetro rodando em segundo plano mesmo após atualizar a página
 function inicializarCronometroEmSegundoPlano() {
   if (rodando && timestampUltimoTick) {
     var agora = Date.now();
@@ -1006,22 +1032,26 @@ var container = document.getElementById('proximoJogoPublico');
 if (!container) return;
 container.innerHTML = '';
 
-if (jogos.length === 0) {
-container.innerHTML = '<div class="report-box"><i>Nenhum jogo cadastrado no momento.</i></div>';
-return;
-}
+// Filtrar apenas jogos cuja data seja hoje ou no futuro (YYYY-MM-DD)
+var hojeStr = new Date().toISOString().split('T')[0];
 
-// Ordenar jogos pela data mais próxima ou futura
-var jogosOrdenados = jogos.slice().sort(function(a, b) {
+var futuros = jogos.filter(function(j) {
+return j.data >= hojeStr;
+}).sort(function(a, b) {
 return new Date(a.data) - new Date(b.data);
 });
 
-var proximoJogo = jogosOrdenados[0];
+if (futuros.length === 0) {
+container.innerHTML = '<div class="report-box" style="text-align:center; color:#64748b;"><i>Nenhum jogo futuro agendado no momento.</i></div>';
+return;
+}
+
+var proximoJogo = futuros[0];
 var convocados = proximoJogo.convocados || [];
 
 var html = '<div class="report-box">';
 html += '<h4 style="color:var(--primary-navy); margin-top:0;">⚽ ' + proximoJogo.nome + '</h4>';
-html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data + '</b> | 👥 Total Convocados: <b>' + convocados.length + '</b></p>';
+html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | 👥 Total Convocados: <b>' + convocados.length + '</b></p>';
 
 if (convocados.length === 0) {
 html += '<p><i>Nenhum jogador convocado para esta partida ainda.</i></p>';
@@ -1381,7 +1411,7 @@ htmlSaiUltimo += '<div class="expense-detail"><span>' + t.desc + '</span><b clas
 
 var divPag = document.getElementById('relatorioPagamentosUltimoJogo');
 var divSai = document.getElementById('relatorioDespesasUltimoJogo');
-var resSal = document.getElementById('resumoSaldo');
+var resSalPub = document.getElementById('resumoSaldoPublico');
 
 if (divPag) {
 divPag.innerHTML = htmlPagUltimo ? htmlPagUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Pagamentos: ' + formatarMoeda(totalPagUltimo) + '</div>' : 'Nenhum pagamento registrado no último jogo.';
@@ -1389,8 +1419,44 @@ divPag.innerHTML = htmlPagUltimo ? htmlPagUltimo + '<div style="margin-top:6px; 
 if (divSai) {
 divSai.innerHTML = htmlSaiUltimo ? htmlSaiUltimo + '<div style="margin-top:6px; font-weight:bold; border-top:1px solid #e2e8f0; padding-top:4px;">Total Despesas: ' + formatarMoeda(totalSaiUltimo) + '</div>' : 'Nenhuma despesa registrada no último jogo.';
 }
-if (resSal) {
-resSal.innerText = formatarMoeda(calcularSaldo());
+if (resSalPub) {
+resSalPub.innerText = formatarMoeda(calcularSaldo());
+}
+
+// Relatório Completo para Admin
+var ent = 0, sai = 0;
+var htmlSaidasAdmin = '';
+var txtSaidasAdmin = '';
+
+for (var i = 0; i < transacoes.length; i++) {
+var t = transacoes[i];
+if (t.tipo === 'pagamento') ent += Number(t.valor);
+if (t.tipo === 'saida') {
+var v = Number(t.valor);
+sai += v;
+htmlSaidasAdmin += '<div class="expense-detail"><span>' + t.desc + '</span><b>-' + formatarMoeda(v) + '</b></div>';
+txtSaidasAdmin += '\n- ' + t.desc + ': -' + formatarMoeda(v);
+}
+}
+
+var saldoAdmin = ent - sai;
+var resEnt = document.getElementById('resumoEntradas');
+var resSai = document.getElementById('resumoSaidas');
+var listDet = document.getElementById('listaDetalheSaidas');
+var resSalAdmin = document.getElementById('resumoSaldoAdmin');
+var btnWpp = document.getElementById('btnWpp');
+
+if (resEnt) resEnt.innerText = formatarMoeda(ent);
+if (resSai) resSai.innerText = formatarMoeda(sai);
+if (listDet) listDet.innerHTML = htmlSaidasAdmin || 'Nenhuma saída registrada.';
+if (resSalAdmin) resSalAdmin.innerText = formatarMoeda(saldoAdmin);
+
+var textoWpp = 'RELATÓRIO FINANCEIRO - IMPÉRIO REAL FC\n\nTotal Arrecadado: ' + formatarMoeda(ent) + '\nSaídas:' + (txtSaidasAdmin || '\nNenhuma') + '\n\nTotal Saídas: ' + formatarMoeda(sai) + '\nSaldo Atual: ' + formatarMoeda(saldoAdmin);
+if (btnWpp) btnWpp.href = 'https://wa.me/?text=' + encodeURIComponent(textoWpp);
+
+var divAdminComp = document.getElementById('relatorioAdminCompleto');
+if (divAdminComp) {
+divAdminComp.style.display = (nivelAcesso === 'admin') ? 'block' : 'none';
 }
 }
 
@@ -2377,7 +2443,7 @@ var st = p.status || 'marechal';
 var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
 var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
 html += '<div class="team-player-item">';
-html += '<span class="badge-nivel ' + obterClasseNypel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
 html += '<span>' + p.nome + '</span>';
 html += '<span class="badge-status ' + statusClass + '">' + statusText + '</span>';
 html += '</div>';
