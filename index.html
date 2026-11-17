@@ -43,10 +43,28 @@ align-items: center;
 gap: 10px;
 }
 
+.header-right {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
 .header-logo {
 height: 40px;
 width: auto;
 object-fit: contain;
+}
+
+.sync-btn {
+background: rgba(255, 255, 255, 0.1);
+color: #cbd5e1;
+border: 1px solid rgba(212, 175, 55, 0.4);
+padding: 6px 10px;
+border-radius: 6px;
+font-size: 0.78rem;
+font-weight: bold;
+cursor: pointer;
+transition: all 0.2s;
 }
 
 .admin-toggle-btn {
@@ -236,7 +254,10 @@ display: none !important;
 <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
 <span>Império Real FC</span>
 </div>
-<button class="admin-toggle-btn" id="btnToggleAdmin" onclick="pedirSenhaAdmin()">🔐 Área Admin</button>
+<div class="header-right">
+<button class="sync-btn" id="btnSyncStatus" onclick="carregarDaNuvem(true)" title="Atualizar dados da nuvem">☁️ Sync</button>
+<button class="admin-toggle-btn" id="btnToggleAdmin" onclick="pedirSenhaAdmin()">🔐 Admin</button>
+</div>
 </div>
 
 <div class="balance-card">
@@ -497,7 +518,7 @@ display: none !important;
 <div id="listaMetas"></div>
 </div>
 
-<!-- Aba Relatório (Público simplificado por padrão, Completo para o Admin) -->
+<!-- Aba Relatório -->
 <div id="tab-relatorio" class="tab-content">
 <!-- Visão Pública (Simplificada) -->
 <div class="report-box" id="relatorioPublico">
@@ -517,7 +538,7 @@ display: none !important;
 </div>
 
 <!-- Visão Admin Completa (Exclusiva para Administrador) -->
-<div class="report-box" id="relatorioAdminCompleto" style="display:none;" data-admin-only>
+<div class="report-box" id="relatorioAdminCompleto" style="display:none; margin-top: 15px;" data-admin-only>
 <h3>Resumo Financeiro Completo (Admin)</h3>
 <p>Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
 <hr style="border: 0; border-top: 1px solid #e2e8f0;">
@@ -594,7 +615,97 @@ display: none !important;
 </div>
 
 <script>
+// Configuração JSONbin.io
+const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
+const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
+const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
+
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
+
+function atualizarStatusSync(texto) {
+  var btn = document.getElementById('btnSyncStatus');
+  if (btn) btn.innerText = texto;
+}
+
+async function carregarDaNuvem(mostrarAlerta) {
+  atualizarStatusSync('⏳ Sync...');
+  try {
+    const resp = await fetch(JSONBIN_URL + "/latest", {
+      method: "GET",
+      headers: {
+        "X-Master-Key": JSONBIN_KEY
+      }
+    });
+    if (!resp.ok) throw new Error("Erro ao buscar dados");
+    const json = await resp.json();
+    const record = json.record || {};
+
+    // Se já houver dados na nuvem, atualiza localmente
+    if (record.jogos !== undefined || record.jogadoresElenco !== undefined || record.transacoes !== undefined || record.partidasHistorico !== undefined) {
+      jogos = record.jogos || [];
+      jogadoresElenco = record.jogadoresElenco || [];
+      transacoes = record.transacoes || [];
+      metas = record.metas || [];
+      partidasHistorico = record.partidasHistorico || [];
+
+      localStorage.setItem('jogos_imperio_real', JSON.stringify(jogos));
+      localStorage.setItem('jogadores_imperio_real', JSON.stringify(jogadoresElenco));
+      localStorage.setItem('transacoes_imperio_real', JSON.stringify(transacoes));
+      localStorage.setItem('metas_imperio_real', JSON.stringify(metas));
+      localStorage.setItem('partidas_imperio_real', JSON.stringify(partidasHistorico));
+
+      renderizar();
+      renderizarElenco();
+      carregarSelectSorteio();
+      carregarSelectCronometro();
+      renderizarHistoricoPartidas();
+      renderizarPainelArtilharia();
+      renderizarRankingArtilheiros();
+      renderizarPartidasPublicas();
+      renderizarProximoJogoPublico();
+      atualizarRelatorio();
+    } else if (jogos.length > 0 || jogadoresElenco.length > 0 || transacoes.length > 0 || partidasHistorico.length > 0) {
+      // Se o bin ainda estava vazio mas o Admin já tinha dados no celular, sobe os dados locais para a nuvem
+      await salvarNaNuvem();
+    }
+
+    atualizarStatusSync('☁️ Online');
+    if (mostrarAlerta) alert('Dados sincronizados com a nuvem com sucesso!');
+  } catch (err) {
+    console.error(err);
+    atualizarStatusSync('⚠️ Offline');
+    if (mostrarAlerta) alert('Não foi possível conectar à nuvem no momento. Exibindo dados locais.');
+  }
+}
+
+async function salvarNaNuvem() {
+  atualizarStatusSync('⏳ Salvando...');
+  try {
+    const payload = {
+      jogos: jogos,
+      jogadoresElenco: jogadoresElenco,
+      transacoes: transacoes,
+      metas: metas,
+      partidasHistorico: partidasHistorico,
+      ultimaAtualizacao: new Date().toISOString()
+    };
+
+    const resp = await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_KEY
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) throw new Error("Erro ao salvar na nuvem");
+    atualizarStatusSync('☁️ Salvo');
+  } catch (err) {
+    console.error(err);
+    atualizarStatusSync('⚠️ Erro Sync');
+  }
+}
 
 function pedirSenhaAdmin() {
 if (nivelAcesso === 'jogador') {
@@ -604,7 +715,7 @@ nivelAcesso = 'admin';
 document.body.className = '';
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
-btn.innerText = '🔓 Admin Ativo';
+btn.innerText = '🔓 Admin';
 alert('Área Administrativa Total desbloqueada!');
 switchTab('jogos');
 } else if (senha === "0101") {
@@ -612,7 +723,7 @@ nivelAcesso = 'juiz';
 document.body.className = 'modo-juiz';
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
-btn.innerText = '⚽ Modo Juiz';
+btn.innerText = '⚽ Juiz';
 alert('Modo Juiz liberado (Sorteio e Cronômetro)!');
 switchTab('cronometro');
 } else if (senha !== null) {
@@ -623,7 +734,7 @@ nivelAcesso = 'jogador';
 document.body.className = 'modo-jogador';
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
-btn.innerText = '🔐 Área Admin';
+btn.innerText = '🔐 Admin';
 var abaAtiva = document.querySelector('.tab-btn.active');
 if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
 switchTab('jogos');
@@ -728,6 +839,7 @@ localStorage.setItem('transacoes_imperio_real', JSON.stringify(transacoes));
 localStorage.setItem('metas_imperio_real', JSON.stringify(metas));
 localStorage.setItem('partidas_imperio_real', JSON.stringify(partidasHistorico));
 renderizar();
+salvarNaNuvem();
 }
 
 function formatarMoeda(v) {
@@ -1032,13 +1144,17 @@ var container = document.getElementById('proximoJogoPublico');
 if (!container) return;
 container.innerHTML = '';
 
-// Filtrar apenas jogos cuja data seja hoje ou no futuro (YYYY-MM-DD)
-var hojeStr = new Date().toISOString().split('T')[0];
+// Data atual no formato YYYY-MM-DD local
+var agora = new Date();
+var ano = agora.getFullYear();
+var mes = String(agora.getMonth() + 1).padStart(2, '0');
+var dia = String(agora.getDate()).padStart(2, '0');
+var hojeStr = ano + '-' + mes + '-' + dia;
 
 var futuros = jogos.filter(function(j) {
 return j.data >= hojeStr;
 }).sort(function(a, b) {
-return new Date(a.data) - new Date(b.data);
+return a.data.localeCompare(b.data);
 });
 
 if (futuros.length === 0) {
@@ -1718,6 +1834,7 @@ switchTab(this.getAttribute('data-tab'));
 }
 
 inicializarCronometroEmSegundoPlano();
+carregarDaNuvem(false);
 
 var dispTempo = document.getElementById('displayTempo');
 if (dispTempo) {
@@ -1814,7 +1931,7 @@ renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
 renderizarPartidasPublicas();
-alert('Backup restaurado com sucesso!');
+alert('Backup restaurado com sucesso e enviado para a nuvem!');
 } else {
 alert('Arquivo de backup inválido.');
 }
@@ -2284,7 +2401,7 @@ atualizarDisplayTempo();
 renderizarPainelArtilharia();
 salvarEstadoPartida();
 
-alert('Partida salva com sucesso no histórico e ranking atualizado!');
+alert('Partida salva com sucesso na nuvem e ranking atualizado!');
 };
 }
 
