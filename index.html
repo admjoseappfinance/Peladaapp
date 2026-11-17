@@ -252,7 +252,7 @@ display: none !important;
 <button class="tab-btn" data-tab="metas" data-admin-only>Metas</button>
 </div>
 
-<!-- Aba Jogos (Agora exibe Partidas Realizadas para Jogadores e Gestão de Jogos Futuros para Admin) -->
+<!-- Aba Jogos -->
 <div id="tab-jogos" class="tab-content active">
 <div data-admin-only>
 <h3>Cadastrar Jogo / Convocação</h3>
@@ -300,8 +300,11 @@ display: none !important;
 <hr style="margin: 25px 0; border: 0; border-top: 1px solid #cbd5e1;">
 </div>
 
+<!-- Seção Pública: Próximo Jogo e Convocados -->
+<h3>📋 Próximo Jogo e Convocados</h3>
+<div id="proximoJogoPublico" style="margin-bottom:20px;"></div>
+
 <h3>⚽ Histórico de Partidas Realizadas</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Placares, artilheiros e detalhes dos jogos já disputados.</p>
 <div id="listaPartidasPublicas"></div>
 </div>
 
@@ -398,9 +401,15 @@ display: none !important;
 <!-- Aba Cronômetro / Partida -->
 <div id="tab-cronometro" class="tab-content" data-admin-only>
 <div class="cronometro-box">
-<h3 id="labelPeriodo" style="margin-top:0; color:var(--primary-navy);">1º Tempo (30 min)</h3>
+<h3 style="margin-top:0; color:var(--primary-navy);">⏱️ Controle da Partida & Artilharia</h3>
+<div class="form-group" style="text-align:left;">
+<label>Vincular ao Jogo (Carrega apenas os convocados do dia)</label>
+<select id="selectJogoCronometro"><option value="">Selecione o jogo do dia...</option></select>
+</div>
+
+<h3 id="labelPeriodo" style="color:var(--primary-navy); margin-top:15px;">1º Tempo (30 min)</h3>
 <div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
-<small style="color:#64748b; display:block; margin-bottom:10px;">💡 Toque no relógio acima para ajustar o tempo manualmente.</small>
+<small style="color:#64748b; display:block; margin-bottom:10px;">💡 O cronômetro roda em segundo plano. Toque no relógio acima para ajustar manualmente.</small>
 
 <div class="placar-container">
 <div class="time-placar">
@@ -422,10 +431,10 @@ display: none !important;
 </div>
 </div>
 
-<!-- Artilharia Rápida -->
+<!-- Artilharia Rápida restrita aos convocados do jogo selecionado -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.95rem;">⚽ Artilharia da Partida (Toque rápido)</h4>
-<div id="painelArtilhariaRapida"><i>Realize o sorteio ou selecione um jogo para carregar os jogadores.</i></div>
+<h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.95rem;">⚽ Artilharia da Partida (Apenas convocados do jogo)</h4>
+<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar apenas os jogadores convocados para a partida.</i></div>
 </div>
 
 <div class="cron-btn-group">
@@ -483,7 +492,7 @@ display: none !important;
 <div id="listaMetas"></div>
 </div>
 
-<!-- Aba Relatório (Atualizada com Pagamentos do último jogo, Despesas do último jogo e Saldo total) -->
+<!-- Aba Relatório -->
 <div id="tab-relatorio" class="tab-content">
 <div class="report-box">
 <h3>Resumo Financeiro</h3>
@@ -588,7 +597,6 @@ document.body.classList.add('modo-jogador');
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
 btn.innerText = '🔐 Área Admin';
-// Se estiver em aba restrita, volta para a aba Jogos
 var abaAtiva = document.querySelector('.tab-btn.active');
 if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
 switchTab('jogos');
@@ -632,9 +640,11 @@ var acrescimoMinutos = partidaSalvaLocal.acrescimoMinutos || 0;
 var golsVermelho = partidaSalvaLocal.golsVermelho || 0;
 var golsAzul = partidaSalvaLocal.golsAzul || 0;
 var artilhariaAtual = partidaSalvaLocal.artilhariaAtual || {};
+var jogoCronometroId = partidaSalvaLocal.jogoCronometroId || '';
 
+var timestampUltimoTick = partidaSalvaLocal.timestampUltimoTick || null;
+var rodando = partidaSalvaLocal.rodando || false;
 var timerInterval = null;
-var rodando = false;
 
 function salvarEstadoPartida() {
   var estado = {
@@ -643,9 +653,46 @@ function salvarEstadoPartida() {
     acrescimoMinutos: acrescimoMinutos,
     golsVermelho: golsVermelho,
     golsAzul: golsAzul,
-    artilhariaAtual: artilhariaAtual
+    artilhariaAtual: artilhariaAtual,
+    jogoCronometroId: jogoCronometroId,
+    rodando: rodando,
+    timestampUltimoTick: rodando ? Date.now() : null
   };
   localStorage.setItem('partida_atual_imperio_real', JSON.stringify(estado));
+}
+
+// Sincronização do cronômetro rodando em segundo plano mesmo após atualizar a página
+function inicializarCronometroEmSegundoPlano() {
+  if (rodando && timestampUltimoTick) {
+    var agora = Date.now();
+    var segundosPassados = Math.floor((agora - timestampUltimoTick) / 1000);
+    if (segundosPassados > 0) {
+      tempoRestante = Math.max(0, tempoRestante - segundosPassados);
+      if (tempoRestante === 0) {
+        rodando = false;
+      }
+    }
+  }
+  if (rodando) {
+    iniciarIntervaloRelogio();
+  }
+  atualizarDisplayTempo();
+}
+
+function iniciarIntervaloRelogio() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    if (tempoRestante > 0) {
+      tempoRestante--;
+      atualizarDisplayTempo();
+      salvarEstadoPartida();
+    } else {
+      clearInterval(timerInterval);
+      rodando = false;
+      salvarEstadoPartida();
+      alert('Fim do tempo regulamentar!');
+    }
+  }, 1000);
 }
 
 function salvarTudo() {
@@ -683,6 +730,7 @@ contents[j].classList.remove('active');
 
 if (tabId === 'jogos') {
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+renderizarProximoJogoPublico();
 renderizarPartidasPublicas();
 }
 if (tabId === 'elenco') renderizarElenco();
@@ -690,6 +738,7 @@ if (tabId === 'relatorio') atualizarRelatorio();
 if (tabId === 'pagamentos') carregarListaBaixaConvocados();
 if (tabId === 'sorteio') carregarSelectSorteio();
 if (tabId === 'cronometro') {
+carregarSelectCronometro();
 renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 atualizarDisplayTempo();
@@ -938,6 +987,59 @@ sel.appendChild(opt);
 sel.value = valAntigo;
 }
 
+function carregarSelectCronometro() {
+var sel = document.getElementById('selectJogoCronometro');
+if (!sel) return;
+var valAntigo = jogoCronometroId;
+sel.innerHTML = '<option value="">Selecione o jogo do dia...</option>';
+for (var i = 0; i < jogos.length; i++) {
+var opt = document.createElement('option');
+opt.value = jogos[i].id;
+opt.textContent = jogos[i].nome + ' (' + jogos[i].data + ')';
+sel.appendChild(opt);
+}
+sel.value = valAntigo;
+}
+
+function renderizarProximoJogoPublico() {
+var container = document.getElementById('proximoJogoPublico');
+if (!container) return;
+container.innerHTML = '';
+
+if (jogos.length === 0) {
+container.innerHTML = '<div class="report-box"><i>Nenhum jogo cadastrado no momento.</i></div>';
+return;
+}
+
+// Ordenar jogos pela data mais próxima ou futura
+var jogosOrdenados = jogos.slice().sort(function(a, b) {
+return new Date(a.data) - new Date(b.data);
+});
+
+var proximoJogo = jogosOrdenados[0];
+var convocados = proximoJogo.convocados || [];
+
+var html = '<div class="report-box">';
+html += '<h4 style="color:var(--primary-navy); margin-top:0;">⚽ ' + proximoJogo.nome + '</h4>';
+html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data + '</b> | 👥 Total Convocados: <b>' + convocados.length + '</b></p>';
+
+if (convocados.length === 0) {
+html += '<p><i>Nenhum jogador convocado para esta partida ainda.</i></p>';
+} else {
+html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+for (var i = 0; i < convocados.length; i++) {
+var p = convocados[i];
+var nome = typeof p === 'string' ? p : p.nome;
+var nivel = typeof p === 'string' ? 'prata' : (p.nivel || 'prata');
+html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px;">' + nome + '</span>';
+}
+html += '</div>';
+}
+html += '</div>';
+
+container.innerHTML = html;
+}
+
 function renderizarPartidasPublicas() {
 var container = document.getElementById('listaPartidasPublicas');
 if (!container) return;
@@ -1114,7 +1216,9 @@ delBtnMeta.onclick = function() { excluirMeta(meta.id); };
 }
 
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
+renderizarProximoJogoPublico();
 renderizarPartidasPublicas();
+carregarSelectCronometro();
 }
 
 function carregarListaBaixaConvocados() {
@@ -1235,6 +1339,7 @@ if (!confirm('Deseja excluir este jogo?')) return;
 jogos = jogos.filter(function(j) { return j.id != id; });
 salvarTudo();
 carregarSelectSorteio();
+carregarSelectCronometro();
 }
 
 function excluirTransacao(id) {
@@ -1458,30 +1563,31 @@ function renderizarPainelArtilharia() {
 var container = document.getElementById('painelArtilhariaRapida');
 if (!container) return;
 
-var listaJogadoresPainel = [];
-var selSorteio = document.getElementById('selectJogoSorteio');
-var jogoId = selSorteio ? selSorteio.value : '';
+var selCron = document.getElementById('selectJogoCronometro');
+var jogoId = selCron ? selCron.value : '';
 
-if (jogoId) {
-for (var i = 0; i < jogos.length; i++) {
-if (jogos[i].id == jogoId && jogos[i].convocados) {
-listaJogadoresPainel = jogos[i].convocados;
-break;
-}
-}
-}
-
-if (listaJogadoresPainel.length === 0) {
-listaJogadoresPainel = jogadoresElenco;
-}
-
-if (listaJogadoresPainel.length === 0) {
-container.innerHTML = '<i>Nenhum jogador disponível. Selecione um jogo na aba Sorteio ou cadastre no Elenco.</i>';
+if (!jogoId) {
+container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os convocados da partida.</i>';
 return;
 }
 
+var jogoSelecionado = null;
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == jogoId) {
+jogoSelecionado = jogos[i];
+break;
+}
+}
+
+if (!jogoSelecionado || !jogoSelecionado.convocados || jogoSelecionado.convocados.length === 0) {
+container.innerHTML = '<i>Este jogo não possui jogadores convocados cadastrados.</i>';
+return;
+}
+
+var listaConvocados = jogoSelecionado.convocados;
 container.innerHTML = '';
-for (var i = 0; i < listaJogadoresPainel.length; i++) {
+
+for (var i = 0; i < listaConvocados.length; i++) {
 (function(p) {
 var nome = typeof p === 'string' ? p : p.nome;
 if (artilhariaAtual[nome] === undefined) {
@@ -1533,7 +1639,7 @@ contDiv.appendChild(btnMais);
 row.appendChild(label);
 row.appendChild(contDiv);
 container.appendChild(row);
-})(listaJogadoresPainel[i]);
+})(listaConvocados[i]);
 }
 }
 
@@ -1544,6 +1650,8 @@ tabBtns[i].onclick = function() {
 switchTab(this.getAttribute('data-tab'));
 };
 }
+
+inicializarCronometroEmSegundoPlano();
 
 var dispTempo = document.getElementById('displayTempo');
 if (dispTempo) {
@@ -1635,6 +1743,7 @@ partidasHistorico = importado.partidasHistorico || importado.partidas || [];
 salvarTudo();
 renderizarElenco();
 carregarSelectSorteio();
+carregarSelectCronometro();
 renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
@@ -1768,6 +1877,7 @@ temporarioJogadores = [];
 renderizarTags(document.getElementById('containerJogadoresTemporarios'), temporarioJogadores, false);
 salvarTudo();
 carregarSelectSorteio();
+carregarSelectCronometro();
 };
 }
 
@@ -1786,6 +1896,8 @@ salvarTudo();
 var modal = document.getElementById('modalEditarLista');
 if (modal) modal.style.display = 'none';
 carregarListaBaixaConvocados();
+renderizarProximoJogoPublico();
+renderizarPainelArtilharia();
 };
 }
 
@@ -1935,17 +2047,8 @@ if (btnIniC) {
 btnIniC.onclick = function() {
 if (!rodando) {
 rodando = true;
-timerInterval = setInterval(function() {
-if (tempoRestante > 0) {
-tempoRestante--;
-atualizarDisplayTempo();
+iniciarIntervaloRelogio();
 salvarEstadoPartida();
-} else {
-clearInterval(timerInterval);
-rodando = false;
-alert('Fim do tempo regulamentar!');
-}
-}, 1000);
 }
 };
 }
@@ -1953,7 +2056,7 @@ alert('Fim do tempo regulamentar!');
 var btnPausC = document.getElementById('btnPausarCron');
 if (btnPausC) {
 btnPausC.onclick = function() {
-clearInterval(timerInterval);
+if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 salvarEstadoPartida();
 };
@@ -1963,7 +2066,7 @@ var btnZerC = document.getElementById('btnZerarCron');
 if (btnZerC) {
 btnZerC.onclick = function() {
 if (!confirm('Deseja zerar o cronômetro e os gols da partida atual?')) return;
-clearInterval(timerInterval);
+if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 tempoRestante = 30 * 60;
 acrescimoMinutos = 0;
@@ -2011,7 +2114,7 @@ salvarEstadoPartida();
 var btnTrocarT = document.getElementById('btnTrocarTempo');
 if (btnTrocarT) {
 btnTrocarT.onclick = function() {
-clearInterval(timerInterval);
+if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 tempoRestante = 30 * 60;
 acrescimoMinutos = 0;
@@ -2095,6 +2198,8 @@ renderizarHistoricoPartidas();
 renderizarRankingArtilheiros();
 renderizarPartidasPublicas();
 
+if (timerInterval) clearInterval(timerInterval);
+rodando = false;
 tempoRestante = 30 * 60;
 periodoAtual = 1;
 acrescimoMinutos = 0;
@@ -2272,7 +2377,7 @@ var st = p.status || 'marechal';
 var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
 var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
 html += '<div class="team-player-item">';
-html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span class="badge-nivel ' + obterClasseNypel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
 html += '<span>' + p.nome + '</span>';
 html += '<span class="badge-status ' + statusClass + '">' + statusText + '</span>';
 html += '</div>';
@@ -2319,14 +2424,23 @@ if (selSorteio) {
 selSorteio.onchange = renderizarPainelArtilharia;
 }
 
+var selCron = document.getElementById('selectJogoCronometro');
+if (selCron) {
+selCron.onchange = function() {
+jogoCronometroId = this.value;
+renderizarPainelArtilharia();
+salvarEstadoPartida();
+};
+}
+
 renderizar();
 renderizarElenco();
 carregarSelectSorteio();
+carregarSelectCronometro();
 renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
 renderizarPartidasPublicas();
-atualizarDisplayTempo();
 
 var gVInit = document.getElementById('golsVermelho');
 var gAInit = document.getElementById('golsAzul');
