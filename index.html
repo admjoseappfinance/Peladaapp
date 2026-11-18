@@ -194,6 +194,7 @@ border: 1px solid #e2e8f0;
 
 .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; min-height: 40px; }
 .player-tag { padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid; }
+.tag-diamante { background: #e0f2fe; color: #0284c7; border-color: #38bdf8; }
 .tag-ouro { background: #fef08a; color: #854d0e; border-color: #eab308; }
 .tag-prata { background: #e2e8f0; color: #475569; border-color: #94a3b8; }
 .tag-bronze { background: #ffedd5; color: #9a3412; border-color: #f97316; }
@@ -302,7 +303,8 @@ display: none !important;
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="inputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
 <select id="inputNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
-<option value="ouro" selected style="color: #854d0e;">🥇 Ouro</option>
+<option value="diamante" selected style="color: #0284c7;">💎 Diamante</option>
+<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
 <option value="prata" style="color: #475569;">🥈 Prata</option>
 <option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
@@ -346,8 +348,9 @@ display: none !important;
 <div style="flex: 1;">
 <label>Nível / Posição Padrão</label>
 <select id="elencoNivel" style="font-weight: bold; padding: 12px;">
-<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
-<option value="prata" selected style="color: #475569;">🥈 Prata</option>
+<option value="diamante" style="color: #0284c7;">💎 Diamante</option>
+<option value="ouro" selected style="color: #854d0e;">🥇 Ouro</option>
+<option value="prata" style="color: #475569;">🥈 Prata</option>
 <option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
@@ -406,7 +409,7 @@ display: none !important;
 <!-- Aba Sorteio -->
 <div id="tab-sorteio" class="tab-content" data-admin-only data-juiz-liberado>
 <h3>Sorteador de Times Inteligente</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide os Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
+<p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide Diamantes, Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
 <div class="form-group">
 <label>Selecione o Jogo</label>
 <select id="selectJogoSorteio"><option value="">Selecione um jogo...</option></select>
@@ -567,6 +570,7 @@ display: none !important;
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="editInputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
 <select id="editNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<option value="diamante" style="color: #0284c7;">💎 Diamante</option>
 <option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
 <option value="prata" selected style="color: #475569;">🥈 Prata</option>
 <option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
@@ -893,6 +897,7 @@ renderizarRankingArtilheiros();
 }
 
 function obterClasseNivel(nivel) {
+if (nivel === 'diamante') return 'tag-diamante';
 if (nivel === 'ouro') return 'tag-ouro';
 if (nivel === 'prata') return 'tag-prata';
 if (nivel === 'bronze') return 'tag-bronze';
@@ -1043,6 +1048,7 @@ selectNivel.style.padding = '4px';
 selectNivel.style.fontSize = '0.8rem';
 selectNivel.style.width = 'auto';
 selectNivel.innerHTML =
+'<option value="diamante"' + (p.nivel === 'diamante' ? ' selected' : '') + '>Diamante</option>' +
 '<option value="ouro"' + (p.nivel === 'ouro' ? ' selected' : '') + '>Ouro</option>' +
 '<option value="prata"' + (p.nivel === 'prata' ? ' selected' : '') + '>Prata</option>' +
 '<option value="bronze"' + (p.nivel === 'bronze' ? ' selected' : '') + '>Bronze</option>' +
@@ -1499,7 +1505,6 @@ salvarTudo();
 function atualizarRelatorio() {
 var ultimoJogoRealizadoId = null;
 
-// Data de hoje em YYYY-MM-DD
 var agora = new Date();
 var ano = agora.getFullYear();
 var mes = String(agora.getMonth() + 1).padStart(2, '0');
@@ -1507,7 +1512,6 @@ var dia = String(agora.getDate()).padStart(2, '0');
 var hojeStr = ano + '-' + mes + '-' + dia;
 
 if (jogos.length > 0) {
-  // Filtra apenas jogos que já passaram (data <= hoje) ou que possuem pagamentos vinculados
   var jogosRealizados = jogos.filter(function(j) {
     var temPagamento = transacoes.some(function(t) { return t.jogoId == j.id; });
     return j.data <= hojeStr || temPagamento;
@@ -1517,7 +1521,6 @@ if (jogos.length > 0) {
     jogosRealizados.sort(function(a, b) { return new Date(b.data) - new Date(a.data); });
     ultimoJogoRealizadoId = jogosRealizados[0].id;
   } else {
-    // Caso não haja jogos passados, pega o mais antigo cadastrado
     var copiaJogos = jogos.slice().sort(function(a, b) { return new Date(b.data) - new Date(a.data); });
     ultimoJogoRealizadoId = copiaJogos[0].id;
   }
@@ -1556,7 +1559,6 @@ if (resSalPub) {
 resSalPub.innerText = formatarMoeda(calcularSaldo());
 }
 
-// Relatório Completo para Admin
 var ent = 0, sai = 0;
 var htmlSaidasAdmin = '';
 var txtSaidasAdmin = '';
@@ -2006,7 +2008,7 @@ return;
 jogadoresElenco.push({
 id: Date.now(),
 nome: nome,
-nivel: selNivel ? selNivel.value : 'prata',
+nivel: selNivel ? selNivel.value : 'ouro',
 status: selStatus ? selStatus.value : 'marechal'
 });
 
@@ -2462,12 +2464,13 @@ renderizarPainelArtilharia();
 salvarEstadoPartida();
 
 var potesGoleiros = { ouro: [], prata: [] };
-var potesLinha = { ouro: [], prata: [], bronze: [] };
+var potesLinha = { diamante: [], ouro: [], prata: [], bronze: [] };
 
 for (var i = 0; i < listaJogadores.length; i++) {
 var p = listaJogadores[i];
 if (p.nivel === 'goleiro-ouro') potesGoleiros.ouro.push(p);
 else if (p.nivel === 'goleiro-prata') potesGoleiros.prata.push(p);
+else if (p.nivel === 'diamante') potesLinha.diamante.push(p);
 else if (p.nivel === 'ouro') potesLinha.ouro.push(p);
 else if (p.nivel === 'prata') potesLinha.prata.push(p);
 else potesLinha.bronze.push(p);
@@ -2485,6 +2488,7 @@ return array;
 
 potesGoleiros.ouro = embaralhar(potesGoleiros.ouro);
 potesGoleiros.prata = embaralhar(potesGoleiros.prata);
+potesLinha.diamante = embaralhar(potesLinha.diamante);
 potesLinha.ouro = embaralhar(potesLinha.ouro);
 potesLinha.prata = embaralhar(potesLinha.prata);
 potesLinha.bronze = embaralhar(potesLinha.bronze);
@@ -2508,6 +2512,14 @@ times[timeIdx].goleiro = todosGoleiros[i];
 todosGoleiros[i].posicaoExtra = 'Goleiro';
 times[timeIdx].reservas.push(todosGoleiros[i]);
 }
+}
+
+var diamanteDistribuido = [];
+for (var t = 0; t < qtdTimes; t++) { diamanteDistribuido.push([]); }
+var tDiamIdx = 0;
+for (var i = 0; i < potesLinha.diamante.length; i++) {
+diamanteDistribuido[tDiamIdx].push(potesLinha.diamante[i]);
+tDiamIdx = (tDiamIdx + 1) % qtdTimes;
 }
 
 var ouroDistribuido = [];
@@ -2534,7 +2546,7 @@ return 1;
 };
 
 for (var t = 0; t < qtdTimes; t++) {
-var poolTime = ouroDistribuido[t].concat(demDistribuido[t]);
+var poolTime = diamanteDistribuido[t].concat(ouroDistribuido[t]).concat(demDistribuido[t]);
 poolTime.sort(function(a, b) {
 return pesoStatus(b.status) - pesoStatus(a.status);
 });
