@@ -225,6 +225,19 @@ border: 1px solid #e2e8f0;
 .cron-btn-group { display: flex; gap: 8px; margin-top: 15px; }
 .acrescimo-box { margin-top: 15px; background: #fffbeb; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
 
+.bt-status-banner {
+background: #f1f5f9;
+border: 1px solid #cbd5e1;
+border-radius: 8px;
+padding: 8px 12px;
+margin-bottom: 12px;
+font-size: 0.82rem;
+color: #334155;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
 .elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 10px; }
 .elenco-scroll { max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .elenco-chip { padding: 5px 10px; border-radius: 16px; font-size: 0.82rem; font-weight: bold; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
@@ -431,6 +444,12 @@ display: none !important;
 <div id="tab-cronometro" class="tab-content" data-admin-only data-juiz-liberado>
 <div class="cronometro-box">
 <h3 style="margin-top:0; color:var(--primary-navy);">⏱️ Controle da Partida & Artilharia</h3>
+
+<div class="bt-status-banner">
+<span>🎮 <b>Controle Bluetooth Ativo:</b> Botão 1 = 🔴 Vermelho | Botão 2 = 🔵 Azul</span>
+<span id="btUltimoClique" style="font-weight:bold; color:#0284c7;">Pronto</span>
+</div>
+
 <div class="form-group" style="text-align:left;">
 <label>Vincular ao Jogo (Carrega apenas os convocados do dia)</label>
 <select id="selectJogoCronometro"><option value="">Selecione o jogo do dia...</option></select>
@@ -1604,6 +1623,70 @@ disp.innerText = (min < 10 ? '0' : '') + min + ':' + (seg < 10 ? '0' : '') + seg
 }
 }
 
+function adicionarGolVermelho() {
+golsVermelho++;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+}
+
+function adicionarGolAzul() {
+golsAzul++;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+}
+
+// Ouvinte para Controle Remoto Bluetooth (2 botões)
+document.addEventListener('keydown', function(e) {
+// Ignora se estiver digitando dentro de um campo de texto ou select
+var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
+
+// Só aciona se estiver na aba Cronômetro (Admin ou Juiz)
+var abaCron = document.getElementById('tab-cronometro');
+if (!abaCron || !abaCron.classList.contains('active')) return;
+
+var tecla = e.key || '';
+var codigo = e.code || '';
+var statusBt = document.getElementById('btUltimoClique');
+
+// Botão 1 (Volume+, Enter, Espaço, Seta Cima) -> Gol Vermelho
+if (
+tecla === 'AudioVolumeUp' ||
+tecla === 'VolumeUp' ||
+tecla === 'Enter' ||
+tecla === ' ' ||
+tecla === 'ArrowUp' ||
+codigo === 'VolumeUp'
+) {
+e.preventDefault();
+adicionarGolVermelho();
+if (navigator.vibrate) navigator.vibrate(100);
+if (statusBt) {
+statusBt.innerText = '🔴 +1 Vermelho!';
+statusBt.style.color = '#dc2626';
+}
+}
+// Botão 2 (Volume-, Escape, Backspace, Seta Baixo) -> Gol Azul
+else if (
+tecla === 'AudioVolumeDown' ||
+tecla === 'VolumeDown' ||
+tecla === 'Escape' ||
+tecla === 'Backspace' ||
+tecla === 'ArrowDown' ||
+codigo === 'VolumeDown'
+) {
+e.preventDefault();
+adicionarGolAzul();
+if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+if (statusBt) {
+statusBt.innerText = '🔵 +1 Azul!';
+statusBt.style.color = '#2563eb';
+}
+}
+});
+
 function renderizarHistoricoPartidas() {
 var container = document.getElementById('listaHistoricoPartidas');
 if (!container) return;
@@ -2341,12 +2424,7 @@ salvarEstadoPartida();
 
 var btnGolV = document.getElementById('btnGolVermelho');
 if (btnGolV) {
-btnGolV.onclick = function() {
-golsVermelho++;
-var gV = document.getElementById('golsVermelho');
-if (gV) gV.innerText = golsVermelho;
-salvarEstadoPartida();
-};
+btnGolV.onclick = adicionarGolVermelho;
 }
 
 var btnMenV = document.getElementById('btnMenosVermelho');
@@ -2363,12 +2441,7 @@ salvarEstadoPartida();
 
 var btnGolA = document.getElementById('btnGolAzul');
 if (btnGolA) {
-btnGolA.onclick = function() {
-golsAzul++;
-var gA = document.getElementById('golsAzul');
-if (gA) gA.innerText = golsAzul;
-salvarEstadoPartida();
-};
+btnGolA.onclick = adicionarGolAzul;
 }
 
 var btnMenA = document.getElementById('btnMenosAzul');
