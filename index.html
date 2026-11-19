@@ -512,8 +512,8 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <hr style="margin: 25px 0; border: 0; border-top: 1px solid #cbd5e1;">
 </div>
 
-<!-- Seção Pública: Próximo Jogo e Convocados -->
-<h3>📋 Próximo Jogo e Convocados</h3>
+<!-- Seção Pública: Próximo Jogo e Confirmados -->
+<h3>📋 Próximo Jogo e Confirmados</h3>
 <div id="proximoJogoPublico" style="margin-bottom:20px;"></div>
 
 <h3>⚽ Histórico de Partidas Realizadas</h3>
@@ -1490,22 +1490,23 @@ return;
 
 var proximoJogo = futuros[0];
 var convocados = proximoJogo.convocados || [];
-var qtdConf = convocados.filter(function(p) { return typeof p !== 'string' && p.confirmado; }).length;
+var confirmados = convocados.filter(function(p) {
+return typeof p !== 'string' && Boolean(p.confirmado);
+});
 
 var html = '<div class="report-box">';
 html += '<h4 style="color:var(--primary-navy); margin-top:0;">⚽ ' + proximoJogo.nome + '</h4>';
-html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + qtdConf + '/' + convocados.length + '</b></p>';
+html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + confirmados.length + '</b></p>';
 
-if (convocados.length === 0) {
-html += '<p><i>Nenhum jogador convocado para esta partida ainda.</i></p>';
+if (confirmados.length === 0) {
+html += '<p><i>Nenhum jogador confirmou presença neste jogo ainda.</i></p>';
 } else {
 html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
-for (var i = 0; i < convocados.length; i++) {
-var p = convocados[i];
+for (var i = 0; i < confirmados.length; i++) {
+var p = confirmados[i];
 var nome = typeof p === 'string' ? p : p.nome;
 var nivel = typeof p === 'string' ? 'prata' : (p.nivel || 'prata');
-var isConf = typeof p !== 'string' && Boolean(p.confirmado);
-html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px;' + (isConf ? ' box-shadow: 0 0 0 2px #16a34a;' : ' opacity:0.65;') + '">' + (isConf ? '✓ ' : '') + nome + '</span>';
+html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px; box-shadow: 0 0 0 2px #16a34a;">✓ ' + nome + '</span>';
 }
 html += '</div>';
 }
