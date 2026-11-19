@@ -316,10 +316,10 @@ display: none !important;
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="inputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
 <select id="inputNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
-<option value="diamante" selected style="color: #0284c7;">💎 Diamante</option>
-<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
-<option value="prata" style="color: #475569;">🥈 Prata</option>
-<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="diamante" selected style="color: #0284c7;">💎 Diamante (4 pts)</option>
+<option value="ouro" style="color: #854d0e;">🥇 Ouro (3 pts)</option>
+<option value="prata" style="color: #475569;">🥈 Prata (2 pts)</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze (1 pt)</option>
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
 </select>
@@ -361,10 +361,10 @@ display: none !important;
 <div style="flex: 1;">
 <label>Nível / Posição Padrão</label>
 <select id="elencoNivel" style="font-weight: bold; padding: 12px;">
-<option value="diamante" style="color: #0284c7;">💎 Diamante</option>
-<option value="ouro" selected style="color: #854d0e;">🥇 Ouro</option>
-<option value="prata" style="color: #475569;">🥈 Prata</option>
-<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="diamante" style="color: #0284c7;">💎 Diamante (4 pts)</option>
+<option value="ouro" selected style="color: #854d0e;">🥇 Ouro (3 pts)</option>
+<option value="prata" style="color: #475569;">🥈 Prata (2 pts)</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze (1 pt)</option>
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
 </select>
@@ -422,7 +422,7 @@ display: none !important;
 <!-- Aba Sorteio -->
 <div id="tab-sorteio" class="tab-content" data-admin-only data-juiz-liberado>
 <h3>Sorteador de Times Inteligente</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Distribui goleiros, divide Diamantes, Ouros e níveis exatamente meio a meio, e prioriza Marechais como titulares (5 na linha + 1 gol) com os demais no banco.</p>
+<p style="color: #64748b; font-size: 0.9rem;">Pesos: <b>Diamante = 4 pts</b>, <b>Ouro = 3 pts</b>, <b>Prata = 2 pts</b>, <b>Bronze = 1 pt</b>. Equilibra pontos e compensa diferenças de categorias entre os times, priorizando Marechais como titulares (5 na linha + 1 gol).</p>
 <div class="form-group">
 <label>Selecione o Jogo</label>
 <select id="selectJogoSorteio"><option value="">Selecione um jogo...</option></select>
@@ -589,10 +589,10 @@ display: none !important;
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="editInputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
 <select id="editNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
-<option value="diamante" style="color: #0284c7;">💎 Diamante</option>
-<option value="ouro" style="color: #854d0e;">🥇 Ouro</option>
-<option value="prata" selected style="color: #475569;">🥈 Prata</option>
-<option value="bronze" style="color: #9a3412;">🥉 Bronze</option>
+<option value="diamante" style="color: #0284c7;">💎 Diamante (4 pts)</option>
+<option value="ouro" style="color: #854d0e;">🥇 Ouro (3 pts)</option>
+<option value="prata" selected style="color: #475569;">🥈 Prata (2 pts)</option>
+<option value="bronze" style="color: #9a3412;">🥉 Bronze (1 pt)</option>
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
 </select>
@@ -922,6 +922,14 @@ if (nivel === 'prata') return 'tag-prata';
 if (nivel === 'bronze') return 'tag-bronze';
 if (nivel === 'goleiro-ouro') return 'tag-goleiro-ouro';
 return 'tag-goleiro-prata';
+}
+
+function obterPontosNivel(nivel) {
+if (nivel === 'diamante') return 4;
+if (nivel === 'ouro') return 3;
+if (nivel === 'prata') return 2;
+if (nivel === 'bronze') return 1;
+return 0;
 }
 
 function ehGoleiro(pObj) {
@@ -1639,11 +1647,9 @@ salvarEstadoPartida();
 
 // Ouvinte para Controle Remoto Bluetooth (2 botões)
 document.addEventListener('keydown', function(e) {
-// Ignora se estiver digitando dentro de um campo de texto ou select
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
 
-// Só aciona se estiver na aba Cronômetro (Admin ou Juiz)
 var abaCron = document.getElementById('tab-cronometro');
 if (!abaCron || !abaCron.classList.contains('active')) return;
 
@@ -1651,7 +1657,6 @@ var tecla = e.key || '';
 var codigo = e.code || '';
 var statusBt = document.getElementById('btUltimoClique');
 
-// Botão 1 (Volume+, Enter, Espaço, Seta Cima) -> Gol Vermelho
 if (
 tecla === 'AudioVolumeUp' ||
 tecla === 'VolumeUp' ||
@@ -1668,7 +1673,6 @@ statusBt.innerText = '🔴 +1 Vermelho!';
 statusBt.style.color = '#dc2626';
 }
 }
-// Botão 2 (Volume-, Escape, Backspace, Seta Baixo) -> Gol Azul
 else if (
 tecla === 'AudioVolumeDown' ||
 tecla === 'VolumeDown' ||
@@ -2536,80 +2540,155 @@ artilhariaAtual[nomeJog] = 0;
 renderizarPainelArtilharia();
 salvarEstadoPartida();
 
-var potesGoleiros = { ouro: [], prata: [] };
-var potesLinha = { diamante: [], ouro: [], prata: [], bronze: [] };
+function embaralhar(array) {
+var copia = array.slice();
+for (var i = copia.length - 1; i > 0; i--) {
+var j = Math.floor(Math.random() * (i + 1));
+var temp = copia[i];
+copia[i] = copia[j];
+copia[j] = temp;
+}
+return copia;
+}
+
+var goleiros = [];
+var jogadoresLinha = [];
 
 for (var i = 0; i < listaJogadores.length; i++) {
 var p = listaJogadores[i];
-if (p.nivel === 'goleiro-ouro') potesGoleiros.ouro.push(p);
-else if (p.nivel === 'goleiro-prata') potesGoleiros.prata.push(p);
-else if (p.nivel === 'diamante') potesLinha.diamante.push(p);
-else if (p.nivel === 'ouro') potesLinha.ouro.push(p);
-else if (p.nivel === 'prata') potesLinha.prata.push(p);
-else potesLinha.bronze.push(p);
+if (ehGoleiro(p)) {
+goleiros.push(p);
+} else {
+p.pts = obterPontosNivel(p.nivel || 'prata');
+jogadoresLinha.push(p);
+}
 }
 
-function embaralhar(array) {
-for (var i = array.length - 1; i > 0; i--) {
-var j = Math.floor(Math.random() * (i + 1));
-var temp = array[i];
-array[i] = array[j];
-array[j] = temp;
-}
-return array;
-}
-
-potesGoleiros.ouro = embaralhar(potesGoleiros.ouro);
-potesGoleiros.prata = embaralhar(potesGoleiros.prata);
-potesLinha.diamante = embaralhar(potesLinha.diamante);
-potesLinha.ouro = embaralhar(potesLinha.ouro);
-potesLinha.prata = embaralhar(potesLinha.prata);
-potesLinha.bronze = embaralhar(potesLinha.bronze);
+goleiros.sort(function(a, b) {
+var pesoA = a.nivel === 'goleiro-ouro' ? 2 : 1;
+var pesoB = b.nivel === 'goleiro-ouro' ? 2 : 1;
+return pesoB - pesoA;
+});
 
 var times = [];
 for (var t = 0; t < qtdTimes; t++) {
 times.push({
 nome: 'Time ' + (t + 1),
 goleiro: null,
+jogadores: [],
 titularesLinha: [],
-reservas: []
+reservas: [],
+pontos: 0,
+contagemNiveis: { diamante: 0, ouro: 0, prata: 0, bronze: 0 }
 });
 }
 
-var todosGoleiros = potesGoleiros.ouro.concat(potesGoleiros.prata);
-for (var i = 0; i < todosGoleiros.length; i++) {
+for (var i = 0; i < goleiros.length; i++) {
 var timeIdx = i % qtdTimes;
 if (!times[timeIdx].goleiro) {
-times[timeIdx].goleiro = todosGoleiros[i];
+times[timeIdx].goleiro = goleiros[i];
 } else {
-todosGoleiros[i].posicaoExtra = 'Goleiro';
-times[timeIdx].reservas.push(todosGoleiros[i]);
+goleiros[i].posicaoExtra = 'Goleiro';
+goleiros[i].pts = 0;
+times[timeIdx].jogadores.push(goleiros[i]);
 }
 }
 
-var diamanteDistribuido = [];
-for (var t = 0; t < qtdTimes; t++) { diamanteDistribuido.push([]); }
-var tDiamIdx = 0;
-for (var i = 0; i < potesLinha.diamante.length; i++) {
-diamanteDistribuido[tDiamIdx].push(potesLinha.diamante[i]);
-tDiamIdx = (tDiamIdx + 1) % qtdTimes;
+function resumirTime(time) {
+var c = time.contagemNiveis;
+var partes = [];
+if (c.diamante > 0) partes.push(c.diamante + ' Diamante');
+if (c.ouro > 0) partes.push(c.ouro + ' Ouro');
+if (c.prata > 0) partes.push(c.prata + ' Prata');
+if (c.bronze > 0) partes.push(c.bronze + ' Bronze');
+return partes.join(' • ') || 'Sem linha';
 }
 
-var ouroDistribuido = [];
-for (var t = 0; t < qtdTimes; t++) { ouroDistribuido.push([]); }
-var tOuroIdx = 0;
-for (var i = 0; i < potesLinha.ouro.length; i++) {
-ouroDistribuido[tOuroIdx].push(potesLinha.ouro[i]);
-tOuroIdx = (tOuroIdx + 1) % qtdTimes;
+function calcularPenalidadeDistribuicao(listaTimes) {
+var pontosArr = listaTimes.map(function(tm) { return tm.pontos; });
+var minPts = Math.min.apply(null, pontosArr);
+var maxPts = Math.max.apply(null, pontosArr);
+var diffPts = maxPts - minPts;
+
+var qtdArr = listaTimes.map(function(tm) { return tm.jogadores.length; });
+var minQtd = Math.min.apply(null, qtdArr);
+var maxQtd = Math.max.apply(null, qtdArr);
+var diffQtd = maxQtd - minQtd;
+
+var bronzeArr = listaTimes.map(function(tm) { return tm.contagemNiveis.bronze; });
+var diffBronze = Math.max.apply(null, bronzeArr) - Math.min.apply(null, bronzeArr);
+
+var diamanteArr = listaTimes.map(function(tm) { return tm.contagemNiveis.diamante; });
+var diffDiamante = Math.max.apply(null, diamanteArr) - Math.min.apply(null, diamanteArr);
+
+var ouroArr = listaTimes.map(function(tm) { return tm.contagemNiveis.ouro; });
+var diffOuro = Math.max.apply(null, ouroArr) - Math.min.apply(null, ouroArr);
+
+// Prioriza igualdade de pontos, quantidade de jogadores e compensação entre Diamante/Ouro/Bronze
+return (diffPts * 100) + (diffQtd * 25) + (diffBronze * 12) + (diffDiamante * 8) + (diffOuro * 6);
 }
 
-var demaisLinha = potesLinha.prata.concat(potesLinha.bronze);
-var demDistribuido = [];
-for (var t = 0; t < qtdTimes; t++) { demDistribuido.push([]); }
-var tDemIdx = 0;
-for (var i = 0; i < demaisLinha.length; i++) {
-demDistribuido[tDemIdx].push(demaisLinha[i]);
-tDemIdx = (tDemIdx + 1) % qtdTimes;
+var melhorDistribuicao = null;
+var menorPenalidade = Infinity;
+var tentativas = 250;
+
+for (var tent = 0; tent < tentativas; tent++) {
+var candidatos = [];
+for (var t = 0; t < qtdTimes; t++) {
+candidatos.push({
+jogadores: [],
+pontos: 0,
+contagemNiveis: { diamante: 0, ouro: 0, prata: 0, bronze: 0 }
+});
+}
+
+// Ordena por maior pontuação com desempate aleatório para explorar compensações reais
+// Ex.: 1 Diamante (4) + 1 Prata (2) = 6 pts vs 2 Ouros (3 + 3) = 6 pts
+var poolEmbaralhado = embaralhar(jogadoresLinha).sort(function(a, b) {
+if (b.pts !== a.pts) return b.pts - a.pts;
+return Math.random() - 0.5;
+});
+
+for (var i = 0; i < poolEmbaralhado.length; i++) {
+var jog = poolEmbaralhado[i];
+var nv = jog.nivel || 'prata';
+
+// Escolhe o time que deixa o conjunto mais equilibrado após receber este jogador
+var indicesOrdenados = [];
+for (var t = 0; t < qtdTimes; t++) indicesOrdenados.push(t);
+indicesOrdenados = embaralhar(indicesOrdenados);
+
+var melhorIdx = indicesOrdenados[0];
+var melhorScoreLocal = Infinity;
+
+for (var k = 0; k < indicesOrdenados.length; k++) {
+var idxT = indicesOrdenados[k];
+var tm = candidatos[idxT];
+
+// Evita acumular muitos bronzes no mesmo time quando há times com menos bronzes
+var penalidadeBronze = (nv === 'bronze') ? tm.contagemNiveis.bronze * 15 : 0;
+var penalidadePts = (tm.pontos + jog.pts) * 10;
+var penalidadeQtd = tm.jogadores.length * 4;
+var scoreLocal = penalidadePts + penalidadeQtd + penalidadeBronze;
+
+if (scoreLocal < melhorScoreLocal) {
+melhorScoreLocal = scoreLocal;
+melhorIdx = idxT;
+}
+}
+
+candidatos[melhorIdx].jogadores.push(jog);
+candidatos[melhorIdx].pontos += jog.pts;
+if (candidatos[melhorIdx].contagemNiveis[nv] !== undefined) {
+candidatos[melhorIdx].contagemNiveis[nv]++;
+}
+}
+
+var penalidadeGlobal = calcularPenalidadeDistribuicao(candidatos);
+if (penalidadeGlobal < menorPenalidade) {
+menorPenalidade = penalidadeGlobal;
+melhorDistribuicao = candidatos;
+}
 }
 
 var pesoStatus = function(st) {
@@ -2619,30 +2698,41 @@ return 1;
 };
 
 for (var t = 0; t < qtdTimes; t++) {
-var poolTime = diamanteDistribuido[t].concat(ouroDistribuido[t]).concat(demDistribuido[t]);
-poolTime.sort(function(a, b) {
+var escolhidos = melhorDistribuicao ? melhorDistribuicao[t] : null;
+if (escolhidos) {
+times[t].jogadores = escolhidos.jogadores.slice();
+times[t].pontos = escolhidos.pontos;
+times[t].contagemNiveis = Object.assign({}, escolhidos.contagemNiveis);
+}
+
+var ordenadosHierarquia = times[t].jogadores.slice().sort(function(a, b) {
+if (pesoStatus(b.status) !== pesoStatus(a.status)) {
 return pesoStatus(b.status) - pesoStatus(a.status);
+}
+return (b.pts || 0) - (a.pts || 0);
 });
 
-for (var i = 0; i < poolTime.length; i++) {
+for (var i = 0; i < ordenadosHierarquia.length; i++) {
 if (times[t].titularesLinha.length < 5) {
-times[t].titularesLinha.push(poolTime[i]);
+times[t].titularesLinha.push(ordenadosHierarquia[i]);
 } else {
-times[t].reservas.push(poolTime[i]);
+times[t].reservas.push(ordenadosHierarquia[i]);
 }
 }
 }
 
-var html = '<h4 style="color:var(--primary-navy);">Times Sorteados com Sucesso!</h4>';
+var html = '<h4 style="color:var(--primary-navy);">Times Sorteados com Equilíbrio de Pontos e Categorias!</h4>';
 var textoWpp = '⚽ SORTEIO DE TIMES - IMPÉRIO REAL FC\nJogo: ' + jogo.nome + '\n';
 
 for (var t = 0; t < times.length; t++) {
 var time = times[t];
-var totalJogadores = (time.goleiro ? 1 : 0) + time.titularesLinha.length + time.reservas.length;
+var totalJogadores = (time.goleiro ? 1 : 0) + time.jogadores.length;
+var resumoCats = resumirTime(time);
 
 html += '<div class="team-card">';
-html += '<div class="team-header"><span>🏆 ' + time.nome + '</span> <small>' + totalJogadores + ' jogadores</small></div>';
-textoWpp += '\n*' + time.nome + '*:\n';
+html += '<div class="team-header"><span>🏆 ' + time.nome + '</span> <small>' + totalJogadores + ' jog. • <b>' + time.pontos + ' pts</b></small></div>';
+html += '<div style="font-size:0.8rem; color:#475569; margin-bottom:8px; background:#f8fafc; padding:5px 8px; border-radius:6px;">📊 Categorias: <b>' + resumoCats + '</b></div>';
+textoWpp += '\n*' + time.nome + '* (' + time.pontos + ' pts | ' + resumoCats + '):\n';
 
 if (time.goleiro) {
 html += '<div class="team-group-title">🧤 Goleiro Titular</div>';
@@ -2662,7 +2752,7 @@ var st = p.status || 'marechal';
 var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
 var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
 html += '<div class="team-player-item">';
-html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + ' (' + p.pts + 'pt)</span>';
 html += '<span>' + p.nome + '</span>';
 html += '<span class="badge-status ' + statusClass + '">' + statusText + '</span>';
 html += '</div>';
@@ -2670,7 +2760,7 @@ textoWpp += '- ' + p.nome + ' (' + p.nivel.toUpperCase() + ' - ' + statusText + 
 }
 }
 
-if (time.reservas.label !== undefined || time.reservas.length > 0) {
+if (time.reservas.length > 0) {
 html += '<div class="team-group-title">🛋️ Banco de Reservas (' + time.reservas.length + ')</div>';
 for (var r = 0; r < time.reservas.length; r++) {
 var p = time.reservas[r];
@@ -2678,7 +2768,7 @@ var st = p.status || 'recruta';
 var statusClass = st === 'recruta' ? 'status-recruta' : (st === 'intermediario' ? 'status-intermediario' : 'status-marechal');
 var statusText = st === 'recruta' ? 'Recruta' : (st === 'intermediario' ? 'Intermediário' : 'Marechal');
 html += '<div class="team-player-item">';
-html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>';
+html += '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + (p.pts ? ' (' + p.pts + 'pt)' : '') + '</span>';
 html += '<span>' + p.nome + '</span>';
 if (p.posicaoExtra) {
 html += '<span class="badge-status status-marechal">Goleiro</span>';
