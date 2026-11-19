@@ -250,6 +250,135 @@ align-items: center;
 .artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
 .artilheiro-item:last-child { border-bottom: none; }
 
+/* Tela Exclusiva de Confirmação via Link do Jogo */
+.confirm-link-card {
+background: var(--card-bg);
+border: 2px solid var(--gold-accent);
+border-radius: 12px;
+padding: 18px;
+margin: 15px;
+box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.confirm-link-header {
+border-bottom: 1px solid #e2e8f0;
+padding-bottom: 12px;
+margin-bottom: 14px;
+}
+
+.confirm-link-title {
+margin: 0;
+color: var(--primary-navy);
+font-size: 1.35rem;
+}
+
+.confirm-link-meta {
+color: #64748b;
+font-size: 0.92rem;
+margin-top: 4px;
+}
+
+.confirm-resumo-bar {
+display: flex;
+justify-content: space-between;
+gap: 8px;
+background: #f8fafc;
+border: 1px solid #e2e8f0;
+border-radius: 8px;
+padding: 10px 12px;
+margin-bottom: 14px;
+font-size: 0.9rem;
+font-weight: bold;
+color: var(--primary-navy);
+}
+
+.confirm-player-list {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.confirm-player-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+padding: 14px;
+border-radius: 10px;
+border: 1.5px solid #cbd5e1;
+background: #ffffff;
+cursor: pointer;
+transition: all 0.15s ease;
+}
+
+.confirm-player-row.confirmado {
+border-color: #16a34a;
+background: #f0fdf4;
+}
+
+.confirm-player-nome {
+font-size: 1.15rem;
+font-weight: bold;
+color: var(--primary-navy);
+}
+
+.confirm-player-sub {
+font-size: 0.82rem;
+color: #64748b;
+margin-top: 2px;
+}
+
+.confirm-player-row.confirmado .confirm-player-sub {
+color: #15803d;
+font-weight: bold;
+}
+
+.btn-confirmar-nome {
+background: #16a34a;
+color: #ffffff;
+border: none;
+border-radius: 8px;
+padding: 12px 16px;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+min-width: 125px;
+flex-shrink: 0;
+}
+
+.btn-confirmado-nome {
+background: #dcfce7;
+color: #15803d;
+border: 1.5px solid #16a34a;
+border-radius: 8px;
+padding: 12px 16px;
+font-size: 0.95rem;
+font-weight: bold;
+cursor: pointer;
+min-width: 125px;
+flex-shrink: 0;
+}
+
+.link-gerado-box {
+background: #f8fafc;
+border: 1px solid #cbd5e1;
+border-radius: 8px;
+padding: 12px;
+margin-top: 12px;
+}
+
+.link-gerado-url {
+font-family: monospace;
+font-size: 0.82rem;
+background: #ffffff;
+border: 1px solid #e2e8f0;
+padding: 8px;
+border-radius: 6px;
+word-break: break-all;
+color: var(--primary-navy);
+margin: 8px 0;
+}
+
 /* Controles de Visibilidade por Permissão */
 body.modo-jogador [data-admin-only],
 body.modo-jogador [data-juiz-only] {
@@ -258,6 +387,20 @@ display: none !important;
 
 body.modo-juiz [data-admin-only]:not([data-juiz-liberado]) {
 display: none !important;
+}
+
+body.modo-confirmacao-link .balance-card,
+body.modo-confirmacao-link .tabs,
+body.modo-confirmacao-link .tab-content {
+display: none !important;
+}
+
+body.modo-confirmacao-link #telaConfirmacaoLink {
+display: block !important;
+}
+
+#telaConfirmacaoLink {
+display: none;
 }
 </style>
 </head>
@@ -272,6 +415,25 @@ display: none !important;
 <button class="sync-btn" id="btnSyncStatus" onclick="carregarDaNuvem(true)" title="Atualizar dados da nuvem">☁️ Sync</button>
 <button class="admin-toggle-btn" id="btnToggleAdmin" onclick="pedirSenhaAdmin()">🔐 Admin</button>
 </div>
+</div>
+
+<!-- Tela Exclusiva Quando Abre o Link de Confirmação do Jogo (?confirmar=ID) -->
+<div id="telaConfirmacaoLink" class="confirm-link-card">
+<div class="confirm-link-header">
+<h2 class="confirm-link-title" id="confLinkTituloJogo">Confirmação de Presença</h2>
+<div class="confirm-link-meta" id="confLinkMetaJogo"></div>
+</div>
+
+<div class="confirm-resumo-bar">
+<span id="confLinkContagem">✅ Confirmados: 0</span>
+<button type="button" class="sync-btn" style="color:#0b1a30; border-color:#cbd5e1; background:#ffffff;" onclick="carregarDaNuvem(true)">🔄 Atualizar</button>
+</div>
+
+<p style="margin:0 0 12px 0; font-size:0.95rem; color:#334155;">
+Toque no seu nome na lista abaixo e confirme sua presença:
+</p>
+
+<div class="confirm-player-list" id="confLinkListaJogadores"></div>
 </div>
 
 <div class="balance-card">
@@ -334,7 +496,16 @@ display: none !important;
 <label style="margin-top: 10px;">Convocados Selecionados (<span id="contadorTemp">0</span>)</label>
 <div class="tags-container" id="containerJogadoresTemporarios"></div>
 </div>
-<button class="action-btn" id="btnSalvarJogo">Salvar Jogo</button>
+<button class="action-btn" id="btnSalvarJogo">Salvar Jogo e Gerar Link</button>
+
+<div id="boxLinkJogoGerado" class="link-gerado-box" style="display:none;">
+<b>🔗 Link de Confirmação do Jogo:</b>
+<div class="link-gerado-url" id="textoLinkJogoGerado"></div>
+<div style="display:flex; gap:8px;">
+<button type="button" class="action-btn" style="margin:0;" id="btnCopiarLinkGerado">📋 Copiar Link</button>
+<button type="button" class="action-btn" style="margin:0; background:#25d366; color:#ffffff;" id="btnWppLinkGerado">📲 WhatsApp</button>
+</div>
+</div>
 
 <div class="history-title">Gerenciar Jogos Futuros / Convocados</div>
 <div id="listaJogos"></div>
@@ -644,6 +815,129 @@ const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQ
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
+var jogoConfirmacaoLinkId = null;
+
+function obterIdConfirmacaoDaUrl() {
+try {
+var params = new URLSearchParams(window.location.search);
+var id = params.get('confirmar');
+return id ? String(id).trim() : null;
+} catch (e) {
+return null;
+}
+}
+
+function gerarLinkConfirmacaoJogo(jogoId) {
+var url = new URL(window.location.href);
+url.search = '';
+url.searchParams.set('confirmar', String(jogoId));
+return url.toString();
+}
+
+function exibirBoxLinkJogo(jogoId) {
+var box = document.getElementById('boxLinkJogoGerado');
+var txt = document.getElementById('textoLinkJogoGerado');
+if (!box || !txt) return;
+txt.textContent = gerarLinkConfirmacaoJogo(jogoId);
+box.style.display = 'block';
+box.setAttribute('data-jogo-id', String(jogoId));
+}
+
+function renderizarTelaConfirmacaoLink() {
+var tela = document.getElementById('telaConfirmacaoLink');
+if (!jogoConfirmacaoLinkId) {
+document.body.classList.remove('modo-confirmacao-link');
+if (tela) tela.style.display = 'none';
+return;
+}
+
+var jogo = null;
+for (var i = 0; i < jogos.length; i++) {
+if (String(jogos[i].id) === String(jogoConfirmacaoLinkId)) {
+jogo = jogos[i];
+break;
+}
+}
+
+document.body.classList.add('modo-confirmacao-link');
+if (tela) tela.style.display = 'block';
+
+var tituloEl = document.getElementById('confLinkTituloJogo');
+var metaEl = document.getElementById('confLinkMetaJogo');
+var contagemEl = document.getElementById('confLinkContagem');
+var listaEl = document.getElementById('confLinkListaJogadores');
+
+if (!jogo) {
+if (tituloEl) tituloEl.textContent = 'Jogo não encontrado';
+if (metaEl) metaEl.textContent = 'Verifique se o link enviado no grupo está atualizado.';
+if (contagemEl) contagemEl.textContent = '✅ Confirmados: 0';
+if (listaEl) listaEl.innerHTML = '<i>Nenhuma lista disponível para este link.</i>';
+return;
+}
+
+var dataFormatada = jogo.data ? jogo.data.split('-').reverse().join('/') : 'Data a definir';
+if (tituloEl) tituloEl.textContent = '⚽ ' + jogo.nome;
+if (metaEl) metaEl.textContent = '📅 ' + dataFormatada;
+
+var convocados = jogo.convocados || [];
+var confirmadosCount = 0;
+for (var c = 0; c < convocados.length; c++) {
+if (convocados[c] && convocados[c].confirmado) confirmadosCount++;
+}
+
+if (contagemEl) {
+contagemEl.textContent = '✅ Confirmados: ' + confirmadosCount + ' / ' + convocados.length;
+}
+
+if (!listaEl) return;
+listaEl.innerHTML = '';
+
+if (convocados.length === 0) {
+listaEl.innerHTML = '<i>Nenhum jogador cadastrado neste jogo.</i>';
+return;
+}
+
+for (var i = 0; i < convocados.length; i++) {
+(function(idx) {
+var p = convocados[idx];
+var nome = typeof p === 'string' ? p : p.nome;
+var estaConfirmado = typeof p === 'string' ? false : Boolean(p.confirmado);
+
+var row = document.createElement('div');
+row.className = 'confirm-player-row' + (estaConfirmado ? ' confirmado' : '');
+
+var info = document.createElement('div');
+info.innerHTML =
+'<div class="confirm-player-nome">' + nome + '</div>' +
+'<div class="confirm-player-sub">' + (estaConfirmado ? 'Presença confirmada no elenco' : 'Toque para confirmar presença') + '</div>';
+
+var btn = document.createElement('button');
+btn.type = 'button';
+btn.className = estaConfirmado ? 'btn-confirmado-nome' : 'btn-confirmar-nome';
+btn.textContent = estaConfirmado ? 'Confirmado ✓' : 'Confirmar';
+
+var alternar = function(ev) {
+if (ev) ev.stopPropagation();
+var alvo = jogo.convocados[idx];
+if (typeof alvo === 'string') {
+alvo = { nome: alvo, nivel: 'prata', status: 'marechal', confirmado: true };
+jogo.convocados[idx] = alvo;
+} else {
+alvo.confirmado = !alvo.confirmado;
+}
+salvarTudo();
+renderizarTelaConfirmacaoLink();
+};
+
+row.onclick = alternar;
+btn.onclick = alternar;
+
+row.appendChild(info);
+row.appendChild(btn);
+listaEl.appendChild(row);
+})(i);
+}
+}
 
 function atualizarStatusSync(texto) {
   var btn = document.getElementById('btnSyncStatus');
@@ -686,6 +980,7 @@ async function carregarDaNuvem(mostrarAlerta) {
       renderizarPartidasPublicas();
       renderizarProximoJogoPublico();
       atualizarRelatorio();
+      renderizarTelaConfirmacaoLink();
     } else if (jogos.length > 0 || jogadoresElenco.length > 0 || transacoes.length > 0 || partidasHistorico.length > 0) {
       await salvarNaNuvem();
     }
@@ -860,6 +1155,7 @@ localStorage.setItem('transacoes_imperio_real', JSON.stringify(transacoes));
 localStorage.setItem('metas_imperio_real', JSON.stringify(metas));
 localStorage.setItem('partidas_imperio_real', JSON.stringify(partidasHistorico));
 renderizar();
+renderizarTelaConfirmacaoLink();
 salvarNaNuvem();
 }
 
@@ -1010,7 +1306,7 @@ chip.className = 'elenco-chip ' + obterClasseNivel(jogador.nivel) + (jaSeleciona
 chip.textContent = '+ ' + jogador.nome;
 chip.onclick = function() {
 if (!jaSelecionado) {
-listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal' });
+listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal', confirmado: false });
 var tagContainer = eEdicao
 ? document.getElementById('containerEditJogadores')
 : document.getElementById('containerJogadoresTemporarios');
@@ -1194,10 +1490,11 @@ return;
 
 var proximoJogo = futuros[0];
 var convocados = proximoJogo.convocados || [];
+var qtdConf = convocados.filter(function(p) { return typeof p !== 'string' && p.confirmado; }).length;
 
 var html = '<div class="report-box">';
 html += '<h4 style="color:var(--primary-navy); margin-top:0;">⚽ ' + proximoJogo.nome + '</h4>';
-html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | 👥 Total Convocados: <b>' + convocados.length + '</b></p>';
+html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + qtdConf + '/' + convocados.length + '</b></p>';
 
 if (convocados.length === 0) {
 html += '<p><i>Nenhum jogador convocado para esta partida ainda.</i></p>';
@@ -1207,7 +1504,8 @@ for (var i = 0; i < convocados.length; i++) {
 var p = convocados[i];
 var nome = typeof p === 'string' ? p : p.nome;
 var nivel = typeof p === 'string' ? 'prata' : (p.nivel || 'prata');
-html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px;">' + nome + '</span>';
+var isConf = typeof p !== 'string' && Boolean(p.confirmado);
+html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px;' + (isConf ? ' box-shadow: 0 0 0 2px #16a34a;' : ' opacity:0.65;') + '">' + (isConf ? '✓ ' : '') + nome + '</span>';
 }
 html += '</div>';
 }
@@ -1296,10 +1594,31 @@ for (var j = 0; j < jogosOrdenados.length; j++) {
 var item = document.createElement('div');
 item.className = 'list-item';
 
+var conv = jogo.convocados || [];
+var qtdConf = conv.filter(function(p) { return typeof p !== 'string' && p.confirmado; }).length;
+
 var info = document.createElement('div');
-info.innerHTML = '<b>' + jogo.nome + '</b><br><small style="color:#64748b;">' + jogo.data + ' - ' + (jogo.convocados ? jogo.convocados.length : 0) + ' convocados</small>';
+info.innerHTML = '<b>' + jogo.nome + '</b><br><small style="color:#64748b;">' + jogo.data + ' - ' + qtdConf + '/' + conv.length + ' confirmados</small>';
 
 var btns = document.createElement('div');
+
+var btnLink = document.createElement('button');
+btnLink.className = 'pay-btn';
+btnLink.style.marginRight = '5px';
+btnLink.textContent = 'Link';
+btnLink.onclick = function() {
+exibirBoxLinkJogo(jogo.id);
+var url = gerarLinkConfirmacaoJogo(jogo.id);
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(url).then(function() {
+alert('Link de confirmação copiado:\n' + url);
+}, function() {
+alert('Link de confirmação:\n' + url);
+});
+} else {
+alert('Link de confirmação:\n' + url);
+}
+};
 
 var btnEdit = document.createElement('button');
 btnEdit.className = 'edit-btn';
@@ -1311,6 +1630,7 @@ btnDel.className = 'delete-btn';
 btnDel.textContent = 'X';
 btnDel.onclick = function() { excluirJogo(jogo.id); };
 
+btns.appendChild(btnLink);
 btns.appendChild(btnEdit);
 btns.appendChild(btnDel);
 item.appendChild(info);
@@ -1497,7 +1817,7 @@ var editJogoId = document.getElementById('editJogoId');
 if (editJogoId) editJogoId.value = id;
 
 edicaoJogadores = (jogo.convocados || []).map(function(p) {
-return typeof p === 'string' ? { nome: p, nivel: 'prata', status: 'marechal' } : Object.assign({}, p);
+return typeof p === 'string' ? { nome: p, nivel: 'prata', status: 'marechal', confirmado: false } : Object.assign({}, p);
 });
 
 var buscaEdit = document.getElementById('buscaElencoEdit');
@@ -1932,6 +2252,8 @@ container.appendChild(row);
 }
 
 window.onload = function() {
+jogoConfirmacaoLinkId = obterIdConfirmacaoDaUrl();
+
 var tabBtns = document.querySelectorAll('.tab-btn');
 for (var i = 0; i < tabBtns.length; i++) {
 tabBtns[i].onclick = function() {
@@ -1940,7 +2262,40 @@ switchTab(this.getAttribute('data-tab'));
 }
 
 inicializarCronometroEmSegundoPlano();
+renderizarTelaConfirmacaoLink();
 carregarDaNuvem(false);
+
+var btnCopLink = document.getElementById('btnCopiarLinkGerado');
+if (btnCopLink) {
+btnCopLink.onclick = function() {
+var txt = document.getElementById('textoLinkJogoGerado');
+var url = txt ? txt.textContent : '';
+if (!url) return;
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(url).then(function() {
+alert('Link copiado!');
+}, function() {
+alert('Link:\n' + url);
+});
+} else {
+alert('Link:\n' + url);
+}
+};
+}
+
+var btnWppLink = document.getElementById('btnWppLinkGerado');
+if (btnWppLink) {
+btnWppLink.onclick = function() {
+var box = document.getElementById('boxLinkJogoGerado');
+var txt = document.getElementById('textoLinkJogoGerado');
+var url = txt ? txt.textContent : '';
+var jId = box ? box.getAttribute('data-jogo-id') : '';
+var jogoObj = jogos.find(function(j) { return String(j.id) === String(jId); });
+var nomeJ = jogoObj ? jogoObj.nome : 'Jogo';
+var msg = '⚽ *' + nomeJ + '*\nEntre no link, clique no seu nome e confirme sua presença:\n' + url;
+window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener,noreferrer');
+};
+}
 
 var dispTempo = document.getElementById('displayTempo');
 if (dispTempo) {
@@ -2113,7 +2468,7 @@ var nivelSel = document.getElementById('inputNivelJogador');
 var statusSel = document.getElementById('inputStatusJogador');
 var nome = input ? input.value.trim() : '';
 if (nome) {
-temporarioJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal' });
+temporarioJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false });
 if (input) input.value = '';
 renderizarTags(document.getElementById('containerJogadoresTemporarios'), temporarioJogadores, false);
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
@@ -2129,7 +2484,7 @@ var nivelSel = document.getElementById('editNivelJogador');
 var statusSel = document.getElementById('editStatusJogador');
 var nome = input ? input.value.trim() : '';
 if (nome) {
-edicaoJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal' });
+edicaoJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false });
 if (input) input.value = '';
 renderizarTags(document.getElementById('containerEditJogadores'), edicaoJogadores, true);
 renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
@@ -2150,11 +2505,21 @@ alert('Preencha o nome do jogo e a data.');
 return;
 }
 
+var novoJogoId = Date.now();
+var convocadosComConfirmacao = temporarioJogadores.map(function(p) {
+return {
+nome: p.nome,
+nivel: p.nivel || 'prata',
+status: p.status || 'marechal',
+confirmado: false
+};
+});
+
 jogos.push({
-id: Date.now(),
+id: novoJogoId,
 nome: nome,
 data: data,
-convocados: temporarioJogadores.slice()
+convocados: convocadosComConfirmacao
 });
 
 if (nomeInput) nomeInput.value = '';
@@ -2167,6 +2532,7 @@ renderizarTags(document.getElementById('containerJogadoresTemporarios'), tempora
 salvarTudo();
 carregarSelectSorteio();
 carregarSelectCronometro();
+exibirBoxLinkJogo(novoJogoId);
 };
 }
 
@@ -2624,7 +2990,6 @@ var diffDiamante = Math.max.apply(null, diamanteArr) - Math.min.apply(null, diam
 var ouroArr = listaTimes.map(function(tm) { return tm.contagemNiveis.ouro; });
 var diffOuro = Math.max.apply(null, ouroArr) - Math.min.apply(null, ouroArr);
 
-// Prioriza igualdade de pontos, quantidade de jogadores e compensação entre Diamante/Ouro/Bronze
 return (diffPts * 100) + (diffQtd * 25) + (diffBronze * 12) + (diffDiamante * 8) + (diffOuro * 6);
 }
 
@@ -2642,8 +3007,6 @@ contagemNiveis: { diamante: 0, ouro: 0, prata: 0, bronze: 0 }
 });
 }
 
-// Ordena por maior pontuação com desempate aleatório para explorar compensações reais
-// Ex.: 1 Diamante (4) + 1 Prata (2) = 6 pts vs 2 Ouros (3 + 3) = 6 pts
 var poolEmbaralhado = embaralhar(jogadoresLinha).sort(function(a, b) {
 if (b.pts !== a.pts) return b.pts - a.pts;
 return Math.random() - 0.5;
@@ -2653,7 +3016,6 @@ for (var i = 0; i < poolEmbaralhado.length; i++) {
 var jog = poolEmbaralhado[i];
 var nv = jog.nivel || 'prata';
 
-// Escolhe o time que deixa o conjunto mais equilibrado após receber este jogador
 var indicesOrdenados = [];
 for (var t = 0; t < qtdTimes; t++) indicesOrdenados.push(t);
 indicesOrdenados = embaralhar(indicesOrdenados);
@@ -2665,7 +3027,6 @@ for (var k = 0; k < indicesOrdenados.length; k++) {
 var idxT = indicesOrdenados[k];
 var tm = candidatos[idxT];
 
-// Evita acumular muitos bronzes no mesmo time quando há times com menos bronzes
 var penalidadeBronze = (nv === 'bronze') ? tm.contagemNiveis.bronze * 15 : 0;
 var penalidadePts = (tm.pontos + jog.pts) * 10;
 var penalidadeQtd = tm.jogadores.length * 4;
