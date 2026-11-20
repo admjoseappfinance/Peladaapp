@@ -189,7 +189,7 @@ button.action-btn:active {
 background: var(--gold-hover);
 }
 
-/* Hub Compacto Financeiro */
+/* Hub Compacto (Financeiro / Elenco & Ranking) */
 .fin-hub-grid {
 display: grid;
 grid-template-columns: repeat(2, 1fr);
@@ -561,12 +561,11 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 
 <div class="tabs">
 <button class="tab-btn active" data-tab="jogos">Jogos</button>
-<button class="tab-btn" data-tab="ranking">Ranking</button>
+<button class="tab-btn" data-tab="ranking">Elenco & Ranking</button>
 <button class="tab-btn" data-tab="financeiro">Financeiro</button>
 <!-- Abas exclusivas de Admin / Juiz -->
 <button class="tab-btn" data-tab="sorteio" data-admin-only data-juiz-only data-juiz-liberado>Sorteio</button>
 <button class="tab-btn" data-tab="cronometro" data-admin-only data-juiz-only data-juiz-liberado>Cronômetro</button>
-<button class="tab-btn" data-tab="elenco" data-admin-only>Elenco</button>
 </div>
 
 <!-- Aba Jogos -->
@@ -756,9 +755,27 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 </div>
 
-<!-- Aba Elenco (Banco de Dados de Jogadores) -->
-<div id="tab-elenco" class="tab-content" data-admin-only>
-<h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">Banco de Dados de Jogadores</h3>
+<!-- Aba Elenco & Ranking (Hub Compacto + Telas Completas ao Clicar) -->
+<div id="tab-ranking" class="tab-content">
+<div class="fin-hub-grid">
+<button type="button" class="fin-hub-card" id="hub-card-jogadores" data-admin-only onclick="abrirElencoRankingHub('jogadores')">
+<div class="fin-hub-title">👥 Jogadores</div>
+<div class="fin-hub-sub" id="hubResumoJogadores">Elenco cadastrado</div>
+</button>
+
+<button type="button" class="fin-hub-card ativo" id="hub-card-artilharia" onclick="abrirElencoRankingHub('artilharia')">
+<div class="fin-hub-title">🏆 Ranking</div>
+<div class="fin-hub-sub" id="hubResumoRanking">Artilharia oficial</div>
+</button>
+</div>
+
+<!-- Subtela: Jogadores (Banco de Dados de Jogadores / Elenco) -->
+<div id="hub-sub-jogadores" class="fin-subview" data-admin-only>
+<div class="fin-subview-header">
+<h3>👥 Jogadores do Elenco</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaElencoRanking()">Fechar</button>
+</div>
+
 <p style="color: #64748b; font-size: 0.85rem; margin:0 0 12px 0;">Cadastre os jogadores fixos do clube para selecioná-los rapidamente nos jogos.</p>
 <div class="form-group">
 <label>Nome do Jogador</label>
@@ -787,7 +804,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 <button class="action-btn" id="btnSalvarElenco">Cadastrar Jogador no Elenco</button>
 
-<div style="margin-top: 14px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1;">
+<div style="margin-top: 14px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1;">
 <h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.9rem;">💾 Segurança e Backup</h4>
 <div style="display: flex; gap: 8px;">
 <button class="action-btn" style="background:var(--secondary-navy); color:var(--gold-accent); margin:0; font-size:0.85rem;" id="btnExportarBackup">Exportar</button>
@@ -799,6 +816,17 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <div class="history-title">Jogadores Cadastrados (<span id="totalElencoCount">0</span>)</div>
 <input type="text" id="filtroListaElenco" placeholder="🔍 Buscar no elenco..." style="margin-bottom: 8px; padding: 9px; font-size:0.9rem;">
 <div id="listaElencoCadastrado"></div>
+</div>
+
+<!-- Subtela: Ranking de Artilheiros -->
+<div id="hub-sub-artilharia" class="fin-subview ativa">
+<div class="fin-subview-header">
+<h3>🏆 Ranking de Artilheiros</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaElencoRanking()">Ocultar</button>
+</div>
+<p style="color: #64748b; font-size: 0.85rem; margin:0 0 12px 0;">Contagem oficial de gols somados das partidas salvas.</p>
+<div id="listaRankingArtilheiros"></div>
+</div>
 </div>
 
 <!-- Aba Sorteio -->
@@ -861,10 +889,10 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 </div>
 
-<!-- Artilharia Rápida restrita aos convocados do jogo selecionado -->
+<!-- Artilharia Rápida restrita aos confirmados do jogo selecionado -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida</h4>
-<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os convocados.</i></div>
+<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Confirmados)</h4>
+<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os confirmados.</i></div>
 </div>
 
 <div class="cron-btn-group">
@@ -887,13 +915,6 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 
 <div class="history-title">Histórico de Partidas (Vermelho x Azul)</div>
 <div id="listaHistoricoPartidas"></div>
-</div>
-
-<!-- Aba Ranking -->
-<div id="tab-ranking" class="tab-content">
-<h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">🏆 Ranking de Artilheiros</h3>
-<p style="color: #64748b; font-size: 0.85rem; margin:0 0 12px 0;">Contagem oficial de gols somados das partidas salvas.</p>
-<div id="listaRankingArtilheiros"></div>
 </div>
 
 <!-- Modal para Editar Convocados -->
@@ -969,6 +990,7 @@ const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
 var jogoConfirmacaoLinkId = null;
 var subtelaFinanceiroAtiva = 'relatorio';
+var subtelaElencoRankingAtiva = 'artilharia';
 
 function atualizarLabelPerfil() {
 var lbl = document.getElementById('labelPerfilTopo');
@@ -986,14 +1008,14 @@ alvo = 'relatorio';
 }
 subtelaFinanceiroAtiva = alvo;
 
-var cards = document.querySelectorAll('.fin-hub-card');
+var cards = document.querySelectorAll('#tab-financeiro .fin-hub-card');
 for (var i = 0; i < cards.length; i++) {
 cards[i].classList.remove('ativo');
 }
 var cardAtivo = document.getElementById('hub-card-' + alvo);
 if (cardAtivo) cardAtivo.classList.add('ativo');
 
-var subviews = document.querySelectorAll('.fin-subview');
+var subviews = document.querySelectorAll('#tab-financeiro .fin-subview');
 for (var j = 0; j < subviews.length; j++) {
 subviews[j].classList.remove('ativa');
 }
@@ -1005,15 +1027,81 @@ if (alvo === 'relatorio') atualizarRelatorio();
 }
 
 function fecharSubtelaFinanceiro() {
-var subviews = document.querySelectorAll('.fin-subview');
+var subviews = document.querySelectorAll('#tab-financeiro .fin-subview');
 for (var j = 0; j < subviews.length; j++) {
 subviews[j].classList.remove('ativa');
 }
-var cards = document.querySelectorAll('.fin-hub-card');
+var cards = document.querySelectorAll('#tab-financeiro .fin-hub-card');
 for (var i = 0; i < cards.length; i++) {
 cards[i].classList.remove('ativo');
 }
 subtelaFinanceiroAtiva = null;
+}
+
+function abrirElencoRankingHub(secao) {
+switchTab('ranking');
+var alvo = secao;
+if (nivelAcesso !== 'admin' && alvo === 'jogadores') {
+alvo = 'artilharia';
+}
+subtelaElencoRankingAtiva = alvo;
+
+var cards = document.querySelectorAll('#tab-ranking .fin-hub-card');
+for (var i = 0; i < cards.length; i++) {
+cards[i].classList.remove('ativo');
+}
+var cardAtivo = document.getElementById('hub-card-' + alvo);
+if (cardAtivo) cardAtivo.classList.add('ativo');
+
+var subviews = document.querySelectorAll('#tab-ranking .fin-subview');
+for (var j = 0; j < subviews.length; j++) {
+subviews[j].classList.remove('ativa');
+}
+var subAtiva = document.getElementById('hub-sub-' + alvo);
+if (subAtiva) subAtiva.classList.add('ativa');
+
+if (alvo === 'jogadores') renderizarElenco();
+if (alvo === 'artilharia') renderizarRankingArtilheiros();
+}
+
+function fecharSubtelaElencoRanking() {
+var subviews = document.querySelectorAll('#tab-ranking .fin-subview');
+for (var j = 0; j < subviews.length; j++) {
+subviews[j].classList.remove('ativa');
+}
+var cards = document.querySelectorAll('#tab-ranking .fin-hub-card');
+for (var i = 0; i < cards.length; i++) {
+cards[i].classList.remove('ativo');
+}
+subtelaElencoRankingAtiva = null;
+}
+
+function atualizarResumosHubElencoRanking() {
+var elJog = document.getElementById('hubResumoJogadores');
+var elRank = document.getElementById('hubResumoRanking');
+
+if (elJog) {
+elJog.textContent = jogadoresElenco.length + ' jogador(es)';
+}
+
+if (elRank) {
+var contagem = {};
+var liderNome = '';
+var liderGols = 0;
+for (var i = 0; i < partidasHistorico.length; i++) {
+var art = partidasHistorico[i].artilharia || {};
+for (var jog in art) {
+if (art[jog] > 0) {
+contagem[jog] = (contagem[jog] || 0) + art[jog];
+if (contagem[jog] > liderGols) {
+liderGols = contagem[jog];
+liderNome = jog;
+}
+}
+}
+}
+elRank.textContent = liderNome ? ('Artilheiro: ' + liderNome + ' (' + liderGols + ')') : 'Artilharia oficial';
+}
 }
 
 function atualizarResumosHubFinanceiro() {
@@ -1279,6 +1367,9 @@ btn.innerText = '🔐 Admin';
 if (subtelaFinanceiroAtiva && subtelaFinanceiroAtiva !== 'relatorio') {
 abrirFinanceiroHub('relatorio');
 }
+if (subtelaElencoRankingAtiva && subtelaElencoRankingAtiva !== 'artilharia') {
+abrirElencoRankingHub('artilharia');
+}
 var abaAtiva = document.querySelector('.tab-btn.active');
 if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
 switchTab('jogos');
@@ -1421,7 +1512,6 @@ atualizarResumosHubFinanceiro();
 atualizarRelatorio();
 if (subtelaFinanceiroAtiva === 'entradas') carregarListaBaixaConvocados();
 }
-if (tabId === 'elenco') renderizarElenco();
 if (tabId === 'sorteio') carregarSelectSorteio();
 if (tabId === 'cronometro') {
 carregarSelectCronometro();
@@ -1438,7 +1528,9 @@ if (dispAc) dispAc.innerText = acrescimoMinutos;
 if (labelP) labelP.innerText = periodoAtual + 'º Tempo (30 min)';
 }
 if (tabId === 'ranking') {
-renderizarRankingArtilheiros();
+atualizarResumosHubElencoRanking();
+if (subtelaElencoRankingAtiva === 'jogadores') renderizarElenco();
+if (subtelaElencoRankingAtiva === 'artilharia') renderizarRankingArtilheiros();
 }
 }
 
@@ -1514,7 +1606,7 @@ var termo = inputBusca ? inputBusca.value.trim().toLowerCase() : '';
 container.innerHTML = '';
 
 if (jogadoresElenco.length === 0) {
-container.innerHTML = '<small style="color:#64748b;">Nenhum jogador cadastrado na aba Elenco.</small>';
+container.innerHTML = '<small style="color:#64748b;">Nenhum jogador cadastrado em Elenco & Ranking → Jogadores.</small>';
 return;
 }
 
@@ -1944,10 +2036,12 @@ delBtnMeta.onclick = function() { excluirMeta(meta.id); };
 }
 
 atualizarResumosHubFinanceiro();
+atualizarResumosHubElencoRanking();
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
 renderizarProximoJogoPublico();
 renderizarPartidasPublicas();
 carregarSelectCronometro();
+renderizarPainelArtilharia();
 }
 
 function carregarListaBaixaConvocados() {
@@ -2412,7 +2506,7 @@ var selCron = document.getElementById('selectJogoCronometro');
 var jogoId = selCron ? selCron.value : '';
 
 if (!jogoId) {
-container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os convocados da partida.</i>';
+container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os jogadores confirmados.</i>';
 return;
 }
 
@@ -2424,17 +2518,20 @@ break;
 }
 }
 
-if (!jogoSelecionado || !jogoSelecionado.convocados || jogoSelecionado.convocados.length === 0) {
-container.innerHTML = '<i>Este jogo não possui jogadores convocados cadastrados.</i>';
+var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
+return typeof p !== 'string' && Boolean(p.confirmado);
+});
+
+if (!jogoSelecionado || confirmados.length === 0) {
+container.innerHTML = '<i>Nenhum jogador confirmado neste jogo para registrar gol.</i>';
 return;
 }
 
-var listaConvocados = jogoSelecionado.convocados;
 container.innerHTML = '';
 
-for (var i = 0; i < listaConvocados.length; i++) {
+for (var i = 0; i < confirmados.length; i++) {
 (function(p) {
-var nome = typeof p === 'string' ? p : p.nome;
+var nome = p.nome;
 if (artilhariaAtual[nome] === undefined) {
 artilhariaAtual[nome] = 0;
 }
@@ -2443,7 +2540,7 @@ var row = document.createElement('div');
 row.className = 'artilheiro-item';
 
 var label = document.createElement('span');
-label.innerHTML = '<b>' + nome + '</b>';
+label.innerHTML = '<b>✓ ' + nome + '</b>';
 
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
@@ -2484,7 +2581,7 @@ contDiv.appendChild(btnMais);
 row.appendChild(label);
 row.appendChild(contDiv);
 container.appendChild(row);
-})(listaConvocados[i]);
+})(confirmados[i]);
 }
 }
 
