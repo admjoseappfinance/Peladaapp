@@ -672,7 +672,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 
 <div id="areaConvocados" style="display:none;">
-<div class="history-title" style="margin-top:8px;">Dar Baixa nos Convocados <small style="color:#6b21a8; font-weight:normal;">(🧤 Goleiros isentos)</small></div>
+<div class="history-title" style="margin-top:8px;">Dar Baixa nos Confirmados <small style="color:#6b21a8; font-weight:normal;">(🧤 Goleiros isentos)</small></div>
 <div class="call-list" id="listaConvocadosBaixa"></div>
 </div>
 
@@ -804,7 +804,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <!-- Aba Sorteio -->
 <div id="tab-sorteio" class="tab-content" data-admin-only data-juiz-liberado>
 <h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">Sorteador de Times Inteligente</h3>
-<p style="color: #64748b; font-size: 0.84rem; margin:0 0 12px 0;">Pesos: <b>Diamante = 4 pts</b>, <b>Ouro = 3 pts</b>, <b>Prata = 2 pts</b>, <b>Bronze = 1 pt</b>. Equilibra pontos e categorias, priorizando Marechais como titulares (5 na linha + 1 gol).</p>
+<p style="color: #64748b; font-size: 0.84rem; margin:0 0 12px 0;">Sorteia apenas os confirmados. Pesos: <b>Diamante = 4 pts</b>, <b>Ouro = 3 pts</b>, <b>Prata = 2 pts</b>, <b>Bronze = 1 pt</b>. Equilibra pontos e categorias, priorizando Marechais como titulares (5 na linha + 1 gol).</p>
 <div class="form-group">
 <label>Selecione o Jogo</label>
 <select id="selectJogoSorteio"><option value="">Selecione um jogo...</option></select>
@@ -1967,16 +1967,20 @@ for (var i = 0; i < jogos.length; i++) {
 if (jogos[i].id == jogoId) { jogo = jogos[i]; break; }
 }
 
-if (!jogo || !jogo.convocados || jogo.convocados.length === 0) {
+var confirmados = (jogo && jogo.convocados ? jogo.convocados : []).filter(function(pObj) {
+return typeof pObj !== 'string' && Boolean(pObj.confirmado);
+});
+
+if (!jogo || confirmados.length === 0) {
 if (area) area.style.display = 'block';
-if (lista) lista.innerHTML = '<i>Nenhum convocado cadastrado para este jogo.</i>';
+if (lista) lista.innerHTML = '<i>Nenhum jogador confirmado neste jogo ainda.</i>';
 return;
 }
 
 if (area) area.style.display = 'block';
 if (lista) lista.innerHTML = '';
 
-for (var j = 0; j < jogo.convocados.length; j++) {
+for (var j = 0; j < confirmados.length; j++) {
 (function(pObj) {
 var nome = typeof pObj === 'string' ? pObj : pObj.nome;
 var isGol = ehGoleiro(pObj);
@@ -2035,7 +2039,7 @@ item.appendChild(btn);
 }
 
 if (lista) lista.appendChild(item);
-})(jogo.convocados[j]);
+})(confirmados[j]);
 }
 }
 
@@ -3118,16 +3122,20 @@ for (var i = 0; i < jogos.length; i++) {
 if (jogos[i].id == jogoId) { jogo = jogos[i]; break; }
 }
 
-if (!jogo || !jogo.convocados || jogo.convocados.length === 0) {
-alert('Este jogo não possui convocados cadastrados.');
+var confirmados = (jogo && jogo.convocados ? jogo.convocados : []).filter(function(p) {
+return typeof p !== 'string' && Boolean(p.confirmado);
+});
+
+if (!jogo || confirmados.length === 0) {
+alert('Este jogo não possui jogadores confirmados para o sorteio.');
 return;
 }
 
-var listaJogadores = jogo.convocados.map(function(p) {
+var listaJogadores = confirmados.map(function(p) {
 return {
-nome: typeof p === 'string' ? p : p.nome,
-nivel: typeof p === 'string' ? 'prata' : (p.nivel || 'prata'),
-status: typeof p === 'string' ? 'marechal' : (p.status || 'marechal')
+nome: p.nome,
+nivel: p.nivel || 'prata',
+status: p.status || 'marechal'
 };
 });
 
