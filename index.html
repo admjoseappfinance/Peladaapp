@@ -13,12 +13,13 @@
 --light-bg: #f4f6f9;
 --card-bg: #ffffff;
 --text-color: #1e293b;
+--border-subtle: #e2e8f0;
 }
 
 body {
 font-family: Arial, sans-serif;
 margin: 0;
-padding: 0;
+padding: 0 0 24px 0;
 background: var(--light-bg);
 color: var(--text-color);
 }
@@ -26,31 +27,41 @@ color: var(--text-color);
 .header {
 background: linear-gradient(135deg, #06101e 0%, var(--primary-navy) 100%);
 color: var(--gold-accent);
-padding: 15px;
+padding: 12px 14px;
 text-align: center;
 font-weight: bold;
-font-size: 1.4rem;
-border-bottom: 3px solid var(--gold-accent);
+font-size: 1.2rem;
+border-bottom: 2px solid var(--gold-accent);
 display: flex;
 align-items: center;
 justify-content: space-between;
-box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
 .header-left {
 display: flex;
 align-items: center;
-gap: 10px;
+gap: 8px;
+}
+
+.header-sub {
+display: block;
+font-size: 0.68rem;
+letter-spacing: 0.06em;
+color: #cbd5e1;
+font-weight: 600;
+text-align: left;
+margin-top: 1px;
 }
 
 .header-right {
 display: flex;
 align-items: center;
-gap: 8px;
+gap: 6px;
 }
 
 .header-logo {
-height: 40px;
+height: 34px;
 width: auto;
 object-fit: contain;
 }
@@ -59,9 +70,9 @@ object-fit: contain;
 background: rgba(255, 255, 255, 0.1);
 color: #cbd5e1;
 border: 1px solid rgba(212, 175, 55, 0.4);
-padding: 6px 10px;
+padding: 5px 8px;
 border-radius: 6px;
-font-size: 0.78rem;
+font-size: 0.74rem;
 font-weight: bold;
 cursor: pointer;
 transition: all 0.2s;
@@ -71,9 +82,9 @@ transition: all 0.2s;
 background: rgba(212, 175, 55, 0.15);
 color: var(--gold-accent);
 border: 1px solid var(--gold-accent);
-padding: 6px 12px;
+padding: 5px 10px;
 border-radius: 6px;
-font-size: 0.8rem;
+font-size: 0.76rem;
 font-weight: bold;
 cursor: pointer;
 transition: all 0.2s;
@@ -85,48 +96,65 @@ color: var(--primary-navy);
 }
 
 .balance-card {
-background: var(--card-bg);
-margin: 15px;
-padding: 20px;
+background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+color: #ffffff;
+margin: 12px;
+padding: 14px 16px;
 border-radius: 12px;
-text-align: center;
-box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-border: 1px solid #e2e8f0;
+display: flex;
+justify-content: space-between;
+align-items: center;
+box-shadow: 0 4px 8px rgba(11, 26, 48, 0.14);
+border: 1px solid rgba(212, 175, 55, 0.35);
 }
 
 .balance-title {
-color: #64748b;
-font-size: 0.95rem;
+color: #cbd5e1;
+font-size: 0.78rem;
 font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.04em;
 }
 
 .balance-value {
-font-size: 2.2rem;
+font-size: 1.65rem;
 font-weight: bold;
-color: var(--primary-navy);
-margin-top: 5px;
+color: var(--gold-accent);
+margin-top: 3px;
+}
+
+.balance-pill {
+background: rgba(212, 175, 55, 0.15);
+color: var(--gold-accent);
+border: 1px solid rgba(212, 175, 55, 0.4);
+padding: 6px 10px;
+border-radius: 8px;
+font-size: 0.78rem;
+font-weight: bold;
+cursor: pointer;
 }
 
 .tabs {
 display: flex;
 background: var(--primary-navy);
-padding: 6px;
-gap: 3px;
+padding: 6px 8px;
+gap: 4px;
 justify-content: flex-start;
 overflow-x: auto;
+border-bottom: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .tab-btn {
-flex: 1;
-min-width: 65px;
-padding: 10px 6px;
+flex: 0 0 auto;
+min-width: 68px;
+padding: 8px 10px;
 border: 1px solid transparent;
 background: rgba(255,255,255,0.08);
 color: #cbd5e1;
 font-weight: bold;
 cursor: pointer;
-border-radius: 6px;
-font-size: 0.72rem;
+border-radius: 7px;
+font-size: 0.74rem;
 transition: all 0.2s;
 white-space: nowrap;
 }
@@ -137,23 +165,23 @@ color: var(--primary-navy);
 border-color: var(--gold-accent);
 }
 
-.tab-content { display: none; padding: 15px; }
+.tab-content { display: none; padding: 12px; }
 .tab-content.active { display: block; }
-.form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--secondary-navy); }
-input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+.form-group { margin-bottom: 12px; }
+label { display: block; margin-bottom: 4px; font-weight: bold; color: var(--secondary-navy); font-size: 0.88rem; }
+input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 7px; box-sizing: border-box; font-size: 0.95rem; background: #fff; }
 
 button.action-btn {
 width: 100%;
-padding: 12px;
+padding: 11px;
 background: var(--gold-accent);
 color: var(--primary-navy);
 border: none;
 font-weight: bold;
-border-radius: 6px;
+border-radius: 7px;
 cursor: pointer;
-font-size: 1rem;
-margin-top: 5px;
+font-size: 0.94rem;
+margin-top: 4px;
 transition: background 0.2s;
 }
 
@@ -161,93 +189,177 @@ button.action-btn:active {
 background: var(--gold-hover);
 }
 
+/* Hub Compacto Financeiro */
+.fin-hub-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 10px;
+margin-bottom: 12px;
+}
+
+.fin-hub-card {
+background: var(--card-bg);
+border: 1px solid var(--border-subtle);
+border-left: 4px solid var(--gold-accent);
+border-radius: 10px;
+padding: 12px;
+text-align: left;
+cursor: pointer;
+box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.fin-hub-card:active {
+transform: scale(0.99);
+}
+
+.fin-hub-card.ativo {
+border-color: var(--primary-navy);
+border-left-color: var(--primary-navy);
+background: #fffdf5;
+box-shadow: 0 4px 10px rgba(11, 26, 48, 0.08);
+}
+
+.fin-hub-title {
+font-weight: bold;
+font-size: 0.96rem;
+color: var(--primary-navy);
+margin-bottom: 2px;
+}
+
+.fin-hub-sub {
+font-size: 0.78rem;
+color: #64748b;
+}
+
+.fin-subview {
+display: none;
+background: var(--card-bg);
+border: 1px solid var(--border-subtle);
+border-radius: 10px;
+padding: 14px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.fin-subview.ativa {
+display: block;
+}
+
+.fin-subview-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid var(--border-subtle);
+padding-bottom: 8px;
+margin-bottom: 12px;
+}
+
+.fin-subview-header h3 {
+margin: 0;
+font-size: 1.02rem;
+color: var(--primary-navy);
+}
+
+.fin-close-btn {
+background: #f1f5f9;
+color: var(--secondary-navy);
+border: 1px solid #cbd5e1;
+border-radius: 6px;
+padding: 4px 9px;
+font-size: 0.78rem;
+font-weight: bold;
+cursor: pointer;
+}
+
 .list-item {
 background: var(--card-bg);
-padding: 12px;
+padding: 10px 12px;
 border-radius: 8px;
 margin-bottom: 8px;
 display: flex;
 justify-content: space-between;
 align-items: center;
-box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-border: 1px solid #e2e8f0;
+box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+border: 1px solid var(--border-subtle);
+font-size: 0.92rem;
 }
 
-.history-title { font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: var(--primary-navy); }
+.history-title { font-weight: bold; margin-top: 16px; margin-bottom: 8px; color: var(--primary-navy); font-size: 0.95rem; }
 .positive { color: #16a34a; font-weight: bold; }
 .negative { color: #dc2626; font-weight: bold; }
-.delete-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-.edit-btn { background: var(--secondary-navy); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-weight: bold; }
-.pay-btn { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+.edit-btn { background: var(--secondary-navy); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 4px; font-weight: bold; font-size: 0.8rem; }
+.pay-btn { background: #16a34a; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
 
-.report-box { background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0; }
-.whatsapp-btn { background: #25d366; color: white; padding: 15px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 15px; text-align: center; width: 100%; box-sizing: border-box; }
-.expense-detail { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
-.badge-paid { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
-.badge-exempt { background: #f3e8ff; color: #6b21a8; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; border: 1px solid #d8b4fe; }
-.call-list { background: #fff; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #e2e8f0; }
-.call-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+.report-box { background: var(--card-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--border-subtle); }
+.whatsapp-btn { background: #25d366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 12px; text-align: center; width: 100%; box-sizing: border-box; font-size: 0.92rem; }
+.expense-detail { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.88rem; }
+.badge-paid { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+.badge-exempt { background: #f3e8ff; color: #6b21a8; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; border: 1px solid #d8b4fe; }
+.call-list { background: #f8fafc; padding: 8px 10px; border-radius: 8px; margin-top: 8px; border: 1px solid var(--border-subtle); }
+.call-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
 .call-item:last-child { border-bottom: none; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+.modal-content { background: white; padding: 18px; border-radius: 12px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
 
-.tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; min-height: 40px; }
-.player-tag { padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid; }
+.tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; padding: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 7px; min-height: 36px; }
+.player-tag { padding: 5px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px; font-size: 0.84rem; font-weight: bold; border: 1px solid; }
 .tag-diamante { background: #e0f2fe; color: #0284c7; border-color: #38bdf8; }
 .tag-ouro { background: #fef08a; color: #854d0e; border-color: #eab308; }
 .tag-prata { background: #e2e8f0; color: #475569; border-color: #94a3b8; }
 .tag-bronze { background: #ffedd5; color: #9a3412; border-color: #f97316; }
 .tag-goleiro-ouro { background: #f3e8ff; color: #6b21a8; border-color: #c084fc; }
 .tag-goleiro-prata { background: #e0f2fe; color: #0369a1; border-color: #38bdf8; }
-.player-tag-btn { background: rgba(0,0,0,0.1); border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; font-weight: bold; }
+.player-tag-btn { background: rgba(0,0,0,0.1); border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; font-weight: bold; }
 
-.team-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+.team-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
 .team-header { font-weight: bold; color: var(--primary-navy); border-bottom: 2px solid var(--gold-accent); padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-.team-group-title { font-weight: bold; color: var(--secondary-navy); margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
-.team-player-item { padding: 5px 0; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 8px; }
-.badge-nivel { font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-right: 4px; }
-.badge-status { font-size: 0.70rem; padding: 1px 4px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-left: auto; }
+.team-group-title { font-weight: bold; color: var(--secondary-navy); margin-top: 8px; margin-bottom: 4px; font-size: 0.86rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+.team-player-item { padding: 4px 0; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 6px; }
+.badge-nivel { font-size: 0.72rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-right: 4px; }
+.badge-status { font-size: 0.68rem; padding: 1px 5px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-left: auto; }
 .status-marechal { background: #dcfce7; color: #15803d; }
 .status-intermediario { background: #fef9c3; color: #854d0e; }
 .status-recruta { background: #fee2e2; color: #991b1b; }
 
-.cronometro-box { background: white; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
-.tempo-display { font-size: 3.2rem; font-weight: bold; color: var(--primary-navy); margin: 5px 0; font-family: monospace; cursor: pointer; }
+.cronometro-box { background: white; padding: 16px; border-radius: 10px; text-align: center; border: 1px solid var(--border-subtle); box-shadow: 0 3px 6px rgba(0,0,0,0.04); }
+.tempo-display { font-size: 3rem; font-weight: bold; color: var(--primary-navy); margin: 4px 0; font-family: monospace; cursor: pointer; }
 .tempo-display:hover { color: var(--gold-hover); text-decoration: underline; }
-.placar-container { display: flex; justify-content: space-around; align-items: center; margin: 15px 0; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+.placar-container { display: flex; justify-content: space-around; align-items: center; margin: 12px 0; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); }
 .time-placar { text-align: center; flex: 1; }
-.time-placar h4 { margin: 0 0 5px 0; font-size: 1rem; }
-.gols-num { font-size: 2.2rem; font-weight: bold; color: var(--gold-hover); margin: 2px 0; }
-.gols-btn-group { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
-.btn-gol { padding: 6px 10px; background: var(--secondary-navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-.btn-menos-gol { padding: 6px 10px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-.cron-btn-group { display: flex; gap: 8px; margin-top: 15px; }
-.acrescimo-box { margin-top: 15px; background: #fffbeb; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+.time-placar h4 { margin: 0 0 4px 0; font-size: 0.95rem; }
+.gols-num { font-size: 2rem; font-weight: bold; color: var(--gold-hover); margin: 2px 0; }
+.gols-btn-group { display: flex; justify-content: center; gap: 5px; margin-top: 4px; }
+.btn-gol { padding: 6px 10px; background: var(--secondary-navy); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.82rem; }
+.btn-menos-gol { padding: 6px 10px; background: #ef4444; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.82rem; }
+.cron-btn-group { display: flex; gap: 6px; margin-top: 12px; }
+.acrescimo-box { margin-top: 12px; background: #fffbeb; border: 1px solid #fde68a; padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
 
 .bt-status-banner {
 background: #f1f5f9;
 border: 1px solid #cbd5e1;
 border-radius: 8px;
-padding: 8px 12px;
-margin-bottom: 12px;
-font-size: 0.82rem;
+padding: 8px 10px;
+margin-bottom: 10px;
+font-size: 0.78rem;
 color: #334155;
 display: flex;
 justify-content: space-between;
 align-items: center;
+gap: 6px;
 }
 
-.elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 10px; }
-.elenco-scroll { max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.elenco-chip { padding: 5px 10px; border-radius: 16px; font-size: 0.82rem; font-weight: bold; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+.elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; padding: 8px; margin-bottom: 8px; }
+.elenco-scroll { max-height: 140px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.elenco-chip { padding: 5px 10px; border-radius: 16px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
 .elenco-chip:hover { filter: brightness(0.95); }
 .elenco-chip.selecionado { opacity: 0.45; text-decoration: line-through; pointer-events: none; }
-.progress-bg { width: 100%; background: #e2e8f0; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden; }
+.progress-bg { width: 100%; background: #e2e8f0; height: 9px; border-radius: 5px; margin-top: 6px; overflow: hidden; }
 .progress-bar { height: 100%; background: #16a34a; transition: width 0.3s; }
 
-.artilharia-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 15px; text-align: left; }
-.artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
+.artilharia-box { background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px; margin-top: 12px; text-align: left; }
+.artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem; }
 .artilheiro-item:last-child { border-bottom: none; }
 
 /* Tela Exclusiva de Confirmação via Link do Jogo */
@@ -255,26 +367,26 @@ align-items: center;
 background: var(--card-bg);
 border: 2px solid var(--gold-accent);
 border-radius: 12px;
-padding: 18px;
-margin: 15px;
+padding: 16px;
+margin: 12px;
 box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
 
 .confirm-link-header {
-border-bottom: 1px solid #e2e8f0;
-padding-bottom: 12px;
-margin-bottom: 14px;
+border-bottom: 1px solid var(--border-subtle);
+padding-bottom: 10px;
+margin-bottom: 12px;
 }
 
 .confirm-link-title {
 margin: 0;
 color: var(--primary-navy);
-font-size: 1.35rem;
+font-size: 1.25rem;
 }
 
 .confirm-link-meta {
 color: #64748b;
-font-size: 0.92rem;
+font-size: 0.88rem;
 margin-top: 4px;
 }
 
@@ -283,11 +395,11 @@ display: flex;
 justify-content: space-between;
 gap: 8px;
 background: #f8fafc;
-border: 1px solid #e2e8f0;
+border: 1px solid var(--border-subtle);
 border-radius: 8px;
-padding: 10px 12px;
-margin-bottom: 14px;
-font-size: 0.9rem;
+padding: 8px 12px;
+margin-bottom: 12px;
+font-size: 0.88rem;
 font-weight: bold;
 color: var(--primary-navy);
 }
@@ -295,7 +407,7 @@ color: var(--primary-navy);
 .confirm-player-list {
 display: flex;
 flex-direction: column;
-gap: 10px;
+gap: 8px;
 }
 
 .confirm-player-row {
@@ -303,7 +415,7 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 gap: 10px;
-padding: 14px;
+padding: 12px;
 border-radius: 10px;
 border: 1.5px solid #cbd5e1;
 background: #ffffff;
@@ -317,13 +429,13 @@ background: #f0fdf4;
 }
 
 .confirm-player-nome {
-font-size: 1.15rem;
+font-size: 1.05rem;
 font-weight: bold;
 color: var(--primary-navy);
 }
 
 .confirm-player-sub {
-font-size: 0.82rem;
+font-size: 0.8rem;
 color: #64748b;
 margin-top: 2px;
 }
@@ -338,11 +450,11 @@ background: #16a34a;
 color: #ffffff;
 border: none;
 border-radius: 8px;
-padding: 12px 16px;
-font-size: 1rem;
+padding: 10px 14px;
+font-size: 0.92rem;
 font-weight: bold;
 cursor: pointer;
-min-width: 125px;
+min-width: 118px;
 flex-shrink: 0;
 }
 
@@ -351,11 +463,11 @@ background: #dcfce7;
 color: #15803d;
 border: 1.5px solid #16a34a;
 border-radius: 8px;
-padding: 12px 16px;
-font-size: 0.95rem;
+padding: 10px 14px;
+font-size: 0.9rem;
 font-weight: bold;
 cursor: pointer;
-min-width: 125px;
+min-width: 118px;
 flex-shrink: 0;
 }
 
@@ -363,20 +475,20 @@ flex-shrink: 0;
 background: #f8fafc;
 border: 1px solid #cbd5e1;
 border-radius: 8px;
-padding: 12px;
-margin-top: 12px;
+padding: 10px 12px;
+margin-top: 10px;
 }
 
 .link-gerado-url {
 font-family: monospace;
-font-size: 0.82rem;
+font-size: 0.8rem;
 background: #ffffff;
-border: 1px solid #e2e8f0;
-padding: 8px;
+border: 1px solid var(--border-subtle);
+padding: 7px;
 border-radius: 6px;
 word-break: break-all;
 color: var(--primary-navy);
-margin: 8px 0;
+margin: 6px 0;
 }
 
 /* Controles de Visibilidade por Permissão */
@@ -409,7 +521,10 @@ display: none;
 <div class="header">
 <div class="header-left">
 <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+<div>
 <span>Império Real FC</span>
+<span class="header-sub" id="labelPerfilTopo">PORTAL DO CLUBE</span>
+</div>
 </div>
 <div class="header-right">
 <button class="sync-btn" id="btnSyncStatus" onclick="carregarDaNuvem(true)" title="Atualizar dados da nuvem">☁️ Sync</button>
@@ -429,7 +544,7 @@ display: none;
 <button type="button" class="sync-btn" style="color:#0b1a30; border-color:#cbd5e1; background:#ffffff;" onclick="carregarDaNuvem(true)">🔄 Atualizar</button>
 </div>
 
-<p style="margin:0 0 12px 0; font-size:0.95rem; color:#334155;">
+<p style="margin:0 0 10px 0; font-size:0.9rem; color:#334155;">
 Toque no seu nome na lista abaixo e confirme sua presença:
 </p>
 
@@ -437,27 +552,27 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 
 <div class="balance-card">
-<div class="balance-title">Saldo Atual em Caixa</div>
+<div>
+<div class="balance-title">Saldo em Caixa</div>
 <div class="balance-value" id="saldoGeral">R$ 0,00</div>
+</div>
+<button type="button" class="balance-pill" onclick="abrirFinanceiroHub('relatorio')">💰 Financeiro</button>
 </div>
 
 <div class="tabs">
 <button class="tab-btn active" data-tab="jogos">Jogos</button>
 <button class="tab-btn" data-tab="ranking">Ranking</button>
-<button class="tab-btn" data-tab="relatorio">Relatório</button>
+<button class="tab-btn" data-tab="financeiro">Financeiro</button>
 <!-- Abas exclusivas de Admin / Juiz -->
 <button class="tab-btn" data-tab="sorteio" data-admin-only data-juiz-only data-juiz-liberado>Sorteio</button>
 <button class="tab-btn" data-tab="cronometro" data-admin-only data-juiz-only data-juiz-liberado>Cronômetro</button>
 <button class="tab-btn" data-tab="elenco" data-admin-only>Elenco</button>
-<button class="tab-btn" data-tab="pagamentos" data-admin-only>Pagamentos</button>
-<button class="tab-btn" data-tab="saidas" data-admin-only>Saídas</button>
-<button class="tab-btn" data-tab="metas" data-admin-only>Metas</button>
 </div>
 
 <!-- Aba Jogos -->
 <div id="tab-jogos" class="tab-content active">
 <div data-admin-only>
-<h3>Cadastrar Jogo / Convocação</h3>
+<h3 style="margin:0 0 10px 0; font-size:1.05rem; color:var(--primary-navy);">Cadastrar Jogo / Convocação</h3>
 <div class="form-group">
 <label>Nome do Jogo / Adversário</label>
 <input type="text" id="nomeJogo" placeholder="Ex: Racha de Quarta">
@@ -470,14 +585,14 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <div class="form-group">
 <label>Selecionar do Elenco Salvo (Busca Rápida)</label>
 <div class="elenco-selector-box">
-<input type="text" id="buscaElencoNovo" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.9rem;">
+<input type="text" id="buscaElencoNovo" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.88rem;">
 <div class="elenco-scroll" id="listaSelecaoElencoNovo"></div>
 </div>
 
 <label>Ou Adicionar Jogador Avulso</label>
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="inputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
-<select id="inputNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<select id="inputNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.85rem;">
 <option value="diamante" selected style="color: #0284c7;">💎 Diamante (4 pts)</option>
 <option value="ouro" style="color: #854d0e;">🥇 Ouro (3 pts)</option>
 <option value="prata" style="color: #475569;">🥈 Prata (2 pts)</option>
@@ -485,15 +600,15 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
 </select>
-<select id="inputStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<select id="inputStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.85rem;">
 <option value="marechal" selected>⭐ Marechal</option>
 <option value="intermediario">⚡ Intermediário</option>
 <option value="recruta">🛡️ Recruta</option>
 </select>
-<button class="action-btn" style="margin:0; width: 50px;" id="btnAddJogadorTemporario">+</button>
+<button class="action-btn" style="margin:0; width: 46px;" id="btnAddJogadorTemporario">+</button>
 </div>
 
-<label style="margin-top: 10px;">Convocados Selecionados (<span id="contadorTemp">0</span>)</label>
+<label style="margin-top: 8px;">Convocados Selecionados (<span id="contadorTemp">0</span>)</label>
 <div class="tags-container" id="containerJogadoresTemporarios"></div>
 </div>
 <button class="action-btn" id="btnSalvarJogo">Salvar Jogo e Gerar Link</button>
@@ -509,29 +624,150 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 
 <div class="history-title">Gerenciar Jogos Futuros / Convocados</div>
 <div id="listaJogos"></div>
-<hr style="margin: 25px 0; border: 0; border-top: 1px solid #cbd5e1;">
+<hr style="margin: 18px 0; border: 0; border-top: 1px solid #cbd5e1;">
 </div>
 
 <!-- Seção Pública: Próximo Jogo e Confirmados -->
-<h3>📋 Próximo Jogo e Confirmados</h3>
-<div id="proximoJogoPublico" style="margin-bottom:20px;"></div>
+<h3 style="margin:0 0 8px 0; font-size:1.02rem; color:var(--primary-navy);">📋 Próximo Jogo e Confirmados</h3>
+<div id="proximoJogoPublico" style="margin-bottom:16px;"></div>
 
-<h3>⚽ Histórico de Partidas Realizadas</h3>
+<h3 style="margin:0 0 8px 0; font-size:1.02rem; color:var(--primary-navy);">⚽ Histórico de Partidas Realizadas</h3>
 <div id="listaPartidasPublicas"></div>
+</div>
+
+<!-- Aba Financeiro (Hub Compacto + Telas Completas ao Clicar) -->
+<div id="tab-financeiro" class="tab-content">
+<div class="fin-hub-grid">
+<button type="button" class="fin-hub-card" id="hub-card-entradas" data-admin-only onclick="abrirFinanceiroHub('entradas')">
+<div class="fin-hub-title">💵 Entradas</div>
+<div class="fin-hub-sub" id="finResumoEntradas">Confirmar pagamentos</div>
+</button>
+
+<button type="button" class="fin-hub-card" id="hub-card-saidas" data-admin-only onclick="abrirFinanceiroHub('saidas')">
+<div class="fin-hub-title">💸 Saídas</div>
+<div class="fin-hub-sub" id="finResumoSaidas">Registrar despesas</div>
+</button>
+
+<button type="button" class="fin-hub-card" id="hub-card-metas" data-admin-only onclick="abrirFinanceiroHub('metas')">
+<div class="fin-hub-title">🎯 Metas</div>
+<div class="fin-hub-sub" id="finResumoMetas">Acompanhar objetivos</div>
+</button>
+
+<button type="button" class="fin-hub-card ativo" id="hub-card-relatorio" onclick="abrirFinanceiroHub('relatorio')">
+<div class="fin-hub-title">📊 Relatório</div>
+<div class="fin-hub-sub" id="finResumoRelatorio">Caixa e resumo</div>
+</button>
+</div>
+
+<!-- Subtela: Entradas / Pagamentos -->
+<div id="fin-sub-entradas" class="fin-subview" data-admin-only>
+<div class="fin-subview-header">
+<h3>💵 Entradas e Pagamentos</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaFinanceiro()">Fechar</button>
+</div>
+
+<div class="form-group">
+<label>Selecione o Jogo</label>
+<select id="selectJogoPagamento"><option value="">Selecione um jogo...</option></select>
+</div>
+
+<div id="areaConvocados" style="display:none;">
+<div class="history-title" style="margin-top:8px;">Dar Baixa nos Convocados <small style="color:#6b21a8; font-weight:normal;">(🧤 Goleiros isentos)</small></div>
+<div class="call-list" id="listaConvocadosBaixa"></div>
+</div>
+
+<div class="history-title">Pagamento Avulso / Extra</div>
+<div class="form-group"><label>Nome do Jogador</label><input type="text" id="nomeJogador" placeholder="Nome"></div>
+<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorPagamento" value="10.00" step="0.01"></div>
+<button class="action-btn" id="btnConfirmarPagamento">Confirmar Pagamento Avulso</button>
+
+<div class="history-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span>Histórico de Entradas</span>
+<button id="btnExportarPagamentosTxt" style="background: var(--secondary-navy); color: var(--gold-accent); border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.78rem;">📤 Exportar .TXT</button>
+</div>
+<div id="listaPagamentos"></div>
+</div>
+
+<!-- Subtela: Saídas -->
+<div id="fin-sub-saidas" class="fin-subview" data-admin-only>
+<div class="fin-subview-header">
+<h3>💸 Saídas e Despesas</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaFinanceiro()">Fechar</button>
+</div>
+
+<div class="form-group">
+<label>Vincular ao Jogo (Opcional)</label>
+<select id="selectJogoSaida"><option value="">Geral</option></select>
+</div>
+<div class="form-group"><label>Descrição</label><input type="text" id="descSaida" placeholder="Ex: Aluguel da quadra"></div>
+<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorSaida" step="0.01" placeholder="0.00"></div>
+<button class="action-btn" style="background: #ef4444; color: white;" id="btnRegistrarSaida">Registrar Saída</button>
+
+<div class="history-title">Histórico de Saídas</div>
+<div id="listaSaidas"></div>
+</div>
+
+<!-- Subtela: Metas -->
+<div id="fin-sub-metas" class="fin-subview" data-admin-only>
+<div class="fin-subview-header">
+<h3>🎯 Metas Financeiras</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaFinanceiro()">Fechar</button>
+</div>
+
+<div class="form-group"><label>Nome da Meta</label><input type="text" id="nomeMeta" placeholder="Ex: Compra de Bolas Novas"></div>
+<div class="form-group"><label>Valor Alvo (R$)</label><input type="number" id="valorMeta" step="0.01" placeholder="300.00"></div>
+<button class="action-btn" id="btnSalvarMeta">Criar Meta</button>
+
+<div class="history-title">Progresso das Metas</div>
+<div id="listaMetas"></div>
+</div>
+
+<!-- Subtela: Relatório -->
+<div id="fin-sub-relatorio" class="fin-subview ativa">
+<div class="fin-subview-header">
+<h3>📊 Relatório Financeiro</h3>
+<button type="button" class="fin-close-btn" onclick="fecharSubtelaFinanceiro()">Ocultar</button>
+</div>
+
+<div id="relatorioPublico">
+<div style="margin-bottom: 12px;">
+<h4 style="color:var(--primary-navy); margin:0 0 5px 0; font-size:0.9rem;">💵 Pagamentos do Último Jogo Realizado</h4>
+<div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:9px; border-radius:7px; border:1px solid var(--border-subtle); font-size:0.88rem;">Nenhum pagamento registrado no último jogo realizado.</div>
+</div>
+
+<div style="margin-bottom: 12px;">
+<h4 style="color:var(--primary-navy); margin:0 0 5px 0; font-size:0.9rem;">🧾 Despesas do Último Jogo Realizado</h4>
+<div id="relatorioDespesasUltimoJogo" style="background:#f8fafc; padding:9px; border-radius:7px; border:1px solid var(--border-subtle); font-size:0.88rem;">Nenhuma despesa registrada no último jogo realizado.</div>
+</div>
+
+<hr style="border: 0; border-top: 1px solid var(--border-subtle);">
+<div style="margin-top:10px; font-weight:bold; font-size:1rem; color:var(--primary-navy);">Saldo Total em Caixa: <span id="resumoSaldoPublico" class="positive">R$ 0,00</span></div>
+</div>
+
+<div id="relatorioAdminCompleto" style="display:none; margin-top: 14px; padding-top: 12px; border-top: 2px solid var(--gold-accent);" data-admin-only>
+<h4 style="margin:0 0 8px 0; color:var(--primary-navy);">Resumo Completo (Admin)</h4>
+<p style="margin:4px 0; font-size:0.9rem;">Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
+<div style="font-weight:bold; font-size:0.88rem; margin-top:8px;">Detalhamento de Saídas:</div>
+<div id="listaDetalheSaidas"></div>
+<p style="margin:8px 0 4px 0; font-size:0.9rem;">Total de Saídas: <span id="resumoSaidas" class="negative">R$ 0,00</span></p>
+<div style="margin-top:8px; font-weight:bold; font-size:0.98rem;">Saldo Final: <span id="resumoSaldoAdmin">R$ 0,00</span></div>
+<a href="#" class="whatsapp-btn" id="btnWpp" target="_blank">Enviar Resumo no WhatsApp</a>
+</div>
+</div>
 </div>
 
 <!-- Aba Elenco (Banco de Dados de Jogadores) -->
 <div id="tab-elenco" class="tab-content" data-admin-only>
-<h3>Banco de Dados de Jogadores</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Cadastre os jogadores fixos do clube para selecioná-los rapidamente nos jogos.</p>
+<h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">Banco de Dados de Jogadores</h3>
+<p style="color: #64748b; font-size: 0.85rem; margin:0 0 12px 0;">Cadastre os jogadores fixos do clube para selecioná-los rapidamente nos jogos.</p>
 <div class="form-group">
 <label>Nome do Jogador</label>
 <input type="text" id="elencoNome" placeholder="Ex: Alef">
 </div>
-<div class="form-group" style="display: flex; gap: 10px;">
+<div class="form-group" style="display: flex; gap: 8px;">
 <div style="flex: 1;">
-<label>Nível / Posição Padrão</label>
-<select id="elencoNivel" style="font-weight: bold; padding: 12px;">
+<label>Nível / Posição</label>
+<select id="elencoNivel" style="font-weight: bold; padding: 10px; font-size:0.88rem;">
 <option value="diamante" style="color: #0284c7;">💎 Diamante (4 pts)</option>
 <option value="ouro" selected style="color: #854d0e;">🥇 Ouro (3 pts)</option>
 <option value="prata" style="color: #475569;">🥈 Prata (2 pts)</option>
@@ -542,7 +778,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 <div style="flex: 1;">
 <label>Categoria</label>
-<select id="elencoStatus" style="font-weight: bold; padding: 12px;">
+<select id="elencoStatus" style="font-weight: bold; padding: 10px; font-size:0.88rem;">
 <option value="marechal">⭐ Marechal</option>
 <option value="intermediario">⚡ Intermediário</option>
 <option value="recruta">🛡️ Recruta</option>
@@ -551,49 +787,24 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 <button class="action-btn" id="btnSalvarElenco">Cadastrar Jogador no Elenco</button>
 
-<div style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
-<h4 style="margin-top:0; color:var(--primary-navy);">💾 Segurança e Backup</h4>
-<div style="display: flex; gap: 10px;">
-<button class="action-btn" style="background:var(--secondary-navy); color:var(--gold-accent); margin:0;" id="btnExportarBackup">Exportar Backup</button>
-<button class="action-btn" style="background:#0284c7; color:white; margin:0;" id="btnImportarBackup">Importar Backup</button>
+<div style="margin-top: 14px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1;">
+<h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.9rem;">💾 Segurança e Backup</h4>
+<div style="display: flex; gap: 8px;">
+<button class="action-btn" style="background:var(--secondary-navy); color:var(--gold-accent); margin:0; font-size:0.85rem;" id="btnExportarBackup">Exportar</button>
+<button class="action-btn" style="background:#0284c7; color:white; margin:0; font-size:0.85rem;" id="btnImportarBackup">Importar</button>
 <input type="file" id="inputFileBackup" style="display:none;" accept=".json">
 </div>
 </div>
 
 <div class="history-title">Jogadores Cadastrados (<span id="totalElencoCount">0</span>)</div>
-<input type="text" id="filtroListaElenco" placeholder="🔍 Buscar no elenco..." style="margin-bottom: 10px; padding: 10px;">
+<input type="text" id="filtroListaElenco" placeholder="🔍 Buscar no elenco..." style="margin-bottom: 8px; padding: 9px; font-size:0.9rem;">
 <div id="listaElencoCadastrado"></div>
-</div>
-
-<!-- Aba Pagamentos -->
-<div id="tab-pagamentos" class="tab-content" data-admin-only>
-<h3>Registrar Pagamento</h3>
-<div class="form-group">
-<label>Selecione o Jogo</label>
-<select id="selectJogoPagamento"><option value="">Selecione um jogo...</option></select>
-</div>
-
-<div id="areaConvocados" style="display:none;">
-<div class="history-title">Dar Baixa nos Convocados <small style="color:#6b21a8; font-weight:normal;">(🧤 Goleiros são isentos)</small></div>
-<div class="call-list" id="listaConvocadosBaixa"></div>
-</div>
-
-<div class="history-title" style="margin-top:25px;">Pagamento Avulso / Extra</div>
-<div class="form-group"><label>Nome do Jogador</label><input type="text" id="nomeJogador"></div>
-<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorPagamento" value="10.00" step="0.01"></div>
-<button class="action-btn" id="btnConfirmarPagamento">Confirmar Pagamento Avulso</button>
-
-<div class="history-title" style="display: flex; justify-content: space-between; align-items: center;">
-<span>Histórico de Pagamentos</span>
-<button id="btnExportarPagamentosTxt" style="background: var(--secondary-navy); color: var(--gold-accent); border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">📤 Exportar Lista (Nome e Valor)</button>
-</div>
-<div id="listaPagamentos"></div>
 </div>
 
 <!-- Aba Sorteio -->
 <div id="tab-sorteio" class="tab-content" data-admin-only data-juiz-liberado>
-<h3>Sorteador de Times Inteligente</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Pesos: <b>Diamante = 4 pts</b>, <b>Ouro = 3 pts</b>, <b>Prata = 2 pts</b>, <b>Bronze = 1 pt</b>. Equilibra pontos e compensa diferenças de categorias entre os times, priorizando Marechais como titulares (5 na linha + 1 gol).</p>
+<h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">Sorteador de Times Inteligente</h3>
+<p style="color: #64748b; font-size: 0.84rem; margin:0 0 12px 0;">Pesos: <b>Diamante = 4 pts</b>, <b>Ouro = 3 pts</b>, <b>Prata = 2 pts</b>, <b>Bronze = 1 pt</b>. Equilibra pontos e categorias, priorizando Marechais como titulares (5 na linha + 1 gol).</p>
 <div class="form-group">
 <label>Selecione o Jogo</label>
 <select id="selectJogoSorteio"><option value="">Selecione um jogo...</option></select>
@@ -608,27 +819,27 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 </div>
 <button class="action-btn" id="btnSortearTimes">🎲 Sortear Times Justos</button>
 
-<div id="resultadoSorteio" style="margin-top: 20px;"></div>
+<div id="resultadoSorteio" style="margin-top: 14px;"></div>
 </div>
 
 <!-- Aba Cronômetro / Partida -->
 <div id="tab-cronometro" class="tab-content" data-admin-only data-juiz-liberado>
 <div class="cronometro-box">
-<h3 style="margin-top:0; color:var(--primary-navy);">⏱️ Controle da Partida & Artilharia</h3>
+<h3 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:1.02rem;">⏱️ Controle da Partida & Artilharia</h3>
 
 <div class="bt-status-banner">
-<span>🎮 <b>Controle Bluetooth Ativo:</b> Botão 1 = 🔴 Vermelho | Botão 2 = 🔵 Azul</span>
+<span>🎮 <b>Controle BT:</b> 1 = 🔴 Vermelho | 2 = 🔵 Azul</span>
 <span id="btUltimoClique" style="font-weight:bold; color:#0284c7;">Pronto</span>
 </div>
 
 <div class="form-group" style="text-align:left;">
-<label>Vincular ao Jogo (Carrega apenas os convocados do dia)</label>
+<label>Vincular ao Jogo</label>
 <select id="selectJogoCronometro"><option value="">Selecione o jogo do dia...</option></select>
 </div>
 
-<h3 id="labelPeriodo" style="color:var(--primary-navy); margin-top:15px;">1º Tempo (30 min)</h3>
+<h3 id="labelPeriodo" style="color:var(--primary-navy); margin:10px 0 2px 0; font-size:0.95rem;">1º Tempo (30 min)</h3>
 <div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
-<small style="color:#64748b; display:block; margin-bottom:10px;">💡 O cronômetro roda em segundo plano. Toque no relógio acima para ajustar manualmente.</small>
+<small style="color:#64748b; display:block; margin-bottom:8px;">💡 Roda em segundo plano. Toque no relógio para ajustar.</small>
 
 <div class="placar-container">
 <div class="time-placar">
@@ -639,7 +850,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <button class="btn-gol" id="btnGolVermelho">+ Gol</button>
 </div>
 </div>
-<div style="font-weight:bold; font-size:1.5rem; color:#64748b;">X</div>
+<div style="font-weight:bold; font-size:1.4rem; color:#64748b;">X</div>
 <div class="time-placar">
 <h4 style="color:#2563eb;">🔵 Azul</h4>
 <div class="gols-num" id="golsAzul">0</div>
@@ -652,26 +863,26 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 
 <!-- Artilharia Rápida restrita aos convocados do jogo selecionado -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:0.95rem;">⚽ Artilharia da Partida (Apenas convocados do jogo)</h4>
-<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar apenas os jogadores convocados para a partida.</i></div>
+<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida</h4>
+<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os convocados.</i></div>
 </div>
 
 <div class="cron-btn-group">
-<button class="action-btn" id="btnIniciarCron" style="background:#16a34a; color:white; margin:0;">▶ Iniciar</button>
-<button class="action-btn" id="btnPausarCron" style="background:#ca8a04; color:white; margin:0;">⏸ Pausar</button>
-<button class="action-btn" id="btnZerarCron" style="background:#dc2626; color:white; margin:0;">⏹ Zerar</button>
+<button class="action-btn" id="btnIniciarCron" style="background:#16a34a; color:white; margin:0; font-size:0.86rem;">▶ Iniciar</button>
+<button class="action-btn" id="btnPausarCron" style="background:#ca8a04; color:white; margin:0; font-size:0.86rem;">⏸ Pausar</button>
+<button class="action-btn" id="btnZerarCron" style="background:#dc2626; color:white; margin:0; font-size:0.86rem;">⏹ Zerar</button>
 </div>
 
 <div class="acrescimo-box">
-<span style="font-weight:bold; color:#854d0e; font-size:0.95rem;">Acréscimo: <span id="displayAcrescimo">0</span> min</span>
+<span style="font-weight:bold; color:#854d0e; font-size:0.88rem;">Acréscimo: <span id="displayAcrescimo">0</span> min</span>
 <div style="display:flex; gap:5px;">
-<button id="btnMenosAcrescimo" style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">-1</button>
-<button id="btnMaisAcrescimo" style="padding:6px 12px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+1</button>
+<button id="btnMenosAcrescimo" style="padding:5px 10px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">-1</button>
+<button id="btnMaisAcrescimo" style="padding:5px 10px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+1</button>
 </div>
 </div>
 
-<button class="action-btn" id="btnTrocarTempo" style="background:var(--secondary-navy); color:var(--gold-accent); margin-top:12px;">🔄 Alternar para o 2º Tempo</button>
-<button class="action-btn" id="btnSalvarPartida" style="background:var(--gold-accent); color:var(--primary-navy); margin-top:8px;">💾 Salvar Partida no Histórico</button>
+<button class="action-btn" id="btnTrocarTempo" style="background:var(--secondary-navy); color:var(--gold-accent); margin-top:10px; font-size:0.88rem;">🔄 Alternar para o 2º Tempo</button>
+<button class="action-btn" id="btnSalvarPartida" style="background:var(--gold-accent); color:var(--primary-navy); margin-top:6px; font-size:0.88rem;">💾 Salvar Partida no Histórico</button>
 </div>
 
 <div class="history-title">Histórico de Partidas (Vermelho x Azul)</div>
@@ -680,86 +891,27 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 
 <!-- Aba Ranking -->
 <div id="tab-ranking" class="tab-content">
-<h3>🏆 Ranking de Artilheiros do Clube</h3>
-<p style="color: #64748b; font-size: 0.9rem;">Contagem oficial de gols somados de todas as partidas salvas no histórico.</p>
-<div id="listaRankingArtilheiros" style="margin-top: 15px;"></div>
-</div>
-
-<!-- Aba Saídas -->
-<div id="tab-saidas" class="tab-content" data-admin-only>
-<h3>Nova Despesa</h3>
-<div class="form-group">
-<label>Vincular ao Jogo (Opcional)</label>
-<select id="selectJogoSaida"><option value="">Geral</option></select>
-</div>
-<div class="form-group"><label>Descrição</label><input type="text" id="descSaida" placeholder="Ex: Aluguel da quadra"></div>
-<div class="form-group"><label>Valor (R$)</label><input type="number" id="valorSaida" step="0.01" placeholder="0.00"></div>
-<button class="action-btn" style="background: #ef4444; color: white;" id="btnRegistrarSaida">Registrar Saída</button>
-
-<div class="history-title">Histórico de Saídas</div>
-<div id="listaSaidas"></div>
-</div>
-
-<!-- Aba Metas -->
-<div id="tab-metas" class="tab-content" data-admin-only>
-<h3>Nova Meta Financeira</h3>
-<div class="form-group"><label>Nome da Meta</label><input type="text" id="nomeMeta" placeholder="Ex: Compra de Bolas Novas"></div>
-<div class="form-group"><label>Valor Alvo (R$)</label><input type="number" id="valorMeta" step="0.01" placeholder="300.00"></div>
-<button class="action-btn" id="btnSalvarMeta">Criar Meta</button>
-
-<div class="history-title">Progresso das Metas</div>
-<div id="listaMetas"></div>
-</div>
-
-<!-- Aba Relatório -->
-<div id="tab-relatorio" class="tab-content">
-<!-- Visão Pública (Simplificada) -->
-<div class="report-box" id="relatorioPublico">
-<h3>Resumo Financeiro</h3>
-<div style="margin-bottom: 15px;">
-<h4 style="color:var(--primary-navy); margin-bottom:5px;">💵 Pagamentos do Último Jogo Realizado</h4>
-<div id="relatorioPagamentosUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhum pagamento registrado no último jogo realizado.</div>
-</div>
-
-<div style="margin-bottom: 15px;">
-<h4 style="color:var(--primary-navy); margin-bottom:5px;">🧾 Despesas do Último Jogo Realizado</h4>
-<div id="relatorioDespesasUltimoJogo" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">Nenhuma despesa registrada no último jogo realizado.</div>
-</div>
-
-<hr style="border: 0; border-top: 1px solid #e2e8f0;">
-<h3 style="margin-top:15px;">Saldo Total em Caixa: <span id="resumoSaldoPublico" class="positive">R$ 0,00</span></h3>
-</div>
-
-<!-- Visão Admin Completa (Exclusiva para Administrador) -->
-<div class="report-box" id="relatorioAdminCompleto" style="display:none; margin-top: 15px;" data-admin-only>
-<h3>Resumo Financeiro Completo (Admin)</h3>
-<p>Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
-<hr style="border: 0; border-top: 1px solid #e2e8f0;">
-<h4>Detalhamento de Saídas:</h4>
-<div id="listaDetalheSaidas"></div>
-<p>Total de Saídas: <span id="resumoSaidas" class="negative">R$ 0,00</span></p>
-<hr style="margin-top: 15px; border: 0; border-top: 1px solid #e2e8f0;">
-<h4>Saldo Final: <span id="resumoSaldoAdmin">R$ 0,00</span></h4>
-<a href="#" class="whatsapp-btn" id="btnWpp" target="_blank">Enviar Resumo no WhatsApp</a>
-</div>
+<h3 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--primary-navy);">🏆 Ranking de Artilheiros</h3>
+<p style="color: #64748b; font-size: 0.85rem; margin:0 0 12px 0;">Contagem oficial de gols somados das partidas salvas.</p>
+<div id="listaRankingArtilheiros"></div>
 </div>
 
 <!-- Modal para Editar Convocados -->
 <div class="modal" id="modalEditarLista">
 <div class="modal-content">
-<h3>Editar Convocados</h3>
+<h3 style="margin-top:0; color:var(--primary-navy);">Editar Convocados</h3>
 <input type="hidden" id="editJogoId">
 <div class="form-group">
 <label>Selecionar do Elenco Salvo:</label>
 <div class="elenco-selector-box">
-<input type="text" id="buscaElencoEdit" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.9rem;">
+<input type="text" id="buscaElencoEdit" placeholder="🔍 Filtrar jogador cadastrado..." style="padding: 8px; font-size: 0.88rem;">
 <div class="elenco-scroll" id="listaSelecaoElencoEdit"></div>
 </div>
 
 <label>Adicionar Novo Avulso:</label>
 <div style="display: flex; gap: 5px; margin-bottom: 5px;">
 <input type="text" id="editInputNomeJogador" placeholder="Nome do jogador..." style="flex: 2;">
-<select id="editNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<select id="editNivelJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.85rem;">
 <option value="diamante" style="color: #0284c7;">💎 Diamante (4 pts)</option>
 <option value="ouro" style="color: #854d0e;">🥇 Ouro (3 pts)</option>
 <option value="prata" selected style="color: #475569;">🥈 Prata (2 pts)</option>
@@ -767,25 +919,25 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <option value="goleiro-ouro" style="color: #6b21a8;">🧤 Goleiro Ouro</option>
 <option value="goleiro-prata" style="color: #0369a1;">🧤 Goleiro Prata</option>
 </select>
-<select id="editStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.9rem;">
+<select id="editStatusJogador" style="flex: 1; padding: 8px; font-weight: bold; font-size: 0.85rem;">
 <option value="marechal" selected>⭐ Marechal</option>
 <option value="intermediario">⚡ Intermediário</option>
 <option value="recruta">🛡️ Recruta</option>
 </select>
-<button class="action-btn" style="margin:0; width: 50px;" id="btnEditAddJogador">+</button>
+<button class="action-btn" style="margin:0; width: 46px;" id="btnEditAddJogador">+</button>
 </div>
-<label style="margin-top: 10px;">Convocados Atuais do Jogo:</label>
+<label style="margin-top: 8px;">Convocados Atuais do Jogo:</label>
 <div class="tags-container" id="containerEditJogadores" style="margin-top: 5px;"></div>
 </div>
 <button class="action-btn" id="btnSalvarEdicaoLista">Salvar Alterações</button>
-<button class="action-btn" style="background:#64748b; color: white; margin-top:8px;" id="btnFecharModal">Cancelar</button>
+<button class="action-btn" style="background:#64748b; color: white; margin-top:6px;" id="btnFecharModal">Cancelar</button>
 </div>
 </div>
 
 <!-- Modal para Editar Partida Salva no Histórico -->
 <div class="modal" id="modalEditarPartidaHist">
 <div class="modal-content">
-<h3>✏️ Editar Partida Salva</h3>
+<h3 style="margin-top:0; color:var(--primary-navy);">✏️ Editar Partida Salva</h3>
 <input type="hidden" id="editPartId">
 <div class="form-group">
 <label>Gols Vermelho</label>
@@ -804,7 +956,7 @@ Toque no seu nome na lista abaixo e confirme sua presença:
 <div id="containerEditArtilhariaHist" style="background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #cbd5e1; max-height:200px; overflow-y:auto;"></div>
 </div>
 <button class="action-btn" id="btnSalvarEdicaoPartida">Salvar Alterações da Partida</button>
-<button class="action-btn" style="background:#64748b; color: white; margin-top:8px;" id="btnFecharModalPartida">Cancelar</button>
+<button class="action-btn" style="background:#64748b; color: white; margin-top:6px;" id="btnFecharModalPartida">Cancelar</button>
 </div>
 </div>
 
@@ -816,6 +968,76 @@ const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
 var jogoConfirmacaoLinkId = null;
+var subtelaFinanceiroAtiva = 'relatorio';
+
+function atualizarLabelPerfil() {
+var lbl = document.getElementById('labelPerfilTopo');
+if (!lbl) return;
+if (nivelAcesso === 'admin') lbl.textContent = 'PAINEL ADMINISTRATIVO';
+else if (nivelAcesso === 'juiz') lbl.textContent = 'MODO JUIZ';
+else lbl.textContent = 'PORTAL DO CLUBE';
+}
+
+function abrirFinanceiroHub(secao) {
+switchTab('financeiro');
+var alvo = secao;
+if (nivelAcesso !== 'admin' && alvo !== 'relatorio') {
+alvo = 'relatorio';
+}
+subtelaFinanceiroAtiva = alvo;
+
+var cards = document.querySelectorAll('.fin-hub-card');
+for (var i = 0; i < cards.length; i++) {
+cards[i].classList.remove('ativo');
+}
+var cardAtivo = document.getElementById('hub-card-' + alvo);
+if (cardAtivo) cardAtivo.classList.add('ativo');
+
+var subviews = document.querySelectorAll('.fin-subview');
+for (var j = 0; j < subviews.length; j++) {
+subviews[j].classList.remove('ativa');
+}
+var subAtiva = document.getElementById('fin-sub-' + alvo);
+if (subAtiva) subAtiva.classList.add('ativa');
+
+if (alvo === 'entradas') carregarListaBaixaConvocados();
+if (alvo === 'relatorio') atualizarRelatorio();
+}
+
+function fecharSubtelaFinanceiro() {
+var subviews = document.querySelectorAll('.fin-subview');
+for (var j = 0; j < subviews.length; j++) {
+subviews[j].classList.remove('ativa');
+}
+var cards = document.querySelectorAll('.fin-hub-card');
+for (var i = 0; i < cards.length; i++) {
+cards[i].classList.remove('ativo');
+}
+subtelaFinanceiroAtiva = null;
+}
+
+function atualizarResumosHubFinanceiro() {
+var totalEnt = 0, totalSai = 0, qtdPag = 0, qtdSai = 0;
+for (var i = 0; i < transacoes.length; i++) {
+if (transacoes[i].tipo === 'pagamento') {
+totalEnt += Number(transacoes[i].valor || 0);
+qtdPag++;
+}
+if (transacoes[i].tipo === 'saida') {
+totalSai += Number(transacoes[i].valor || 0);
+qtdSai++;
+}
+}
+var elEnt = document.getElementById('finResumoEntradas');
+var elSai = document.getElementById('finResumoSaidas');
+var elMet = document.getElementById('finResumoMetas');
+var elRel = document.getElementById('finResumoRelatorio');
+
+if (elEnt) elEnt.textContent = qtdPag + ' pgto(s) • ' + formatarMoeda(totalEnt);
+if (elSai) elSai.textContent = qtdSai + ' saída(s) • ' + formatarMoeda(totalSai);
+if (elMet) elMet.textContent = metas.length + ' meta(s) ativa(s)';
+if (elRel) elRel.textContent = 'Saldo: ' + formatarMoeda(totalEnt - totalSai);
+}
 
 function obterIdConfirmacaoDaUrl() {
 try {
@@ -1029,6 +1251,7 @@ var senha = prompt("Digite a senha de acesso (Admin ou Juiz):");
 if (senha === "1571") {
 nivelAcesso = 'admin';
 document.body.className = '';
+atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '🔓 Admin';
@@ -1037,6 +1260,7 @@ switchTab('jogos');
 } else if (senha === "0101") {
 nivelAcesso = 'juiz';
 document.body.className = 'modo-juiz';
+atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '⚽ Juiz';
@@ -1048,9 +1272,13 @@ alert('Senha incorreta!');
 } else {
 nivelAcesso = 'jogador';
 document.body.className = 'modo-jogador';
+atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
 btn.innerText = '🔐 Admin';
+if (subtelaFinanceiroAtiva && subtelaFinanceiroAtiva !== 'relatorio') {
+abrirFinanceiroHub('relatorio');
+}
 var abaAtiva = document.querySelector('.tab-btn.active');
 if (abaAtiva && abaAtiva.hasAttribute('data-admin-only')) {
 switchTab('jogos');
@@ -1188,9 +1416,12 @@ renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaEle
 renderizarProximoJogoPublico();
 renderizarPartidasPublicas();
 }
+if (tabId === 'financeiro') {
+atualizarResumosHubFinanceiro();
+atualizarRelatorio();
+if (subtelaFinanceiroAtiva === 'entradas') carregarListaBaixaConvocados();
+}
 if (tabId === 'elenco') renderizarElenco();
-if (tabId === 'relatorio') atualizarRelatorio();
-if (tabId === 'pagamentos') carregarListaBaixaConvocados();
 if (tabId === 'sorteio') carregarSelectSorteio();
 if (tabId === 'cronometro') {
 carregarSelectCronometro();
@@ -1356,7 +1587,7 @@ item.className = 'list-item';
 var info = document.createElement('div');
 info.style.display = 'flex';
 info.style.alignItems = 'center';
-info.style.gap = '8px';
+info.style.gap = '6px';
 info.innerHTML =
 '<span class="badge-nivel ' + obterClasseNivel(p.nivel) + '">' + p.nivel.replace('-', ' ') + '</span>' +
 '<b>' + p.nome + '</b>' +
@@ -1364,11 +1595,11 @@ info.innerHTML =
 
 var actions = document.createElement('div');
 actions.style.display = 'flex';
-actions.style.gap = '5px';
+actions.style.gap = '4px';
 
 var selectNivel = document.createElement('select');
 selectNivel.style.padding = '4px';
-selectNivel.style.fontSize = '0.8rem';
+selectNivel.style.fontSize = '0.78rem';
 selectNivel.style.width = 'auto';
 selectNivel.innerHTML =
 '<option value="diamante"' + (p.nivel === 'diamante' ? ' selected' : '') + '>Diamante</option>' +
@@ -1391,7 +1622,7 @@ renderizarElenco();
 
 var selectStatus = document.createElement('select');
 selectStatus.style.padding = '4px';
-selectStatus.style.fontSize = '0.8rem';
+selectStatus.style.fontSize = '0.78rem';
 selectStatus.style.width = 'auto';
 selectStatus.innerHTML =
 '<option value="marechal"' + (st === 'marechal' ? ' selected' : '') + '>Marechal</option>' +
@@ -1495,18 +1726,18 @@ return typeof p !== 'string' && Boolean(p.confirmado);
 });
 
 var html = '<div class="report-box">';
-html += '<h4 style="color:var(--primary-navy); margin-top:0;">⚽ ' + proximoJogo.nome + '</h4>';
-html += '<p style="color:#64748b; margin:5px 0 15px 0;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + confirmados.length + '</b></p>';
+html += '<h4 style="color:var(--primary-navy); margin:0;">⚽ ' + proximoJogo.nome + '</h4>';
+html += '<p style="color:#64748b; margin:4px 0 12px 0; font-size:0.88rem;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + confirmados.length + '</b></p>';
 
 if (confirmados.length === 0) {
-html += '<p><i>Nenhum jogador confirmou presença neste jogo ainda.</i></p>';
+html += '<p style="margin:0; font-size:0.9rem; color:#64748b;"><i>Nenhum jogador confirmou presença neste jogo ainda.</i></p>';
 } else {
 html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
 for (var i = 0; i < confirmados.length; i++) {
 var p = confirmados[i];
 var nome = typeof p === 'string' ? p : p.nome;
 var nivel = typeof p === 'string' ? 'prata' : (p.nivel || 'prata');
-html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.85rem; padding:5px 10px; box-shadow: 0 0 0 2px #16a34a;">✓ ' + nome + '</span>';
+html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.84rem; padding:5px 10px; box-shadow: 0 0 0 2px #16a34a;">✓ ' + nome + '</span>';
 }
 html += '</div>';
 }
@@ -1605,7 +1836,7 @@ var btns = document.createElement('div');
 
 var btnLink = document.createElement('button');
 btnLink.className = 'pay-btn';
-btnLink.style.marginRight = '5px';
+btnLink.style.marginRight = '4px';
 btnLink.textContent = 'Link';
 btnLink.onclick = function() {
 exibirBoxLinkJogo(jogo.id);
@@ -1670,7 +1901,7 @@ span.textContent = (t.tipo === 'saida' ? '- ' : '+ ') + formatarMoeda(t.valor);
 var btnDel = document.createElement('button');
 btnDel.className = 'delete-btn';
 btnDel.style.padding = '2px 6px';
-btnDel.style.marginLeft = '8px';
+btnDel.style.marginLeft = '6px';
 btnDel.textContent = 'X';
 btnDel.onclick = function() { excluirTransacao(t.id); };
 
@@ -1691,14 +1922,14 @@ for (var m = 0; m < metas.length; m++) {
 (function(meta) {
 var pct = Math.min(100, Math.max(0, (saldoAtual / meta.valor) * 100)).toFixed(0);
 var box = document.createElement('div');
-box.style.cssText = 'background:white; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #e2e8f0;';
+box.style.cssText = 'background:#f8fafc; padding:10px 12px; margin-bottom:8px; border-radius:8px; border:1px solid #e2e8f0;';
 
 box.innerHTML =
 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
 '<b>' + meta.nome + '</b>' +
 '<button class="delete-btn" id="del-m-' + meta.id + '">X</button>' +
 '</div>' +
-'<div style="margin-top:5px; font-size:0.9rem; color:#64748b;">' +
+'<div style="margin-top:4px; font-size:0.86rem; color:#64748b;">' +
 'Alvo: ' + formatarMoeda(meta.valor) + ' | Progresso: <b style="color:var(--primary-navy);">' + pct + '%</b>' +
 '</div>' +
 '<div class="progress-bg"><div class="progress-bar" style="width:' + pct + '%;"></div></div>';
@@ -1712,6 +1943,7 @@ delBtnMeta.onclick = function() { excluirMeta(meta.id); };
 }
 }
 
+atualizarResumosHubFinanceiro();
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
 renderizarProximoJogoPublico();
 renderizarPartidasPublicas();
@@ -2044,7 +2276,7 @@ item.innerHTML =
 textoArtilheiros + '<br>' +
 '<small style="color:#64748b;">📅 ' + p.data + '</small>' +
 '</div>' +
-'<div style="display:flex; gap:5px;">' +
+'<div style="display:flex; gap:4px;">' +
 '<button class="edit-btn" id="edit-part-' + p.id + '">Editar</button>' +
 '<button class="delete-btn" id="del-part-' + p.id + '">X</button>' +
 '</div>';
@@ -2160,10 +2392,10 @@ var div = document.createElement('div');
 div.className = 'list-item';
 div.innerHTML =
 '<div style="display:flex; align-items:center; gap:10px;">' +
-'<span style="font-size:1.2rem; font-weight:bold; min-width:30px;">' + iconePos + ' #' + posicao + '</span>' +
+'<span style="font-size:1.1rem; font-weight:bold; min-width:28px;">' + iconePos + ' #' + posicao + '</span>' +
 '<b>' + item.nome + '</b>' +
 '</div>' +
-'<span style="font-weight:bold; color:var(--primary-navy); font-size:1.1rem;">' + item.gols + ' gol' + (item.gols > 1 ? 's' : '') + '</span>';
+'<span style="font-weight:bold; color:var(--primary-navy); font-size:1.05rem;">' + item.gols + ' gol' + (item.gols > 1 ? 's' : '') + '</span>';
 container.appendChild(div);
 }
 }
@@ -2212,12 +2444,12 @@ label.innerHTML = '<b>' + nome + '</b>';
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
 contDiv.style.alignItems = 'center';
-contDiv.style.gap = '8px';
+contDiv.style.gap = '6px';
 
 var scoreSpan = document.createElement('span');
 scoreSpan.style.fontWeight = 'bold';
 scoreSpan.style.color = 'var(--primary-navy)';
-scoreSpan.style.minWidth = '25px';
+scoreSpan.style.minWidth = '22px';
 scoreSpan.style.textAlign = 'center';
 scoreSpan.textContent = artilhariaAtual[nome];
 
@@ -2254,6 +2486,7 @@ container.appendChild(row);
 
 window.onload = function() {
 jogoConfirmacaoLinkId = obterIdConfirmacaoDaUrl();
+atualizarLabelPerfil();
 
 var tabBtns = document.querySelectorAll('.tab-btn');
 for (var i = 0; i < tabBtns.length; i++) {
@@ -3083,7 +3316,7 @@ times[t].reservas.push(ordenadosHierarquia[i]);
 }
 }
 
-var html = '<h4 style="color:var(--primary-navy);">Times Sorteados com Equilíbrio de Pontos e Categorias!</h4>';
+var html = '<h4 style="color:var(--primary-navy); margin:0 0 10px 0;">Times Sorteados com Equilíbrio de Pontos e Categorias!</h4>';
 var textoWpp = '⚽ SORTEIO DE TIMES - IMPÉRIO REAL FC\nJogo: ' + jogo.nome + '\n';
 
 for (var t = 0; t < times.length; t++) {
@@ -3093,7 +3326,7 @@ var resumoCats = resumirTime(time);
 
 html += '<div class="team-card">';
 html += '<div class="team-header"><span>🏆 ' + time.nome + '</span> <small>' + totalJogadores + ' jog. • <b>' + time.pontos + ' pts</b></small></div>';
-html += '<div style="font-size:0.8rem; color:#475569; margin-bottom:8px; background:#f8fafc; padding:5px 8px; border-radius:6px;">📊 Categorias: <b>' + resumoCats + '</b></div>';
+html += '<div style="font-size:0.78rem; color:#475569; margin-bottom:6px; background:#f8fafc; padding:5px 8px; border-radius:6px;">📊 Categorias: <b>' + resumoCats + '</b></div>';
 textoWpp += '\n*' + time.nome + '* (' + time.pontos + ' pts | ' + resumoCats + '):\n';
 
 if (time.goleiro) {
@@ -3178,6 +3411,7 @@ renderizarHistoricoPartidas();
 renderizarPainelArtilharia();
 renderizarRankingArtilheiros();
 renderizarPartidasPublicas();
+atualizarRelatorio();
 
 var gVInit = document.getElementById('golsVermelho');
 var gAInit = document.getElementById('golsAzul');
