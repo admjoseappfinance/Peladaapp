@@ -428,6 +428,10 @@ border-color: #16a34a;
 background: #f0fdf4;
 }
 
+.confirm-player-row.bloqueado-outro {
+opacity: 0.92;
+}
+
 .confirm-player-nome {
 font-size: 1.05rem;
 font-weight: bold;
@@ -467,6 +471,19 @@ padding: 10px 14px;
 font-size: 0.9rem;
 font-weight: bold;
 cursor: pointer;
+min-width: 118px;
+flex-shrink: 0;
+}
+
+.btn-confirmado-travado {
+background: #e2e8f0;
+color: #334155;
+border: 1.5px solid #94a3b8;
+border-radius: 8px;
+padding: 10px 14px;
+font-size: 0.86rem;
+font-weight: bold;
+cursor: not-allowed;
 min-width: 118px;
 flex-shrink: 0;
 }
@@ -545,7 +562,7 @@ display: none;
 </div>
 
 <p style="margin:0 0 10px 0; font-size:0.9rem; color:#334155;">
-Toque no seu nome na lista abaixo e confirme sua presença:
+Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirmou neste aparelho pode desmarcar (ou o Admin):
 </p>
 
 <div class="confirm-player-list" id="confLinkListaJogadores"></div>
@@ -992,6 +1009,23 @@ var jogoConfirmacaoLinkId = null;
 var subtelaFinanceiroAtiva = 'relatorio';
 var subtelaElencoRankingAtiva = 'artilharia';
 
+function obterIdDispositivoLocal() {
+var chave = 'imperio_real_device_id';
+var id = null;
+try {
+id = localStorage.getItem(chave);
+if (!id) {
+id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+localStorage.setItem(chave, id);
+}
+} catch (e) {
+id = 'dev_temp';
+}
+return id;
+}
+
+var ID_DISPOSITIVO_ATUAL = obterIdDispositivoLocal();
+
 function atualizarLabelPerfil() {
 var lbl = document.getElementById('labelPerfilTopo');
 if (!lbl) return;
@@ -1212,28 +1246,70 @@ for (var i = 0; i < convocados.length; i++) {
 var p = convocados[idx];
 var nome = typeof p === 'string' ? p : p.nome;
 var estaConfirmado = typeof p === 'string' ? false : Boolean(p.confirmado);
+var donoDevice = (typeof p === 'object' && p.confirmadoPorDispositivo) ? p.confirmadoPorDispositivo : null;
+
+var confirmouNesteAparelho = estaConfirmado && donoDevice === ID_DISPOSITIVO_ATUAL;
+var confirmadoPorOutro = estaConfirmado && donoDevice && donoDevice !== ID_DISPOSITIVO_ATUAL;
+var podeDesmarcar = !estaConfirmado || confirmouNesteAparelho || (nivelAcesso === 'admin');
 
 var row = document.createElement('div');
-row.className = 'confirm-player-row' + (estaConfirmado ? ' confirmado' : '');
+row.className = 'confirm-player-row' +
+(estaConfirmado ? ' confirmado' : '') +
+(!podeDesmarcar ? ' bloqueado-outro' : '');
+
+var subTexto = 'Toque para confirmar presença';
+if (confirmouNesteAparelho) {
+subTexto = 'Confirmado neste aparelho (toque para desmarcar)';
+} else if (confirmadoPorOutro) {
+subTexto = nivelAcesso === 'admin'
+? 'Confirmado em outro aparelho (Admin pode desmarcar)'
+: 'Confirmado em outro aparelho (somente quem confirmou pode desmarcar)';
+} else if (estaConfirmado) {
+subTexto = 'Presença confirmada';
+}
 
 var info = document.createElement('div');
 info.innerHTML =
 '<div class="confirm-player-nome">' + nome + '</div>' +
-'<div class="confirm-player-sub">' + (estaConfirmado ? 'Presença confirmada no elenco' : 'Toque para confirmar presença') + '</div>';
+'<div class="confirm-player-sub">' + subTexto + '</div>';
 
 var btn = document.createElement('button');
 btn.type = 'button';
-btn.className = estaConfirmado ? 'btn-confirmado-nome' : 'btn-confirmar-nome';
-btn.textContent = estaConfirmado ? 'Confirmado ✓' : 'Confirmar';
+if (!estaConfirmado) {
+btn.className = 'btn-confirmar-nome';
+btn.textContent = 'Confirmar';
+} else if (podeDesmarcar) {
+btn.className = 'btn-confirmado-nome';
+btn.textContent = 'Confirmado ✓';
+} else {
+btn.className = 'btn-confirmado-travado';
+btn.textContent = 'Confirmado 🔒';
+}
 
 var alternar = function(ev) {
 if (ev) ev.stopPropagation();
 var alvo = jogo.convocados[idx];
+var jaConf = typeof alvo === 'string' ? false : Boolean(alvo.confirmado);
+var devResp = (typeof alvo === 'object' && alvo.confirmadoPorDispositivo) ? alvo.confirmadoPorDispositivo : null;
+
+if (jaConf && devResp && devResp !== ID_DISPOSITIVO_ATUAL && nivelAcesso !== 'admin') {
+alert('Apenas quem confirmou a presença de ' + nome + ' (ou o Admin) pode desmarcar.');
+return;
+}
+
 if (typeof alvo === 'string') {
-alvo = { nome: alvo, nivel: 'prata', status: 'marechal', confirmado: true };
+alvo = {
+nome: alvo,
+nivel: 'prata',
+status: 'marechal',
+confirmado: true,
+confirmadoPorDispositivo: ID_DISPOSITIVO_ATUAL
+};
 jogo.convocados[idx] = alvo;
 } else {
-alvo.confirmado = !alvo.confirmado;
+var novoEstado = !alvo.confirmado;
+alvo.confirmado = novoEstado;
+alvo.confirmadoPorDispositivo = novoEstado ? ID_DISPOSITIVO_ATUAL : null;
 }
 salvarTudo();
 renderizarTelaConfirmacaoLink();
@@ -1343,8 +1419,9 @@ atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '🔓 Admin';
+renderizarTelaConfirmacaoLink();
 alert('Área Administrativa Total desbloqueada!');
-switchTab('jogos');
+if (!jogoConfirmacaoLinkId) switchTab('jogos');
 } else if (senha === "0101") {
 nivelAcesso = 'juiz';
 document.body.className = 'modo-juiz';
@@ -1352,8 +1429,9 @@ atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '⚽ Juiz';
+renderizarTelaConfirmacaoLink();
 alert('Modo Juiz liberado (Sorteio e Cronômetro)!');
-switchTab('cronometro');
+if (!jogoConfirmacaoLinkId) switchTab('cronometro');
 } else if (senha !== null) {
 alert('Senha incorreta!');
 }
@@ -1364,6 +1442,7 @@ atualizarLabelPerfil();
 var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
 btn.innerText = '🔐 Admin';
+renderizarTelaConfirmacaoLink();
 if (subtelaFinanceiroAtiva && subtelaFinanceiroAtiva !== 'relatorio') {
 abrirFinanceiroHub('relatorio');
 }
@@ -1629,7 +1708,7 @@ chip.className = 'elenco-chip ' + obterClasseNivel(jogador.nivel) + (jaSeleciona
 chip.textContent = '+ ' + jogador.nome;
 chip.onclick = function() {
 if (!jaSelecionado) {
-listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal', confirmado: false });
+listaDestino.push({ nome: jogador.nome, nivel: jogador.nivel, status: jogador.status || 'marechal', confirmado: false, confirmadoPorDispositivo: null });
 var tagContainer = eEdicao
 ? document.getElementById('containerEditJogadores')
 : document.getElementById('containerJogadoresTemporarios');
@@ -2148,7 +2227,9 @@ var editJogoId = document.getElementById('editJogoId');
 if (editJogoId) editJogoId.value = id;
 
 edicaoJogadores = (jogo.convocados || []).map(function(p) {
-return typeof p === 'string' ? { nome: p, nivel: 'prata', status: 'marechal', confirmado: false } : Object.assign({}, p);
+return typeof p === 'string'
+? { nome: p, nivel: 'prata', status: 'marechal', confirmado: false, confirmadoPorDispositivo: null }
+: Object.assign({}, p);
 });
 
 var buscaEdit = document.getElementById('buscaElencoEdit');
@@ -2803,7 +2884,7 @@ var nivelSel = document.getElementById('inputNivelJogador');
 var statusSel = document.getElementById('inputStatusJogador');
 var nome = input ? input.value.trim() : '';
 if (nome) {
-temporarioJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false });
+temporarioJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false, confirmadoPorDispositivo: null });
 if (input) input.value = '';
 renderizarTags(document.getElementById('containerJogadoresTemporarios'), temporarioJogadores, false);
 renderizarSelecaoElenco('listaSelecaoElencoNovo', temporarioJogadores, 'buscaElencoNovo', false);
@@ -2819,7 +2900,7 @@ var nivelSel = document.getElementById('editNivelJogador');
 var statusSel = document.getElementById('editStatusJogador');
 var nome = input ? input.value.trim() : '';
 if (nome) {
-edicaoJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false });
+edicaoJogadores.push({ nome: nome, nivel: nivelSel ? nivelSel.value : 'prata', status: statusSel ? statusSel.value : 'marechal', confirmado: false, confirmadoPorDispositivo: null });
 if (input) input.value = '';
 renderizarTags(document.getElementById('containerEditJogadores'), edicaoJogadores, true);
 renderizarSelecaoElenco('listaSelecaoElencoEdit', edicaoJogadores, 'buscaElencoEdit', true);
@@ -2846,7 +2927,8 @@ return {
 nome: p.nome,
 nivel: p.nivel || 'prata',
 status: p.status || 'marechal',
-confirmado: false
+confirmado: false,
+confirmadoPorDispositivo: null
 };
 });
 
