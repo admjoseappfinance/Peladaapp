@@ -345,9 +345,26 @@ margin-bottom: 10px;
 font-size: 0.78rem;
 color: #334155;
 display: flex;
+flex-direction: column;
+gap: 6px;
+text-align: left;
+}
+
+.bt-status-topo {
+display: flex;
 justify-content: space-between;
 align-items: center;
 gap: 6px;
+}
+
+.bt-mapa-legenda {
+font-size: 0.72rem;
+color: #475569;
+line-height: 1.45;
+background: #ffffff;
+border: 1px solid #e2e8f0;
+border-radius: 6px;
+padding: 6px 8px;
 }
 
 .elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; padding: 8px; margin-bottom: 8px; }
@@ -873,8 +890,13 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <h3 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:1.02rem;">⏱️ Controle da Partida & Artilharia</h3>
 
 <div class="bt-status-banner">
-<span>🎮 <b>Controle BT:</b> 1 = 🔴 Vermelho | 2 = 🔵 Azul</span>
+<div class="bt-status-topo">
+<span>⌨️ <b>Teclado BT (24 atletas):</b> Q–B = +1 Gol</span>
 <span id="btUltimoClique" style="font-weight:bold; color:#0284c7;">Pronto</span>
+</div>
+<div class="bt-mapa-legenda">
+<b>Q</b>: Adailton • <b>W</b>: Alef • <b>E</b>: Alessandro • <b>R</b>: Alex • <b>T</b>: Alison • <b>Y</b>: Carlinhos • <b>U</b>: Carlos Império • <b>I</b>: Coco • <b>O</b>: Cristiano • <b>P</b>: Denilson • <b>A</b>: Edinho • <b>S</b>: Erik • <b>D</b>: Fernando • <b>F</b>: Jhony • <b>G</b>: Jose • <b>H</b>: Kerginaldo • <b>J</b>: Naldo • <b>K</b>: Niltinho • <b>L</b>: Novinho • <b>Z</b>: Preto • <b>X</b>: Rogerio • <b>C</b>: Selino • <b>V</b>: Thiago • <b>B</b>: Vitin
+</div>
 </div>
 
 <div class="form-group" style="text-align:left;">
@@ -1003,6 +1025,34 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
 const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
+
+// Mapeamento em sequência física do teclado (24 jogadores)
+const MAPA_TECLADO_JOGADORES = {
+q: 'Adailton',
+w: 'Alef',
+e: 'Alessandro',
+r: 'Alex',
+t: 'Alison',
+y: 'Carlinhos',
+u: 'Carlos Império',
+i: 'Coco',
+o: 'Cristiano',
+p: 'Denilson',
+a: 'Edinho',
+s: 'Erik',
+d: 'Fernando',
+f: 'Jhony',
+g: 'Jose',
+h: 'Kerginaldo',
+j: 'Naldo',
+k: 'Niltinho',
+l: 'Novinho',
+z: 'Preto',
+x: 'Rogerio',
+c: 'Selino',
+v: 'Thiago',
+b: 'Vitin'
+};
 
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
 var jogoConfirmacaoLinkId = null;
@@ -2377,7 +2427,20 @@ if (gA) gA.innerText = golsAzul;
 salvarEstadoPartida();
 }
 
-// Ouvinte para Controle Remoto Bluetooth (2 botões)
+function adicionarGolJogador(nomeJogador, teclaUsada) {
+artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
+salvarEstadoPartida();
+renderizarPainelArtilharia();
+
+var statusBt = document.getElementById('btUltimoClique');
+if (statusBt) {
+statusBt.innerText = '⚽ +1 ' + nomeJogador + ' (' + teclaUsada.toUpperCase() + ') = ' + artilhariaAtual[nomeJogador];
+statusBt.style.color = '#15803d';
+}
+if (navigator.vibrate) navigator.vibrate(70);
+}
+
+// Ouvinte para Teclado Bluetooth (24 atletas em sequência Q-B)
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
@@ -2385,41 +2448,12 @@ if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') re
 var abaCron = document.getElementById('tab-cronometro');
 if (!abaCron || !abaCron.classList.contains('active')) return;
 
-var tecla = e.key || '';
-var codigo = e.code || '';
-var statusBt = document.getElementById('btUltimoClique');
+var tecla = (e.key || '').toLowerCase();
+var jogadorAlvo = MAPA_TECLADO_JOGADORES[tecla];
 
-if (
-tecla === 'AudioVolumeUp' ||
-tecla === 'VolumeUp' ||
-tecla === 'Enter' ||
-tecla === ' ' ||
-tecla === 'ArrowUp' ||
-codigo === 'VolumeUp'
-) {
+if (jogadorAlvo) {
 e.preventDefault();
-adicionarGolVermelho();
-if (navigator.vibrate) navigator.vibrate(100);
-if (statusBt) {
-statusBt.innerText = '🔴 +1 Vermelho!';
-statusBt.style.color = '#dc2626';
-}
-}
-else if (
-tecla === 'AudioVolumeDown' ||
-tecla === 'VolumeDown' ||
-tecla === 'Escape' ||
-tecla === 'Backspace' ||
-tecla === 'ArrowDown' ||
-codigo === 'VolumeDown'
-) {
-e.preventDefault();
-adicionarGolAzul();
-if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
-if (statusBt) {
-statusBt.innerText = '🔵 +1 Azul!';
-statusBt.style.color = '#2563eb';
-}
+adicionarGolJogador(jogadorAlvo, tecla);
 }
 });
 
@@ -2586,11 +2620,8 @@ if (!container) return;
 var selCron = document.getElementById('selectJogoCronometro');
 var jogoId = selCron ? selCron.value : '';
 
-if (!jogoId) {
-container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os jogadores confirmados.</i>';
-return;
-}
-
+var jogadoresExibir = [];
+if (jogoId) {
 var jogoSelecionado = null;
 for (var i = 0; i < jogos.length; i++) {
 if (jogos[i].id == jogoId) {
@@ -2598,21 +2629,27 @@ jogoSelecionado = jogos[i];
 break;
 }
 }
-
 var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
 return typeof p !== 'string' && Boolean(p.confirmado);
 });
+jogadoresExibir = confirmados.map(function(p) { return p.nome; });
+}
 
-if (!jogoSelecionado || confirmados.length === 0) {
-container.innerHTML = '<i>Nenhum jogador confirmado neste jogo para registrar gol.</i>';
+for (var nomeAtleta in artilhariaAtual) {
+if (artilhariaAtual[nomeAtleta] > 0 && jogadoresExibir.indexOf(nomeAtleta) === -1) {
+jogadoresExibir.push(nomeAtleta);
+}
+}
+
+if (jogadoresExibir.length === 0) {
+container.innerHTML = '<i>Selecione um jogo com confirmados ou aperte uma tecla Q–B para somar gol.</i>';
 return;
 }
 
 container.innerHTML = '';
 
-for (var i = 0; i < confirmados.length; i++) {
-(function(p) {
-var nome = p.nome;
+for (var i = 0; i < jogadoresExibir.length; i++) {
+(function(nome) {
 if (artilhariaAtual[nome] === undefined) {
 artilhariaAtual[nome] = 0;
 }
@@ -2621,7 +2658,7 @@ var row = document.createElement('div');
 row.className = 'artilheiro-item';
 
 var label = document.createElement('span');
-label.innerHTML = '<b>✓ ' + nome + '</b>';
+label.innerHTML = '<b>' + nome + '</b>';
 
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
@@ -2662,7 +2699,7 @@ contDiv.appendChild(btnMais);
 row.appendChild(label);
 row.appendChild(contDiv);
 container.appendChild(row);
-})(confirmados[i]);
+})(jogadoresExibir[i]);
 }
 }
 
