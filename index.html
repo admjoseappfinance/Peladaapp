@@ -345,26 +345,9 @@ margin-bottom: 10px;
 font-size: 0.78rem;
 color: #334155;
 display: flex;
-flex-direction: column;
-gap: 6px;
-text-align: left;
-}
-
-.bt-status-topo {
-display: flex;
 justify-content: space-between;
 align-items: center;
 gap: 6px;
-}
-
-.bt-mapa-legenda {
-font-size: 0.72rem;
-color: #475569;
-line-height: 1.45;
-background: #ffffff;
-border: 1px solid #e2e8f0;
-border-radius: 6px;
-padding: 6px 8px;
 }
 
 .elenco-selector-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; padding: 8px; margin-bottom: 8px; }
@@ -890,17 +873,12 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <h3 style="margin:0 0 8px 0; color:var(--primary-navy); font-size:1.02rem;">⏱️ Controle da Partida & Artilharia</h3>
 
 <div class="bt-status-banner">
-<div class="bt-status-topo">
-<span>⌨️ <b>Teclado BT:</b> Q–B = +1 Gol | Caps/Shift Esq = Vermelho | Enter/Shift Dir = Azul</span>
+<span>🎮 <b>Controle BT:</b> 1 = 🔴 Vermelho | 2 = 🔵 Azul</span>
 <span id="btUltimoClique" style="font-weight:bold; color:#0284c7;">Pronto</span>
-</div>
-<div class="bt-mapa-legenda">
-<b>Q</b>: Adailton • <b>W</b>: Alef • <b>E</b>: Alessandro • <b>R</b>: Alex • <b>T</b>: Alison • <b>Y</b>: Carlinhos • <b>U</b>: Carlos Império • <b>I</b>: Coco • <b>O</b>: Cristiano • <b>P</b>: Denilson • <b>A</b>: Edinho • <b>S</b>: Erik • <b>D</b>: Fernando • <b>F</b>: Jhony • <b>G</b>: Jose • <b>H</b>: Kerginaldo • <b>J</b>: Naldo • <b>K</b>: Niltinho • <b>L</b>: Novinho • <b>Z</b>: Preto • <b>X</b>: Rogerio • <b>C</b>: Selino • <b>V</b>: Thiago • <b>B</b>: Vitin
-</div>
 </div>
 
 <div class="form-group" style="text-align:left;">
-<label>Vincular ao Jogo (Opcional)</label>
+<label>Vincular ao Jogo</label>
 <select id="selectJogoCronometro"><option value="">Selecione o jogo do dia...</option></select>
 </div>
 
@@ -928,10 +906,10 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Artilharia Rápida com todos os jogadores -->
+<!-- Artilharia Rápida restrita aos confirmados do jogo selecionado -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Todos os Jogadores)</h4>
-<div id="painelArtilhariaRapida"></div>
+<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Confirmados)</h4>
+<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os confirmados.</i></div>
 </div>
 
 <div class="cron-btn-group">
@@ -1025,34 +1003,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
 const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
-
-// Mapeamento em sequência física do teclado (24 jogadores)
-const MAPA_TECLADO_JOGADORES = {
-q: 'Adailton',
-w: 'Alef',
-e: 'Alessandro',
-r: 'Alex',
-t: 'Alison',
-y: 'Carlinhos',
-u: 'Carlos Império',
-i: 'Coco',
-o: 'Cristiano',
-p: 'Denilson',
-a: 'Edinho',
-s: 'Erik',
-d: 'Fernando',
-f: 'Jhony',
-g: 'Jose',
-h: 'Kerginaldo',
-j: 'Naldo',
-k: 'Niltinho',
-l: 'Novinho',
-z: 'Preto',
-x: 'Rogerio',
-c: 'Selino',
-v: 'Thiago',
-b: 'Vitin'
-};
 
 var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
 var jogoConfirmacaoLinkId = null;
@@ -2420,15 +2370,6 @@ if (gV) gV.innerText = golsVermelho;
 salvarEstadoPartida();
 }
 
-function removerGolVermelho() {
-if (golsVermelho > 0) {
-golsVermelho--;
-var gV = document.getElementById('golsVermelho');
-if (gV) gV.innerText = golsVermelho;
-salvarEstadoPartida();
-}
-}
-
 function adicionarGolAzul() {
 golsAzul++;
 var gA = document.getElementById('golsAzul');
@@ -2436,33 +2377,7 @@ if (gA) gA.innerText = golsAzul;
 salvarEstadoPartida();
 }
 
-function removerGolAzul() {
-if (golsAzul > 0) {
-golsAzul--;
-var gA = document.getElementById('golsAzul');
-if (gA) gA.innerText = golsAzul;
-salvarEstadoPartida();
-}
-}
-
-function atualizarBannerTeclado(texto, cor) {
-var statusBt = document.getElementById('btUltimoClique');
-if (statusBt) {
-statusBt.innerText = texto;
-statusBt.style.color = cor || '#0284c7';
-}
-}
-
-function adicionarGolJogador(nomeJogador, teclaUsada) {
-artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
-salvarEstadoPartida();
-renderizarPainelArtilharia();
-
-atualizarBannerTeclado('⚽ +1 ' + nomeJogador + ' (' + teclaUsada.toUpperCase() + ') = ' + artilhariaAtual[nomeJogador], '#15803d');
-if (navigator.vibrate) navigator.vibrate(70);
-}
-
-// Ouvinte para Teclado Bluetooth (24 atletas Q-B + Controles de Placar)
+// Ouvinte para Controle Remoto Bluetooth (2 botões)
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
@@ -2470,40 +2385,41 @@ if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') re
 var abaCron = document.getElementById('tab-cronometro');
 if (!abaCron || !abaCron.classList.contains('active')) return;
 
-if (e.code === 'CapsLock') {
+var tecla = e.key || '';
+var codigo = e.code || '';
+var statusBt = document.getElementById('btUltimoClique');
+
+if (
+tecla === 'AudioVolumeUp' ||
+tecla === 'VolumeUp' ||
+tecla === 'Enter' ||
+tecla === ' ' ||
+tecla === 'ArrowUp' ||
+codigo === 'VolumeUp'
+) {
 e.preventDefault();
 adicionarGolVermelho();
-atualizarBannerTeclado('🔴 +1 Gol Vermelho (Caps Lock)', '#dc2626');
-return;
+if (navigator.vibrate) navigator.vibrate(100);
+if (statusBt) {
+statusBt.innerText = '🔴 +1 Vermelho!';
+statusBt.style.color = '#dc2626';
 }
-
-if (e.code === 'ShiftLeft') {
-e.preventDefault();
-removerGolVermelho();
-atualizarBannerTeclado('🔴 -1 Gol Vermelho (Shift Esq)', '#dc2626');
-return;
 }
-
-if (e.code === 'Enter') {
+else if (
+tecla === 'AudioVolumeDown' ||
+tecla === 'VolumeDown' ||
+tecla === 'Escape' ||
+tecla === 'Backspace' ||
+tecla === 'ArrowDown' ||
+codigo === 'VolumeDown'
+) {
 e.preventDefault();
 adicionarGolAzul();
-atualizarBannerTeclado('🔵 +1 Gol Azul (Enter)', '#2563eb');
-return;
+if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+if (statusBt) {
+statusBt.innerText = '🔵 +1 Azul!';
+statusBt.style.color = '#2563eb';
 }
-
-if (e.code === 'ShiftRight') {
-e.preventDefault();
-removerGolAzul();
-atualizarBannerTeclado('🔵 -1 Gol Azul (Shift Dir)', '#2563eb');
-return;
-}
-
-var tecla = (e.key || '').toLowerCase();
-var jogadorAlvo = MAPA_TECLADO_JOGADORES[tecla];
-
-if (jogadorAlvo) {
-e.preventDefault();
-adicionarGolJogador(jogadorAlvo, tecla);
 }
 });
 
@@ -2667,41 +2583,36 @@ function renderizarPainelArtilharia() {
 var container = document.getElementById('painelArtilhariaRapida');
 if (!container) return;
 
-var nomesSet = {};
-var jogadoresExibir = [];
+var selCron = document.getElementById('selectJogoCronometro');
+var jogoId = selCron ? selCron.value : '';
 
-function adicionarNomeUnico(nome) {
-if (!nome) return;
-var chave = nome.trim();
-if (!chave || nomesSet[chave.toLowerCase()]) return;
-nomesSet[chave.toLowerCase()] = true;
-jogadoresExibir.push(chave);
+if (!jogoId) {
+container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os jogadores confirmados.</i>';
+return;
 }
 
-for (var tecla in MAPA_TECLADO_JOGADORES) {
-adicionarNomeUnico(MAPA_TECLADO_JOGADORES[tecla]);
+var jogoSelecionado = null;
+for (var i = 0; i < jogos.length; i++) {
+if (jogos[i].id == jogoId) {
+jogoSelecionado = jogos[i];
+break;
+}
 }
 
-var elencoOrdenado = jogadoresElenco.slice().sort(function(a, b) {
-return a.nome.localeCompare(b.nome);
+var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
+return typeof p !== 'string' && Boolean(p.confirmado);
 });
-for (var i = 0; i < elencoOrdenado.length; i++) {
-adicionarNomeUnico(elencoOrdenado[i].nome);
-}
 
-for (var nomeAtleta in artilhariaAtual) {
-adicionarNomeUnico(nomeAtleta);
-}
-
-if (jogadoresExibir.length === 0) {
-container.innerHTML = '<i>Nenhum jogador disponível.</i>';
+if (!jogoSelecionado || confirmados.length === 0) {
+container.innerHTML = '<i>Nenhum jogador confirmado neste jogo para registrar gol.</i>';
 return;
 }
 
 container.innerHTML = '';
 
-for (var i = 0; i < jogadoresExibir.length; i++) {
-(function(nome) {
+for (var i = 0; i < confirmados.length; i++) {
+(function(p) {
+var nome = p.nome;
 if (artilhariaAtual[nome] === undefined) {
 artilhariaAtual[nome] = 0;
 }
@@ -2710,7 +2621,7 @@ var row = document.createElement('div');
 row.className = 'artilheiro-item';
 
 var label = document.createElement('span');
-label.innerHTML = '<b>' + nome + '</b>';
+label.innerHTML = '<b>✓ ' + nome + '</b>';
 
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
@@ -2751,7 +2662,7 @@ contDiv.appendChild(btnMais);
 row.appendChild(label);
 row.appendChild(contDiv);
 container.appendChild(row);
-})(jogadoresExibir[i]);
+})(confirmados[i]);
 }
 }
 
@@ -3305,7 +3216,14 @@ btnGolV.onclick = adicionarGolVermelho;
 
 var btnMenV = document.getElementById('btnMenosVermelho');
 if (btnMenV) {
-btnMenV.onclick = removerGolVermelho;
+btnMenV.onclick = function() {
+if (golsVermelho > 0) {
+golsVermelho--;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+}
+};
 }
 
 var btnGolA = document.getElementById('btnGolAzul');
@@ -3315,7 +3233,14 @@ btnGolA.onclick = adicionarGolAzul;
 
 var btnMenA = document.getElementById('btnMenosAzul');
 if (btnMenA) {
-btnMenA.onclick = removerGolAzul;
+btnMenA.onclick = function() {
+if (golsAzul > 0) {
+golsAzul--;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+}
+};
 }
 
 var btnSalvarP = document.getElementById('btnSalvarPartida');
