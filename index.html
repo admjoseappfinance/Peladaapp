@@ -2370,6 +2370,15 @@ if (gV) gV.innerText = golsVermelho;
 salvarEstadoPartida();
 }
 
+function diminuirGolVermelho() {
+if (golsVermelho > 0) {
+golsVermelho--;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+}
+}
+
 function adicionarGolAzul() {
 golsAzul++;
 var gA = document.getElementById('golsAzul');
@@ -2377,7 +2386,16 @@ if (gA) gA.innerText = golsAzul;
 salvarEstadoPartida();
 }
 
-// Ouvinte para Controle Remoto Bluetooth (2 botões)
+function diminuirGolAzul() {
+if (golsAzul > 0) {
+golsAzul--;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+}
+}
+
+// Ouvinte para Controle Remoto Bluetooth (2 botões) e Teclado Físico
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
@@ -2389,6 +2407,7 @@ var tecla = e.key || '';
 var codigo = e.code || '';
 var statusBt = document.getElementById('btUltimoClique');
 
+// Controle BT / Enter para +1 Gol Vermelho
 if (
 tecla === 'AudioVolumeUp' ||
 tecla === 'VolumeUp' ||
@@ -2405,6 +2424,7 @@ statusBt.innerText = '🔴 +1 Vermelho!';
 statusBt.style.color = '#dc2626';
 }
 }
+// Controle BT para +1 Gol Azul
 else if (
 tecla === 'AudioVolumeDown' ||
 tecla === 'VolumeDown' ||
@@ -2418,6 +2438,34 @@ adicionarGolAzul();
 if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
 if (statusBt) {
 statusBt.innerText = '🔵 +1 Azul!';
+statusBt.style.color = '#2563eb';
+}
+}
+// Teclado: Caps Lock para +1 Gol Azul
+else if (tecla === 'CapsLock' || codigo === 'CapsLock') {
+e.preventDefault();
+adicionarGolAzul();
+if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+if (statusBt) {
+statusBt.innerText = '🔵 +1 Azul (Caps Lock)!';
+statusBt.style.color = '#2563eb';
+}
+}
+// Teclado: Shift Direito para -1 Gol Vermelho
+else if (codigo === 'ShiftRight') {
+e.preventDefault();
+diminuirGolVermelho();
+if (statusBt) {
+statusBt.innerText = '🔴 -1 Vermelho (Shift Dir.)!';
+statusBt.style.color = '#dc2626';
+}
+}
+// Teclado: Shift Esquerdo para -1 Gol Azul
+else if (codigo === 'ShiftLeft') {
+e.preventDefault();
+diminuirGolAzul();
+if (statusBt) {
+statusBt.innerText = '🔵 -1 Azul (Shift Esq.)!';
 statusBt.style.color = '#2563eb';
 }
 }
@@ -3216,14 +3264,7 @@ btnGolV.onclick = adicionarGolVermelho;
 
 var btnMenV = document.getElementById('btnMenosVermelho');
 if (btnMenV) {
-btnMenV.onclick = function() {
-if (golsVermelho > 0) {
-golsVermelho--;
-var gV = document.getElementById('golsVermelho');
-if (gV) gV.innerText = golsVermelho;
-salvarEstadoPartida();
-}
-};
+btnMenV.onclick = diminuirGolVermelho;
 }
 
 var btnGolA = document.getElementById('btnGolAzul');
@@ -3233,14 +3274,7 @@ btnGolA.onclick = adicionarGolAzul;
 
 var btnMenA = document.getElementById('btnMenosAzul');
 if (btnMenA) {
-btnMenA.onclick = function() {
-if (golsAzul > 0) {
-golsAzul--;
-var gA = document.getElementById('golsAzul');
-if (gA) gA.innerText = golsAzul;
-salvarEstadoPartida();
-}
-};
+btnMenA.onclick = diminuirGolAzul;
 }
 
 var btnSalvarP = document.getElementById('btnSalvarPartida');
