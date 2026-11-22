@@ -891,7 +891,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 
 <div class="bt-status-banner">
 <div class="bt-status-topo">
-<span>⌨️ <b>Teclado BT (24 atletas):</b> Q–B = +1 Gol</span>
+<span>⌨️ <b>Teclado BT:</b> Q–B = +1 Gol | Caps/Shift Esq = Vermelho | Enter/Shift Dir = Azul</span>
 <span id="btUltimoClique" style="font-weight:bold; color:#0284c7;">Pronto</span>
 </div>
 <div class="bt-mapa-legenda">
@@ -900,7 +900,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 
 <div class="form-group" style="text-align:left;">
-<label>Vincular ao Jogo</label>
+<label>Vincular ao Jogo (Opcional)</label>
 <select id="selectJogoCronometro"><option value="">Selecione o jogo do dia...</option></select>
 </div>
 
@@ -928,10 +928,10 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Artilharia Rápida restrita aos confirmados do jogo selecionado -->
+<!-- Artilharia Rápida com todos os jogadores -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Confirmados)</h4>
-<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os confirmados.</i></div>
+<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Todos os Jogadores)</h4>
+<div id="painelArtilhariaRapida"></div>
 </div>
 
 <div class="cron-btn-group">
@@ -2420,6 +2420,15 @@ if (gV) gV.innerText = golsVermelho;
 salvarEstadoPartida();
 }
 
+function removerGolVermelho() {
+if (golsVermelho > 0) {
+golsVermelho--;
+var gV = document.getElementById('golsVermelho');
+if (gV) gV.innerText = golsVermelho;
+salvarEstadoPartida();
+}
+}
+
 function adicionarGolAzul() {
 golsAzul++;
 var gA = document.getElementById('golsAzul');
@@ -2427,26 +2436,67 @@ if (gA) gA.innerText = golsAzul;
 salvarEstadoPartida();
 }
 
+function removerGolAzul() {
+if (golsAzul > 0) {
+golsAzul--;
+var gA = document.getElementById('golsAzul');
+if (gA) gA.innerText = golsAzul;
+salvarEstadoPartida();
+}
+}
+
+function atualizarBannerTeclado(texto, cor) {
+var statusBt = document.getElementById('btUltimoClique');
+if (statusBt) {
+statusBt.innerText = texto;
+statusBt.style.color = cor || '#0284c7';
+}
+}
+
 function adicionarGolJogador(nomeJogador, teclaUsada) {
 artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
 salvarEstadoPartida();
 renderizarPainelArtilharia();
 
-var statusBt = document.getElementById('btUltimoClique');
-if (statusBt) {
-statusBt.innerText = '⚽ +1 ' + nomeJogador + ' (' + teclaUsada.toUpperCase() + ') = ' + artilhariaAtual[nomeJogador];
-statusBt.style.color = '#15803d';
-}
+atualizarBannerTeclado('⚽ +1 ' + nomeJogador + ' (' + teclaUsada.toUpperCase() + ') = ' + artilhariaAtual[nomeJogador], '#15803d');
 if (navigator.vibrate) navigator.vibrate(70);
 }
 
-// Ouvinte para Teclado Bluetooth (24 atletas em sequência Q-B)
+// Ouvinte para Teclado Bluetooth (24 atletas Q-B + Controles de Placar)
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
 
 var abaCron = document.getElementById('tab-cronometro');
 if (!abaCron || !abaCron.classList.contains('active')) return;
+
+if (e.code === 'CapsLock') {
+e.preventDefault();
+adicionarGolVermelho();
+atualizarBannerTeclado('🔴 +1 Gol Vermelho (Caps Lock)', '#dc2626');
+return;
+}
+
+if (e.code === 'ShiftLeft') {
+e.preventDefault();
+removerGolVermelho();
+atualizarBannerTeclado('🔴 -1 Gol Vermelho (Shift Esq)', '#dc2626');
+return;
+}
+
+if (e.code === 'Enter') {
+e.preventDefault();
+adicionarGolAzul();
+atualizarBannerTeclado('🔵 +1 Gol Azul (Enter)', '#2563eb');
+return;
+}
+
+if (e.code === 'ShiftRight') {
+e.preventDefault();
+removerGolAzul();
+atualizarBannerTeclado('🔵 -1 Gol Azul (Shift Dir)', '#2563eb');
+return;
+}
 
 var tecla = (e.key || '').toLowerCase();
 var jogadorAlvo = MAPA_TECLADO_JOGADORES[tecla];
@@ -2617,32 +2667,34 @@ function renderizarPainelArtilharia() {
 var container = document.getElementById('painelArtilhariaRapida');
 if (!container) return;
 
-var selCron = document.getElementById('selectJogoCronometro');
-var jogoId = selCron ? selCron.value : '';
-
+var nomesSet = {};
 var jogadoresExibir = [];
-if (jogoId) {
-var jogoSelecionado = null;
-for (var i = 0; i < jogos.length; i++) {
-if (jogos[i].id == jogoId) {
-jogoSelecionado = jogos[i];
-break;
+
+function adicionarNomeUnico(nome) {
+if (!nome) return;
+var chave = nome.trim();
+if (!chave || nomesSet[chave.toLowerCase()]) return;
+nomesSet[chave.toLowerCase()] = true;
+jogadoresExibir.push(chave);
 }
+
+for (var tecla in MAPA_TECLADO_JOGADORES) {
+adicionarNomeUnico(MAPA_TECLADO_JOGADORES[tecla]);
 }
-var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
-return typeof p !== 'string' && Boolean(p.confirmado);
+
+var elencoOrdenado = jogadoresElenco.slice().sort(function(a, b) {
+return a.nome.localeCompare(b.nome);
 });
-jogadoresExibir = confirmados.map(function(p) { return p.nome; });
+for (var i = 0; i < elencoOrdenado.length; i++) {
+adicionarNomeUnico(elencoOrdenado[i].nome);
 }
 
 for (var nomeAtleta in artilhariaAtual) {
-if (artilhariaAtual[nomeAtleta] > 0 && jogadoresExibir.indexOf(nomeAtleta) === -1) {
-jogadoresExibir.push(nomeAtleta);
-}
+adicionarNomeUnico(nomeAtleta);
 }
 
 if (jogadoresExibir.length === 0) {
-container.innerHTML = '<i>Selecione um jogo com confirmados ou aperte uma tecla Q–B para somar gol.</i>';
+container.innerHTML = '<i>Nenhum jogador disponível.</i>';
 return;
 }
 
@@ -3253,14 +3305,7 @@ btnGolV.onclick = adicionarGolVermelho;
 
 var btnMenV = document.getElementById('btnMenosVermelho');
 if (btnMenV) {
-btnMenV.onclick = function() {
-if (golsVermelho > 0) {
-golsVermelho--;
-var gV = document.getElementById('golsVermelho');
-if (gV) gV.innerText = golsVermelho;
-salvarEstadoPartida();
-}
-};
+btnMenV.onclick = removerGolVermelho;
 }
 
 var btnGolA = document.getElementById('btnGolAzul');
@@ -3270,14 +3315,7 @@ btnGolA.onclick = adicionarGolAzul;
 
 var btnMenA = document.getElementById('btnMenosAzul');
 if (btnMenA) {
-btnMenA.onclick = function() {
-if (golsAzul > 0) {
-golsAzul--;
-var gA = document.getElementById('golsAzul');
-if (gA) gA.innerText = golsAzul;
-salvarEstadoPartida();
-}
-};
+btnMenA.onclick = removerGolAzul;
 }
 
 var btnSalvarP = document.getElementById('btnSalvarPartida');
