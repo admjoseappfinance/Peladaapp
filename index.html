@@ -189,6 +189,43 @@ button.action-btn:active {
 background: var(--gold-hover);
 }
 
+/* Banner de Aviso de Fim de Tempo (Não bloqueia o áudio) */
+.alerta-fim-tempo {
+display: none;
+margin: 10px 12px 0 12px;
+padding: 12px 14px;
+border-radius: 10px;
+background: #dc2626;
+color: #ffffff;
+border: 2px solid #fef08a;
+box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+animation: pulsarAlerta 0.8s infinite alternate;
+}
+
+.alerta-fim-tempo.ativo {
+display: flex;
+}
+
+@keyframes pulsarAlerta {
+from { transform: scale(1); }
+to { transform: scale(1.015); }
+}
+
+.alerta-fim-btn {
+background: #fef08a;
+color: #0b1a30;
+border: none;
+border-radius: 7px;
+padding: 7px 12px;
+font-weight: bold;
+font-size: 0.82rem;
+cursor: pointer;
+flex-shrink: 0;
+}
+
 /* Hub Compacto (Financeiro / Elenco & Ranking) */
 .fin-hub-grid {
 display: grid;
@@ -549,6 +586,15 @@ display: none;
 </div>
 </div>
 
+<!-- Banner Instantâneo de Fim de Tempo (Não bloqueia o áudio) -->
+<div id="alertaFimTempo" class="alerta-fim-tempo">
+<div>
+<div style="font-weight:bold; font-size:0.98rem;">⏰ FIM DO TEMPO!</div>
+<div id="textoAlertaFimTempo" style="font-size:0.8rem; opacity:0.95;">O cronômetro chegou a 00:00.</div>
+</div>
+<button type="button" class="alerta-fim-btn" onclick="fecharAlertaFimTempo()">OK</button>
+</div>
+
 <!-- Tela Exclusiva Quando Abre o Link de Confirmação do Jogo (?confirmar=ID) -->
 <div id="telaConfirmacaoLink" class="confirm-link-card">
 <div class="confirm-link-header">
@@ -884,7 +930,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 
 <h3 id="labelPeriodo" style="color:var(--primary-navy); margin:10px 0 2px 0; font-size:0.95rem;">1º Tempo (30 min)</h3>
 <div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
-<small style="color:#64748b; display:block; margin-bottom:8px;">💡 Roda em segundo plano + apito ao zerar. Toque no relógio para ajustar.</small>
+<small style="color:#64748b; display:block; margin-bottom:8px;">💡 Apito imediato ao zerar + retorno da tela bloqueada. Toque no relógio para ajustar.</small>
 
 <div class="placar-container">
 <div class="time-placar">
@@ -1039,6 +1085,7 @@ const MAPA_LETRAS_ARTILHARIA = {
 
 // --- SISTEMA DE SONS (Web Audio API) ---
 var audioCtx = null;
+var avisoFimTempoPendente = false;
 
 function obterAudioContext() {
   var Ctx = window.AudioContext || window.webkitAudioContext;
@@ -1057,51 +1104,62 @@ function tocarApitoFimTempo() {
     var ctx = obterAudioContext();
     if (!ctx) return;
 
-    // Sequência forte e prolongada (~3,2s): 4 pulsos firmes + apito final longo
-    var pulsos = [
-      { inicio: 0.00, duracao: 0.45, f1: 980, f2: 490 },
-      { inicio: 0.55, duracao: 0.45, f1: 980, f2: 490 },
-      { inicio: 1.10, duracao: 0.45, f1: 980, f2: 490 },
-      { inicio: 1.65, duracao: 0.45, f1: 980, f2: 490 },
-      { inicio: 2.20, duracao: 1.05, f1: 1120, f2: 560 }
-    ];
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(function() {
+        executarSequenciaApito(ctx);
+      }).catch(function() {});
+      return;
+    }
 
-    pulsos.forEach(function(p) {
-      var oscAgudo = ctx.createOscillator();
-      var oscGrave = ctx.createOscillator();
-      var gainAgudo = ctx.createGain();
-      var gainGrave = ctx.createGain();
-
-      oscAgudo.type = 'sawtooth';
-      oscAgudo.frequency.setValueAtTime(p.f1, ctx.currentTime + p.inicio);
-
-      oscGrave.type = 'square';
-      oscGrave.frequency.setValueAtTime(p.f2, ctx.currentTime + p.inicio);
-
-      var tStart = ctx.currentTime + p.inicio;
-      var tEnd = tStart + p.duracao;
-
-      gainAgudo.gain.setValueAtTime(0.001, tStart);
-      gainAgudo.gain.linearRampToValueAtTime(0.9, tStart + 0.02);
-      gainAgudo.gain.setValueAtTime(0.9, tEnd - 0.04);
-      gainAgudo.gain.exponentialRampToValueAtTime(0.001, tEnd);
-
-      gainGrave.gain.setValueAtTime(0.001, tStart);
-      gainGrave.gain.linearRampToValueAtTime(0.75, tStart + 0.02);
-      gainGrave.gain.setValueAtTime(0.75, tEnd - 0.04);
-      gainGrave.gain.exponentialRampToValueAtTime(0.001, tEnd);
-
-      oscAgudo.connect(gainAgudo);
-      oscGrave.connect(gainGrave);
-      gainAgudo.connect(ctx.destination);
-      gainGrave.connect(ctx.destination);
-
-      oscAgudo.start(tStart);
-      oscGrave.start(tStart);
-      oscAgudo.stop(tEnd + 0.02);
-      oscGrave.stop(tEnd + 0.02);
-    });
+    executarSequenciaApito(ctx);
   } catch (e) {}
+}
+
+function executarSequenciaApito(ctx) {
+  // Sequência forte e prolongada (~3,2s): 4 pulsos firmes + apito final longo
+  var pulsos = [
+    { inicio: 0.00, duracao: 0.45, f1: 980, f2: 490 },
+    { inicio: 0.55, duracao: 0.45, f1: 980, f2: 490 },
+    { inicio: 1.10, duracao: 0.45, f1: 980, f2: 490 },
+    { inicio: 1.65, duracao: 0.45, f1: 980, f2: 490 },
+    { inicio: 2.20, duracao: 1.05, f1: 1120, f2: 560 }
+  ];
+
+  pulsos.forEach(function(p) {
+    var oscAgudo = ctx.createOscillator();
+    var oscGrave = ctx.createOscillator();
+    var gainAgudo = ctx.createGain();
+    var gainGrave = ctx.createGain();
+
+    oscAgudo.type = 'sawtooth';
+    oscAgudo.frequency.setValueAtTime(p.f1, ctx.currentTime + p.inicio);
+
+    oscGrave.type = 'square';
+    oscGrave.frequency.setValueAtTime(p.f2, ctx.currentTime + p.inicio);
+
+    var tStart = ctx.currentTime + p.inicio;
+    var tEnd = tStart + p.duracao;
+
+    gainAgudo.gain.setValueAtTime(0.001, tStart);
+    gainAgudo.gain.linearRampToValueAtTime(0.9, tStart + 0.02);
+    gainAgudo.gain.setValueAtTime(0.9, tEnd - 0.04);
+    gainAgudo.gain.exponentialRampToValueAtTime(0.001, tEnd);
+
+    gainGrave.gain.setValueAtTime(0.001, tStart);
+    gainGrave.gain.linearRampToValueAtTime(0.75, tStart + 0.02);
+    gainGrave.gain.setValueAtTime(0.75, tEnd - 0.04);
+    gainGrave.gain.exponentialRampToValueAtTime(0.001, tEnd);
+
+    oscAgudo.connect(gainAgudo);
+    oscGrave.connect(gainGrave);
+    gainAgudo.connect(ctx.destination);
+    gainGrave.connect(ctx.destination);
+
+    oscAgudo.start(tStart);
+    oscGrave.start(tStart);
+    oscAgudo.stop(tEnd + 0.02);
+    oscGrave.stop(tEnd + 0.02);
+  });
 }
 
 function tocarSomGol() {
@@ -1123,6 +1181,26 @@ function tocarSomGol() {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.24);
   } catch (e) {}
+}
+
+function mostrarBannerFimTempo(mensagemExtra) {
+  avisoFimTempoPendente = true;
+  var banner = document.getElementById('alertaFimTempo');
+  var txt = document.getElementById('textoAlertaFimTempo');
+  if (txt) {
+    txt.textContent = mensagemExtra || ('O ' + periodoAtual + 'º tempo chegou a 00:00.');
+  }
+  if (banner) {
+    banner.classList.add('ativo');
+  }
+}
+
+function fecharAlertaFimTempo() {
+  avisoFimTempoPendente = false;
+  var banner = document.getElementById('alertaFimTempo');
+  if (banner) {
+    banner.classList.remove('ativo');
+  }
 }
 
 function obterIdDispositivoLocal() {
@@ -1629,45 +1707,85 @@ function salvarEstadoPartida() {
   localStorage.setItem('partida_atual_imperio_real', JSON.stringify(estado));
 }
 
-function finalizarTimerComSom() {
+function finalizarTimerComSom(motivoExtra) {
   if (timerInterval) clearInterval(timerInterval);
   rodando = false;
   tempoRestante = 0;
   atualizarDisplayTempo();
   salvarEstadoPartida();
+  mostrarBannerFimTempo(motivoExtra);
+  if (navigator.vibrate) navigator.vibrate([300, 120, 300, 120, 600]);
   tocarApitoFimTempo();
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
-  alert('⏰ Fim do tempo!');
+}
+
+function sincronizarRelogioComTempoReal(dispararAvisoSeEncerrado) {
+  if (!rodando || !timestampUltimoTick) {
+    atualizarDisplayTempo();
+    return;
+  }
+  var agora = Date.now();
+  var segundosPassados = Math.floor((agora - timestampUltimoTick) / 1000);
+  if (segundosPassados <= 0) {
+    atualizarDisplayTempo();
+    return;
+  }
+
+  var novoTempo = tempoRestante - segundosPassados;
+  if (novoTempo <= 0) {
+    tempoRestante = 0;
+    if (dispararAvisoSeEncerrado) {
+      finalizarTimerComSom('O tempo acabou enquanto a tela estava fora de foco.');
+    } else {
+      if (timerInterval) clearInterval(timerInterval);
+      rodando = false;
+      atualizarDisplayTempo();
+      salvarEstadoPartida();
+      mostrarBannerFimTempo('O tempo acabou enquanto a tela estava fora de foco.');
+      if (navigator.vibrate) navigator.vibrate([300, 120, 300, 120, 600]);
+      tocarApitoFimTempo();
+    }
+  } else {
+    tempoRestante = novoTempo;
+    timestampUltimoTick = agora;
+    atualizarDisplayTempo();
+    salvarEstadoPartida();
+  }
 }
 
 function inicializarCronometroEmSegundoPlano() {
-  var estourouEmSegundoPlano = false;
   if (rodando && timestampUltimoTick) {
     var agora = Date.now();
     var segundosPassados = Math.floor((agora - timestampUltimoTick) / 1000);
     if (segundosPassados > 0) {
       tempoRestante = Math.max(0, tempoRestante - segundosPassados);
-      if (tempoRestante === 0) {
-        rodando = false;
-        estourouEmSegundoPlano = true;
-      }
+      timestampUltimoTick = agora;
+    }
+    if (tempoRestante <= 0) {
+      rodando = false;
+      atualizarDisplayTempo();
+      salvarEstadoPartida();
+      mostrarBannerFimTempo('O cronômetro encerrou enquanto o app estava fechado.');
+      if (navigator.vibrate) navigator.vibrate([300, 120, 300, 120, 600]);
+      tocarApitoFimTempo();
+      return;
     }
   }
   if (rodando) {
     iniciarIntervaloRelogio();
   }
   atualizarDisplayTempo();
-  if (estourouEmSegundoPlano) {
-    salvarEstadoPartida();
-    tocarApitoFimTempo();
-  }
 }
 
 function iniciarIntervaloRelogio() {
   if (timerInterval) clearInterval(timerInterval);
+  timestampUltimoTick = Date.now();
   timerInterval = setInterval(function() {
-    if (tempoRestante > 1) {
-      tempoRestante--;
+    var agora = Date.now();
+    var decorrido = timestampUltimoTick ? Math.max(1, Math.round((agora - timestampUltimoTick) / 1000)) : 1;
+    timestampUltimoTick = agora;
+
+    if (tempoRestante > decorrido) {
+      tempoRestante -= decorrido;
       atualizarDisplayTempo();
       salvarEstadoPartida();
     } else {
@@ -1675,6 +1793,34 @@ function iniciarIntervaloRelogio() {
     }
   }, 1000);
 }
+
+// Destrava o áudio ao primeiro toque/clique em qualquer lugar da página
+['pointerdown', 'touchstart', 'click', 'keydown'].forEach(function(evNome) {
+  document.addEventListener(evNome, function() {
+    var ctx = obterAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(function() {});
+    }
+    if (avisoFimTempoPendente) {
+      tocarApitoFimTempo();
+    }
+  }, { passive: true });
+});
+
+// Ao voltar para a aba / desbloquear a tela, recalcula o tempo real e toca imediatamente se já zerou
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    var ctx = obterAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(function() {});
+    }
+    sincronizarRelogioComTempoReal(true);
+  }
+});
+
+window.addEventListener('focus', function() {
+  sincronizarRelogioComTempoReal(true);
+});
 
 function salvarTudo() {
 localStorage.setItem('jogos_imperio_real', JSON.stringify(jogos));
@@ -2959,6 +3105,7 @@ var atualMin = Math.floor(tempoRestante / 60);
 var novoMin = prompt('Digite o novo tempo em minutos para o cronômetro:', atualMin);
 if (novoMin !== null && !isNaN(novoMin) && novoMin.trim() !== '') {
 tempoRestante = parseInt(novoMin, 10) * 60;
+fecharAlertaFimTempo();
 atualizarDisplayTempo();
 salvarEstadoPartida();
 alert('Tempo atualizado para ' + novoMin + ' minutos!');
@@ -3357,7 +3504,11 @@ var btnIniC = document.getElementById('btnIniciarCron');
 if (btnIniC) {
 btnIniC.onclick = function() {
 obterAudioContext();
+fecharAlertaFimTempo();
 if (!rodando) {
+if (tempoRestante <= 0) {
+tempoRestante = 30 * 60;
+}
 rodando = true;
 iniciarIntervaloRelogio();
 salvarEstadoPartida();
@@ -3368,6 +3519,7 @@ salvarEstadoPartida();
 var btnPausC = document.getElementById('btnPausarCron');
 if (btnPausC) {
 btnPausC.onclick = function() {
+sincronizarRelogioComTempoReal(false);
 if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 salvarEstadoPartida();
@@ -3380,6 +3532,7 @@ btnZerC.onclick = function() {
 if (!confirm('Deseja zerar o cronômetro e os gols da partida atual?')) return;
 if (timerInterval) clearInterval(timerInterval);
 rodando = false;
+fecharAlertaFimTempo();
 tempoRestante = 30 * 60;
 acrescimoMinutos = 0;
 golsVermelho = 0;
@@ -3401,6 +3554,7 @@ var btnMaisAc = document.getElementById('btnMaisAcrescimo');
 if (btnMaisAc) {
 btnMaisAc.onclick = function() {
 obterAudioContext();
+fecharAlertaFimTempo();
 acrescimoMinutos++;
 tempoRestante += 60;
 var dispAc = document.getElementById('displayAcrescimo');
@@ -3415,7 +3569,7 @@ if (btnMenosAc) {
 btnMenosAc.onclick = function() {
 if (acrescimoMinutos > 0) {
 acrescimoMinutos--;
-tempoRestante -= 60;
+tempoRestante = Math.max(0, tempoRestante - 60);
 var dispAc = document.getElementById('displayAcrescimo');
 if (dispAc) dispAc.innerText = acrescimoMinutos;
 atualizarDisplayTempo();
@@ -3428,6 +3582,7 @@ var btnTrocarT = document.getElementById('btnTrocarTempo');
 if (btnTrocarT) {
 btnTrocarT.onclick = function() {
 obterAudioContext();
+fecharAlertaFimTempo();
 if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 tempoRestante = 30 * 60;
@@ -3490,6 +3645,7 @@ renderizarPartidasPublicas();
 
 if (timerInterval) clearInterval(timerInterval);
 rodando = false;
+fecharAlertaFimTempo();
 tempoRestante = 30 * 60;
 periodoAtual = 1;
 acrescimoMinutos = 0;
