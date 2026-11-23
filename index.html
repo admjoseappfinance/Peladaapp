@@ -358,7 +358,7 @@ gap: 6px;
 .progress-bg { width: 100%; background: #e2e8f0; height: 9px; border-radius: 5px; margin-top: 6px; overflow: hidden; }
 .progress-bar { height: 100%; background: #16a34a; transition: width 0.3s; }
 
-.artilharia-box { background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px; margin-top: 12px; text-align: left; }
+.artilharia-box { background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px; margin-top: 12px; text-align: left; max-height: 260px; overflow-y: auto; }
 .artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem; }
 .artilheiro-item:last-child { border-bottom: none; }
 
@@ -906,10 +906,10 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Artilharia Rápida restrita aos confirmados do jogo selecionado -->
+<!-- Artilharia Rápida exibindo todo o elenco -->
 <div class="artilharia-box">
-<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Confirmados)</h4>
-<div id="painelArtilhariaRapida"><i>Selecione um jogo acima para carregar os confirmados.</i></div>
+<h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Todo o Elenco)</h4>
+<div id="painelArtilhariaRapida"><i>Carregando elenco...</i></div>
 </div>
 
 <div class="cron-btn-group">
@@ -2680,34 +2680,39 @@ function renderizarPainelArtilharia() {
 var container = document.getElementById('painelArtilhariaRapida');
 if (!container) return;
 
-var selCron = document.getElementById('selectJogoCronometro');
-var jogoId = selCron ? selCron.value : '';
-
 var listaNomes = [];
-if (jogoId) {
-var jogoSelecionado = null;
-for (var i = 0; i < jogos.length; i++) {
-if (jogos[i].id == jogoId) {
-jogoSelecionado = jogos[i];
-break;
-}
-}
-var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
-return typeof p !== 'string' && Boolean(p.confirmado);
-});
-for (var i = 0; i < confirmados.length; i++) {
-listaNomes.push(confirmados[i].nome);
-}
+var vistosLower = {};
+
+function adicionarSeNovo(nome) {
+if (!nome) return;
+var chave = nome.trim().toLowerCase();
+if (!chave || vistosLower[chave]) return;
+vistosLower[chave] = true;
+listaNomes.push(nome.trim());
 }
 
+// 1. Todo o elenco cadastrado em ordem alfabética
+var elencoOrdenado = jogadoresElenco.slice().sort(function(a, b) {
+return (a.nome || '').localeCompare(b.nome || '');
+});
+for (var i = 0; i < elencoOrdenado.length; i++) {
+adicionarSeNovo(elencoOrdenado[i].nome);
+}
+
+// 2. Nomes mapeados nas teclas caso algum não esteja no elenco
+for (var tecla in MAPA_LETRAS_ARTILHARIA) {
+adicionarSeNovo(MAPA_LETRAS_ARTILHARIA[tecla]);
+}
+
+// 3. Qualquer jogador que já tenha gol registrado na partida atual
 for (var jogChave in artilhariaAtual) {
-if (artilhariaAtual[jogChave] > 0 && listaNomes.indexOf(jogChave) === -1) {
-listaNomes.push(jogChave);
+if (artilhariaAtual[jogChave] > 0) {
+adicionarSeNovo(jogChave);
 }
 }
 
 if (listaNomes.length === 0) {
-container.innerHTML = '<i>Selecione um jogo com confirmados ou aperte uma letra mapeada no teclado para registrar gol.</i>';
+container.innerHTML = '<i>Nenhum jogador cadastrado no elenco ainda.</i>';
 return;
 }
 
@@ -2723,7 +2728,7 @@ var row = document.createElement('div');
 row.className = 'artilheiro-item';
 
 var label = document.createElement('span');
-label.innerHTML = '<b>✓ ' + nome + '</b>';
+label.innerHTML = '<b>' + nome + '</b>';
 
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
