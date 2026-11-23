@@ -884,7 +884,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 
 <h3 id="labelPeriodo" style="color:var(--primary-navy); margin:10px 0 2px 0; font-size:0.95rem;">1º Tempo (30 min)</h3>
 <div class="tempo-display" id="displayTempo" title="Toque para editar o tempo manualmente">30:00</div>
-<small style="color:#64748b; display:block; margin-bottom:8px;">💡 Roda em segundo plano. Toque no relógio para ajustar.</small>
+<small style="color:#64748b; display:block; margin-bottom:8px;">💡 Roda em segundo plano + apito ao zerar. Toque no relógio para ajustar.</small>
 
 <div class="placar-container">
 <div class="time-placar">
@@ -1036,6 +1036,73 @@ const MAPA_LETRAS_ARTILHARIA = {
   'c': 'Thiago',
   'v': 'vitin'
 };
+
+// --- SISTEMA DE SONS (Web Audio API) ---
+var audioCtx = null;
+
+function obterAudioContext() {
+  var Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  if (!audioCtx) {
+    audioCtx = new Ctx();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(function() {});
+  }
+  return audioCtx;
+}
+
+function tocarApitoFimTempo() {
+  try {
+    var ctx = obterAudioContext();
+    if (!ctx) return;
+
+    // Sequência de 3 apitos/sirene curtos ao fim do tempo
+    var pulsos = [
+      { inicio: 0.00, duracao: 0.28, freq: 880 },
+      { inicio: 0.36, duracao: 0.28, freq: 880 },
+      { inicio: 0.72, duracao: 0.65, freq: 660 }
+    ];
+
+    pulsos.forEach(function(p) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(p.freq, ctx.currentTime + p.inicio);
+
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + p.inicio);
+      gain.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + p.inicio + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + p.inicio + p.duracao);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + p.inicio);
+      osc.stop(ctx.currentTime + p.inicio + p.duracao + 0.02);
+    });
+  } catch (e) {}
+}
+
+function tocarSomGol() {
+  try {
+    var ctx = obterAudioContext();
+    if (!ctx) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.18);
+
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.24);
+  } catch (e) {}
+}
 
 function obterIdDispositivoLocal() {
 var chave = 'imperio_real_device_id';
@@ -1541,7 +1608,19 @@ function salvarEstadoPartida() {
   localStorage.setItem('partida_atual_imperio_real', JSON.stringify(estado));
 }
 
+function finalizarTimerComSom() {
+  if (timerInterval) clearInterval(timerInterval);
+  rodando = false;
+  tempoRestante = 0;
+  atualizarDisplayTempo();
+  salvarEstadoPartida();
+  tocarApitoFimTempo();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+  alert('⏰ Fim do tempo!');
+}
+
 function inicializarCronometroEmSegundoPlano() {
+  var estourouEmSegundoPlano = false;
   if (rodando && timestampUltimoTick) {
     var agora = Date.now();
     var segundosPassados = Math.floor((agora - timestampUltimoTick) / 1000);
@@ -1549,6 +1628,7 @@ function inicializarCronometroEmSegundoPlano() {
       tempoRestante = Math.max(0, tempoRestante - segundosPassados);
       if (tempoRestante === 0) {
         rodando = false;
+        estourouEmSegundoPlano = true;
       }
     }
   }
@@ -1556,20 +1636,21 @@ function inicializarCronometroEmSegundoPlano() {
     iniciarIntervaloRelogio();
   }
   atualizarDisplayTempo();
+  if (estourouEmSegundoPlano) {
+    salvarEstadoPartida();
+    tocarApitoFimTempo();
+  }
 }
 
 function iniciarIntervaloRelogio() {
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(function() {
-    if (tempoRestante > 0) {
+    if (tempoRestante > 1) {
       tempoRestante--;
       atualizarDisplayTempo();
       salvarEstadoPartida();
     } else {
-      clearInterval(timerInterval);
-      rodando = false;
-      salvarEstadoPartida();
-      alert('Fim do tempo regulamentar!');
+      finalizarTimerComSom();
     }
   }, 1000);
 }
@@ -2396,6 +2477,7 @@ golsVermelho++;
 var gV = document.getElementById('golsVermelho');
 if (gV) gV.innerText = golsVermelho;
 salvarEstadoPartida();
+tocarSomGol();
 }
 
 function diminuirGolVermelho() {
@@ -2412,6 +2494,7 @@ golsAzul++;
 var gA = document.getElementById('golsAzul');
 if (gA) gA.innerText = golsAzul;
 salvarEstadoPartida();
+tocarSomGol();
 }
 
 function diminuirGolAzul() {
@@ -2428,6 +2511,7 @@ if (!nomeJogador) return;
 artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
 salvarEstadoPartida();
 renderizarPainelArtilharia();
+tocarSomGol();
 var statusBt = document.getElementById('btUltimoClique');
 if (statusBt) {
 statusBt.innerText = '⚽ +1 ' + nomeJogador + ' (' + artilhariaAtual[nomeJogador] + ')';
@@ -2785,6 +2869,7 @@ btnMais.onclick = function() {
 artilhariaAtual[nome]++;
 scoreSpan.textContent = artilhariaAtual[nome];
 salvarEstadoPartida();
+tocarSomGol();
 };
 
 contDiv.appendChild(btnMenos);
@@ -2848,6 +2933,7 @@ window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopene
 var dispTempo = document.getElementById('displayTempo');
 if (dispTempo) {
 dispTempo.onclick = function() {
+obterAudioContext();
 var atualMin = Math.floor(tempoRestante / 60);
 var novoMin = prompt('Digite o novo tempo em minutos para o cronômetro:', atualMin);
 if (novoMin !== null && !isNaN(novoMin) && novoMin.trim() !== '') {
@@ -3249,6 +3335,7 @@ salvarTudo();
 var btnIniC = document.getElementById('btnIniciarCron');
 if (btnIniC) {
 btnIniC.onclick = function() {
+obterAudioContext();
 if (!rodando) {
 rodando = true;
 iniciarIntervaloRelogio();
@@ -3292,6 +3379,7 @@ salvarEstadoPartida();
 var btnMaisAc = document.getElementById('btnMaisAcrescimo');
 if (btnMaisAc) {
 btnMaisAc.onclick = function() {
+obterAudioContext();
 acrescimoMinutos++;
 tempoRestante += 60;
 var dispAc = document.getElementById('displayAcrescimo');
@@ -3318,6 +3406,7 @@ salvarEstadoPartida();
 var btnTrocarT = document.getElementById('btnTrocarTempo');
 if (btnTrocarT) {
 btnTrocarT.onclick = function() {
+obterAudioContext();
 if (timerInterval) clearInterval(timerInterval);
 rodando = false;
 tempoRestante = 30 * 60;
