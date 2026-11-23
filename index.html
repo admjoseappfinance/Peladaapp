@@ -2509,12 +2509,37 @@ statusBt.innerText = '🔵 -1 Azul (Shift Esq.)!';
 statusBt.style.color = '#2563eb';
 }
 }
-// Teclado: Letras mapeadas para artilharia individual
+// Teclado: Letras mapeadas para artilharia individual (usando e.code para maior precisão física)
 else if (!e.ctrlKey && !e.altKey && !e.metaKey) {
-var letraMinuscula = tecla.toLowerCase();
-if (MAPA_LETRAS_ARTILHARIA[letraMinuscula]) {
+var nomeJogador = null;
+if (codigo === 'KeyQ' || tecla.toLowerCase() === 'q') nomeJogador = 'Adailton';
+else if (codigo === 'KeyW' || tecla.toLowerCase() === 'w') nomeJogador = 'Alef';
+else if (codigo === 'KeyE' || tecla.toLowerCase() === 'e') nomeJogador = 'Alessandro';
+else if (codigo === 'KeyR' || tecla.toLowerCase() === 'r') nomeJogador = 'Alex';
+else if (codigo === 'KeyT' || tecla.toLowerCase() === 't') nomeJogador = 'Alison';
+else if (codigo === 'KeyY' || tecla.toLowerCase() === 'y') nomeJogador = 'Carlinhos';
+else if (codigo === 'KeyU' || tecla.toLowerCase() === 'u') nomeJogador = 'Carlos império';
+else if (codigo === 'KeyI' || tecla.toLowerCase() === 'i') nomeJogador = 'Coco';
+else if (codigo === 'KeyO' || tecla.toLowerCase() === 'o') nomeJogador = 'Cristiano';
+else if (codigo === 'KeyP' || tecla.toLowerCase() === 'p') nomeJogador = 'Denilson';
+else if (codigo === 'KeyA' || tecla.toLowerCase() === 'a') nomeJogador = 'Edinho';
+else if (codigo === 'KeyS' || tecla.toLowerCase() === 's') nomeJogador = 'Erik';
+else if (codigo === 'KeyD' || tecla.toLowerCase() === 'd') nomeJogador = 'Fernando';
+else if (codigo === 'KeyF' || tecla.toLowerCase() === 'f') nomeJogador = 'Jhony';
+else if (codigo === 'KeyG' || tecla.toLowerCase() === 'g') nomeJogador = 'Jose';
+else if (codigo === 'KeyH' || tecla.toLowerCase() === 'h') nomeJogador = 'Kerginaldo';
+else if (codigo === 'KeyJ' || tecla.toLowerCase() === 'j') nomeJogador = 'Naldo';
+else if (codigo === 'KeyK' || tecla.toLowerCase() === 'k') nomeJogador = 'Niltinho';
+else if (codigo === 'KeyL' || tecla.toLowerCase() === 'l') nomeJogador = 'Novinho';
+else if (codigo === 'Semicolon' || tecla.toLowerCase() === 'ç') nomeJogador = 'Preto';
+else if (codigo === 'KeyZ' || tecla.toLowerCase() === 'z') nomeJogador = 'rogerio';
+else if (codigo === 'KeyX' || tecla.toLowerCase() === 'x') nomeJogador = 'selino';
+else if (codigo === 'KeyC' || tecla.toLowerCase() === 'c') nomeJogador = 'Thiago';
+else if (codigo === 'KeyV' || tecla.toLowerCase() === 'v') nomeJogador = 'vitin';
+
+if (nomeJogador) {
 e.preventDefault();
-adicionarGolJogadorPorLetra(MAPA_LETRAS_ARTILHARIA[letraMinuscula]);
+adicionarGolJogadorPorLetra(nomeJogador);
 if (navigator.vibrate) navigator.vibrate(60);
 }
 }
