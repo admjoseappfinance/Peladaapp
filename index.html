@@ -1057,28 +1057,49 @@ function tocarApitoFimTempo() {
     var ctx = obterAudioContext();
     if (!ctx) return;
 
-    // Sequência de 3 apitos/sirene curtos ao fim do tempo
+    // Sequência forte e prolongada (~3,2s): 4 pulsos firmes + apito final longo
     var pulsos = [
-      { inicio: 0.00, duracao: 0.28, freq: 880 },
-      { inicio: 0.36, duracao: 0.28, freq: 880 },
-      { inicio: 0.72, duracao: 0.65, freq: 660 }
+      { inicio: 0.00, duracao: 0.45, f1: 980, f2: 490 },
+      { inicio: 0.55, duracao: 0.45, f1: 980, f2: 490 },
+      { inicio: 1.10, duracao: 0.45, f1: 980, f2: 490 },
+      { inicio: 1.65, duracao: 0.45, f1: 980, f2: 490 },
+      { inicio: 2.20, duracao: 1.05, f1: 1120, f2: 560 }
     ];
 
     pulsos.forEach(function(p) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(p.freq, ctx.currentTime + p.inicio);
+      var oscAgudo = ctx.createOscillator();
+      var oscGrave = ctx.createOscillator();
+      var gainAgudo = ctx.createGain();
+      var gainGrave = ctx.createGain();
 
-      gain.gain.setValueAtTime(0.001, ctx.currentTime + p.inicio);
-      gain.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + p.inicio + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + p.inicio + p.duracao);
+      oscAgudo.type = 'sawtooth';
+      oscAgudo.frequency.setValueAtTime(p.f1, ctx.currentTime + p.inicio);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+      oscGrave.type = 'square';
+      oscGrave.frequency.setValueAtTime(p.f2, ctx.currentTime + p.inicio);
 
-      osc.start(ctx.currentTime + p.inicio);
-      osc.stop(ctx.currentTime + p.inicio + p.duracao + 0.02);
+      var tStart = ctx.currentTime + p.inicio;
+      var tEnd = tStart + p.duracao;
+
+      gainAgudo.gain.setValueAtTime(0.001, tStart);
+      gainAgudo.gain.linearRampToValueAtTime(0.9, tStart + 0.02);
+      gainAgudo.gain.setValueAtTime(0.9, tEnd - 0.04);
+      gainAgudo.gain.exponentialRampToValueAtTime(0.001, tEnd);
+
+      gainGrave.gain.setValueAtTime(0.001, tStart);
+      gainGrave.gain.linearRampToValueAtTime(0.75, tStart + 0.02);
+      gainGrave.gain.setValueAtTime(0.75, tEnd - 0.04);
+      gainGrave.gain.exponentialRampToValueAtTime(0.001, tEnd);
+
+      oscAgudo.connect(gainAgudo);
+      oscGrave.connect(gainGrave);
+      gainAgudo.connect(ctx.destination);
+      gainGrave.connect(ctx.destination);
+
+      oscAgudo.start(tStart);
+      oscGrave.start(tStart);
+      oscAgudo.stop(tEnd + 0.02);
+      oscGrave.stop(tEnd + 0.02);
     });
   } catch (e) {}
 }
