@@ -1009,6 +1009,34 @@ var jogoConfirmacaoLinkId = null;
 var subtelaFinanceiroAtiva = 'relatorio';
 var subtelaElencoRankingAtiva = 'artilharia';
 
+// Mapeamento em ordem alfabética distribuído nas teclas QWERTY (incluindo Ç)
+const MAPA_LETRAS_ARTILHARIA = {
+  'q': 'Adailton',
+  'w': 'Alef',
+  'e': 'Alessandro',
+  'r': 'Alex',
+  't': 'Alison',
+  'y': 'Carlinhos',
+  'u': 'Carlos império',
+  'i': 'Coco',
+  'o': 'Cristiano',
+  'p': 'Denilson',
+  'a': 'Edinho',
+  's': 'Erik',
+  'd': 'Fernando',
+  'f': 'Jhony',
+  'g': 'Jose',
+  'h': 'Kerginaldo',
+  'j': 'Naldo',
+  'k': 'Niltinho',
+  'l': 'Novinho',
+  'ç': 'Preto',
+  'z': 'rogerio',
+  'x': 'selino',
+  'c': 'Thiago',
+  'v': 'vitin'
+};
+
 function obterIdDispositivoLocal() {
 var chave = 'imperio_real_device_id';
 var id = null;
@@ -2395,6 +2423,18 @@ salvarEstadoPartida();
 }
 }
 
+function adicionarGolJogadorPorLetra(nomeJogador) {
+if (!nomeJogador) return;
+artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
+salvarEstadoPartida();
+renderizarPainelArtilharia();
+var statusBt = document.getElementById('btUltimoClique');
+if (statusBt) {
+statusBt.innerText = '⚽ +1 ' + nomeJogador + ' (' + artilhariaAtual[nomeJogador] + ')';
+statusBt.style.color = '#15803d';
+}
+}
+
 // Ouvinte para Controle Remoto Bluetooth (2 botões) e Teclado Físico
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
@@ -2467,6 +2507,15 @@ diminuirGolAzul();
 if (statusBt) {
 statusBt.innerText = '🔵 -1 Azul (Shift Esq.)!';
 statusBt.style.color = '#2563eb';
+}
+}
+// Teclado: Letras mapeadas para artilharia individual
+else if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+var letraMinuscula = tecla.toLowerCase();
+if (MAPA_LETRAS_ARTILHARIA[letraMinuscula]) {
+e.preventDefault();
+adicionarGolJogadorPorLetra(MAPA_LETRAS_ARTILHARIA[letraMinuscula]);
+if (navigator.vibrate) navigator.vibrate(60);
 }
 }
 });
@@ -2634,11 +2683,8 @@ if (!container) return;
 var selCron = document.getElementById('selectJogoCronometro');
 var jogoId = selCron ? selCron.value : '';
 
-if (!jogoId) {
-container.innerHTML = '<i>Selecione um jogo no menu acima para carregar apenas os jogadores confirmados.</i>';
-return;
-}
-
+var listaNomes = [];
+if (jogoId) {
 var jogoSelecionado = null;
 for (var i = 0; i < jogos.length; i++) {
 if (jogos[i].id == jogoId) {
@@ -2646,21 +2692,29 @@ jogoSelecionado = jogos[i];
 break;
 }
 }
-
 var confirmados = (jogoSelecionado && jogoSelecionado.convocados ? jogoSelecionado.convocados : []).filter(function(p) {
 return typeof p !== 'string' && Boolean(p.confirmado);
 });
+for (var i = 0; i < confirmados.length; i++) {
+listaNomes.push(confirmados[i].nome);
+}
+}
 
-if (!jogoSelecionado || confirmados.length === 0) {
-container.innerHTML = '<i>Nenhum jogador confirmado neste jogo para registrar gol.</i>';
+for (var jogChave in artilhariaAtual) {
+if (artilhariaAtual[jogChave] > 0 && listaNomes.indexOf(jogChave) === -1) {
+listaNomes.push(jogChave);
+}
+}
+
+if (listaNomes.length === 0) {
+container.innerHTML = '<i>Selecione um jogo com confirmados ou aperte uma letra mapeada no teclado para registrar gol.</i>';
 return;
 }
 
 container.innerHTML = '';
 
-for (var i = 0; i < confirmados.length; i++) {
-(function(p) {
-var nome = p.nome;
+for (var i = 0; i < listaNomes.length; i++) {
+(function(nome) {
 if (artilhariaAtual[nome] === undefined) {
 artilhariaAtual[nome] = 0;
 }
@@ -2710,7 +2764,7 @@ contDiv.appendChild(btnMais);
 row.appendChild(label);
 row.appendChild(contDiv);
 container.appendChild(row);
-})(confirmados[i]);
+})(listaNomes[i]);
 }
 }
 
