@@ -2787,15 +2787,38 @@ salvarEstadoPartida();
 }
 }
 
+function resolverChaveArtilharia(nomeJogador) {
+var alvo = String(nomeJogador || '').trim();
+if (!alvo) return alvo;
+var alvoLower = alvo.toLowerCase();
+
+for (var chave in artilhariaAtual) {
+if (String(chave).trim().toLowerCase() === alvoLower) {
+return chave;
+}
+}
+
+for (var i = 0; i < jogadoresElenco.length; i++) {
+var nomeElenco = String((jogadoresElenco[i] && jogadoresElenco[i].nome) || '').trim();
+if (nomeElenco && nomeElenco.toLowerCase() === alvoLower) {
+return nomeElenco;
+}
+}
+
+return alvo;
+}
+
 function adicionarGolJogadorPorLetra(nomeJogador) {
-if (!nomeJogador) return;
-artilhariaAtual[nomeJogador] = (artilhariaAtual[nomeJogador] || 0) + 1;
+var chaveReal = resolverChaveArtilharia(nomeJogador);
+if (!chaveReal) return;
+var atual = Number(artilhariaAtual[chaveReal] || 0);
+artilhariaAtual[chaveReal] = atual + 1;
 salvarEstadoPartida();
 renderizarPainelArtilharia();
 tocarSomGol();
 var statusBt = document.getElementById('btUltimoClique');
 if (statusBt) {
-statusBt.innerText = '⚽ +1 ' + nomeJogador + ' (' + artilhariaAtual[nomeJogador] + ')';
+statusBt.innerText = '⚽ +1 ' + chaveReal + ' (' + artilhariaAtual[chaveReal] + ')';
 statusBt.style.color = '#15803d';
 }
 }
@@ -3109,15 +3132,16 @@ container.innerHTML = '';
 
 for (var i = 0; i < listaNomes.length; i++) {
 (function(nome) {
-if (artilhariaAtual[nome] === undefined) {
-artilhariaAtual[nome] = 0;
+var chaveExistente = resolverChaveArtilharia(nome);
+if (artilhariaAtual[chaveExistente] === undefined) {
+artilhariaAtual[chaveExistente] = 0;
 }
 
 var row = document.createElement('div');
 row.className = 'artilheiro-item';
 
 var label = document.createElement('span');
-label.innerHTML = '<b>' + nome + '</b>';
+label.innerHTML = '<b>' + chaveExistente + '</b>';
 
 var contDiv = document.createElement('div');
 contDiv.style.display = 'flex';
@@ -3129,15 +3153,16 @@ scoreSpan.style.fontWeight = 'bold';
 scoreSpan.style.color = 'var(--primary-navy)';
 scoreSpan.style.minWidth = '22px';
 scoreSpan.style.textAlign = 'center';
-scoreSpan.textContent = artilhariaAtual[nome];
+scoreSpan.textContent = Number(artilhariaAtual[chaveExistente] || 0);
 
 var btnMenos = document.createElement('button');
 btnMenos.style.cssText = 'padding:4px 8px; background:#ef4444; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
 btnMenos.textContent = '-';
 btnMenos.onclick = function() {
-if (artilhariaAtual[nome] > 0) {
-artilhariaAtual[nome]--;
-scoreSpan.textContent = artilhariaAtual[nome];
+var atual = Number(artilhariaAtual[chaveExistente] || 0);
+if (atual > 0) {
+artilhariaAtual[chaveExistente] = atual - 1;
+scoreSpan.textContent = artilhariaAtual[chaveExistente];
 salvarEstadoPartida();
 }
 };
@@ -3146,8 +3171,8 @@ var btnMais = document.createElement('button');
 btnMais.style.cssText = 'padding:4px 8px; background:#16a34a; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;';
 btnMais.textContent = '+1 Gol';
 btnMais.onclick = function() {
-artilhariaAtual[nome]++;
-scoreSpan.textContent = artilhariaAtual[nome];
+artilhariaAtual[chaveExistente] = Number(artilhariaAtual[chaveExistente] || 0) + 1;
+scoreSpan.textContent = artilhariaAtual[chaveExistente];
 salvarEstadoPartida();
 tocarSomGol();
 };
