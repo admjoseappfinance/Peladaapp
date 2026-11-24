@@ -209,7 +209,6 @@ button.action-btn:active {
 background: var(--gold-hover);
 }
 
-/* Banner de Aviso de Fim de Tempo (Não bloqueia o áudio) */
 .alerta-fim-tempo {
 display: none;
 margin: 10px 12px 0 12px;
@@ -246,7 +245,6 @@ cursor: pointer;
 flex-shrink: 0;
 }
 
-/* Hub Compacto (Financeiro / Elenco & Ranking) */
 .fin-hub-grid {
 display: grid;
 grid-template-columns: repeat(2, 1fr);
@@ -419,7 +417,6 @@ gap: 6px;
 .artilheiro-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem; }
 .artilheiro-item:last-child { border-bottom: none; }
 
-/* Tela Exclusiva de Confirmação via Link do Jogo */
 .confirm-link-card {
 background: var(--card-bg);
 border: 2px solid var(--gold-accent);
@@ -565,7 +562,6 @@ color: var(--primary-navy);
 margin: 6px 0;
 }
 
-/* Controles de Visibilidade por Permissão */
 body.modo-jogador [data-admin-only],
 body.modo-jogador [data-juiz-only] {
 display: none !important;
@@ -607,7 +603,6 @@ display: none;
 </div>
 </div>
 
-<!-- Banner Instantâneo de Fim de Tempo (Não bloqueia o áudio) -->
 <div id="alertaFimTempo" class="alerta-fim-tempo">
 <div>
 <div style="font-weight:bold; font-size:0.98rem;">⏰ FIM DO TEMPO!</div>
@@ -616,7 +611,6 @@ display: none;
 <button type="button" class="alerta-fim-btn" onclick="fecharAlertaFimTempo()">OK</button>
 </div>
 
-<!-- Tela Exclusiva Quando Abre o Link de Confirmação do Jogo (?confirmar=ID) -->
 <div id="telaConfirmacaoLink" class="confirm-link-card">
 <div class="confirm-link-header">
 <h2 class="confirm-link-title" id="confLinkTituloJogo">Confirmação de Presença</h2>
@@ -647,7 +641,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <button class="tab-btn active" data-tab="jogos">Jogos</button>
 <button class="tab-btn" data-tab="ranking">Elenco & Ranking</button>
 <button class="tab-btn" data-tab="financeiro">Financeiro</button>
-<!-- Abas exclusivas de Admin / Juiz -->
 <button class="tab-btn" data-tab="sorteio" data-admin-only data-juiz-only data-juiz-liberado>Sorteio</button>
 <button class="tab-btn" data-tab="cronometro" data-admin-only data-juiz-only data-juiz-liberado>Cronômetro</button>
 </div>
@@ -710,7 +703,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <hr style="margin: 18px 0; border: 0; border-top: 1px solid #cbd5e1;">
 </div>
 
-<!-- Seção Pública: Próximo Jogo e Confirmados -->
 <h3 style="margin:0 0 8px 0; font-size:1.02rem; color:var(--primary-navy);">📋 Próximo Jogo e Confirmados</h3>
 <div id="proximoJogoPublico" style="margin-bottom:16px;"></div>
 
@@ -718,7 +710,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaPartidasPublicas"></div>
 </div>
 
-<!-- Aba Financeiro (Hub Compacto + Telas Completas ao Clicar) -->
+<!-- Aba Financeiro -->
 <div id="tab-financeiro" class="tab-content">
 <div class="fin-hub-grid">
 <button type="button" class="fin-hub-card" id="hub-card-entradas" data-admin-only onclick="abrirFinanceiroHub('entradas')">
@@ -742,7 +734,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </button>
 </div>
 
-<!-- Subtela: Entradas / Pagamentos -->
 <div id="fin-sub-entradas" class="fin-subview" data-admin-only>
 <div class="fin-subview-header">
 <h3>💵 Entradas e Pagamentos</h3>
@@ -771,7 +762,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaPagamentos"></div>
 </div>
 
-<!-- Subtela: Saídas -->
 <div id="fin-sub-saidas" class="fin-subview" data-admin-only>
 <div class="fin-subview-header">
 <h3>💸 Saídas e Despesas</h3>
@@ -790,7 +780,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaSaidas"></div>
 </div>
 
-<!-- Subtela: Metas -->
 <div id="fin-sub-metas" class="fin-subview" data-admin-only>
 <div class="fin-subview-header">
 <h3>🎯 Metas Financeiras</h3>
@@ -805,7 +794,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaMetas"></div>
 </div>
 
-<!-- Subtela: Relatório -->
 <div id="fin-sub-relatorio" class="fin-subview ativa">
 <div class="fin-subview-header">
 <h3>📊 Relatório Financeiro</h3>
@@ -839,7 +827,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Aba Elenco & Ranking (Hub Compacto + Telas Completas ao Clicar) -->
+<!-- Aba Elenco & Ranking -->
 <div id="tab-ranking" class="tab-content">
 <div class="fin-hub-grid">
 <button type="button" class="fin-hub-card" id="hub-card-jogadores" data-admin-only onclick="abrirElencoRankingHub('jogadores')">
@@ -853,7 +841,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </button>
 </div>
 
-<!-- Subtela: Jogadores (Banco de Dados de Jogadores / Elenco) -->
 <div id="hub-sub-jogadores" class="fin-subview" data-admin-only>
 <div class="fin-subview-header">
 <h3>👥 Jogadores do Elenco</h3>
@@ -902,7 +889,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaElencoCadastrado"></div>
 </div>
 
-<!-- Subtela: Ranking de Artilheiros -->
 <div id="hub-sub-artilharia" class="fin-subview ativa">
 <div class="fin-subview-header">
 <h3>🏆 Ranking de Artilheiros</h3>
@@ -973,7 +959,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Artilharia Rápida exibindo todo o elenco -->
 <div class="artilharia-box">
 <h4 style="margin:0 0 6px 0; color:var(--primary-navy); font-size:0.9rem;">⚽ Artilharia da Partida (Todo o Elenco)</h4>
 <div id="painelArtilhariaRapida"><i>Carregando elenco...</i></div>
@@ -1001,7 +986,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <div id="listaHistoricoPartidas"></div>
 </div>
 
-<!-- Modal para Editar Convocados -->
+<!-- Modal Editar Convocados -->
 <div class="modal" id="modalEditarLista">
 <div class="modal-content">
 <h3 style="margin-top:0; color:var(--primary-navy);">Editar Convocados</h3>
@@ -1039,7 +1024,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 </div>
 
-<!-- Modal para Editar Partida Salva no Histórico -->
+<!-- Modal Editar Partida Salva -->
 <div class="modal" id="modalEditarPartidaHist">
 <div class="modal-content">
 <h3 style="margin-top:0; color:var(--primary-navy);">✏️ Editar Partida Salva</h3>
@@ -1066,7 +1051,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 
 <script>
-// --- PWA EM ARQUIVO ÚNICO (ÍCONE CANVAS + MANIFESTO + SERVICE WORKER) ---
+// --- PWA EM ARQUIVO ÚNICO ---
 var eventoInstalacaoPendente = null;
 
 function gerarIconeDataUrl(tamanho) {
@@ -1180,17 +1165,15 @@ window.addEventListener("appinstalled", function() {
 
 configurarPWAUnico();
 
-// Configuração JSONbin.io
 const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
 const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 
-var nivelAcesso = 'jogador'; // 'jogador', 'juiz', 'admin'
+var nivelAcesso = 'jogador';
 var jogoConfirmacaoLinkId = null;
 var subtelaFinanceiroAtiva = 'relatorio';
 var subtelaElencoRankingAtiva = 'artilharia';
 
-// Mapeamento em ordem alfabética distribuído nas teclas QWERTY (incluindo Ç)
 const MAPA_LETRAS_ARTILHARIA = {
   'q': 'Adailton',
   'w': 'Alef',
@@ -1218,7 +1201,6 @@ const MAPA_LETRAS_ARTILHARIA = {
   'v': 'vitin'
 };
 
-// --- SISTEMA DE SONS (Web Audio API) ---
 var audioCtx = null;
 var avisoFimTempoPendente = false;
 
@@ -2826,6 +2808,7 @@ var abaCron = document.getElementById('tab-cronometro');
 if (!abaCron || !abaCron.classList.contains('active')) return;
 
 var tecla = e.key || '';
+var teclaLower = tecla.toLowerCase();
 var codigo = e.code || '';
 var statusBt = document.getElementById('btUltimoClique');
 
@@ -2886,32 +2869,40 @@ statusBt.innerText = '🔵 -1 Azul (Shift Esq.)!';
 statusBt.style.color = '#2563eb';
 }
 }
+else if (codigo === 'KeyZ' || teclaLower === 'z') {
+e.preventDefault();
+adicionarGolJogadorPorLetra('rogerio');
+if (navigator.vibrate) navigator.vibrate(60);
+}
+else if (codigo === 'KeyX' || teclaLower === 'x') {
+e.preventDefault();
+adicionarGolJogadorPorLetra('selino');
+if (navigator.vibrate) navigator.vibrate(60);
+}
 else if (!e.ctrlKey && !e.altKey && !e.metaKey) {
 var nomeJogador = null;
-if (codigo === 'KeyQ' || tecla.toLowerCase() === 'q') nomeJogador = 'Adailton';
-else if (codigo === 'KeyW' || tecla.toLowerCase() === 'w') nomeJogador = 'Alef';
-else if (codigo === 'KeyE' || tecla.toLowerCase() === 'e') nomeJogador = 'Alessandro';
-else if (codigo === 'KeyR' || tecla.toLowerCase() === 'r') nomeJogador = 'Alex';
-else if (codigo === 'KeyT' || tecla.toLowerCase() === 't') nomeJogador = 'Alison';
-else if (codigo === 'KeyY' || tecla.toLowerCase() === 'y') nomeJogador = 'Carlinhos';
-else if (codigo === 'KeyU' || tecla.toLowerCase() === 'u') nomeJogador = 'Carlos império';
-else if (codigo === 'KeyI' || tecla.toLowerCase() === 'i') nomeJogador = 'Coco';
-else if (codigo === 'KeyO' || tecla.toLowerCase() === 'o') nomeJogador = 'Cristiano';
-else if (codigo === 'KeyP' || tecla.toLowerCase() === 'p') nomeJogador = 'Denilson';
-else if (codigo === 'KeyA' || tecla.toLowerCase() === 'a') nomeJogador = 'Edinho';
-else if (codigo === 'KeyS' || tecla.toLowerCase() === 's') nomeJogador = 'Erik';
-else if (codigo === 'KeyD' || tecla.toLowerCase() === 'd') nomeJogador = 'Fernando';
-else if (codigo === 'KeyF' || tecla.toLowerCase() === 'f') nomeJogador = 'Jhony';
-else if (codigo === 'KeyG' || tecla.toLowerCase() === 'g') nomeJogador = 'Jose';
-else if (codigo === 'KeyH' || tecla.toLowerCase() === 'h') nomeJogador = 'Kerginaldo';
-else if (codigo === 'KeyJ' || tecla.toLowerCase() === 'j') nomeJogador = 'Naldo';
-else if (codigo === 'KeyK' || tecla.toLowerCase() === 'k') nomeJogador = 'Niltinho';
-else if (codigo === 'KeyL' || tecla.toLowerCase() === 'l') nomeJogador = 'Novinho';
-else if (codigo === 'Semicolon' || tecla.toLowerCase() === 'ç') nomeJogador = 'Preto';
-else if (codigo === 'KeyZ' || tecla.toLowerCase() === 'z') nomeJogador = 'rogerio';
-else if (codigo === 'KeyX' || tecla.toLowerCase() === 'x') nomeJogador = 'selino';
-else if (codigo === 'KeyC' || tecla.toLowerCase() === 'c') nomeJogador = 'Thiago';
-else if (codigo === 'KeyV' || tecla.toLowerCase() === 'v') nomeJogador = 'vitin';
+if (codigo === 'KeyQ' || teclaLower === 'q') nomeJogador = 'Adailton';
+else if (codigo === 'KeyW' || teclaLower === 'w') nomeJogador = 'Alef';
+else if (codigo === 'KeyE' || teclaLower === 'e') nomeJogador = 'Alessandro';
+else if (codigo === 'KeyR' || teclaLower === 'r') nomeJogador = 'Alex';
+else if (codigo === 'KeyT' || teclaLower === 't') nomeJogador = 'Alison';
+else if (codigo === 'KeyY' || teclaLower === 'y') nomeJogador = 'Carlinhos';
+else if (codigo === 'KeyU' || teclaLower === 'u') nomeJogador = 'Carlos império';
+else if (codigo === 'KeyI' || teclaLower === 'i') nomeJogador = 'Coco';
+else if (codigo === 'KeyO' || teclaLower === 'o') nomeJogador = 'Cristiano';
+else if (codigo === 'KeyP' || teclaLower === 'p') nomeJogador = 'Denilson';
+else if (codigo === 'KeyA' || teclaLower === 'a') nomeJogador = 'Edinho';
+else if (codigo === 'KeyS' || teclaLower === 's') nomeJogador = 'Erik';
+else if (codigo === 'KeyD' || teclaLower === 'd') nomeJogador = 'Fernando';
+else if (codigo === 'KeyF' || teclaLower === 'f') nomeJogador = 'Jhony';
+else if (codigo === 'KeyG' || teclaLower === 'g') nomeJogador = 'Jose';
+else if (codigo === 'KeyH' || teclaLower === 'h') nomeJogador = 'Kerginaldo';
+else if (codigo === 'KeyJ' || teclaLower === 'j') nomeJogador = 'Naldo';
+else if (codigo === 'KeyK' || teclaLower === 'k') nomeJogador = 'Niltinho';
+else if (codigo === 'KeyL' || teclaLower === 'l') nomeJogador = 'Novinho';
+else if (codigo === 'Semicolon' || teclaLower === 'ç') nomeJogador = 'Preto';
+else if (codigo === 'KeyC' || teclaLower === 'c') nomeJogador = 'Thiago';
+else if (codigo === 'KeyV' || teclaLower === 'v') nomeJogador = 'vitin';
 
 if (nomeJogador) {
 e.preventDefault();
