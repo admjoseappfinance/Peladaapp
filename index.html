@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1a30">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Império Real FC">
+<link id="pwaManifestLink" rel="manifest" href="">
+<link rel="apple-touch-icon" href="logo.png">
 <title>Império Real FC</title>
 <style>
 :root {
@@ -76,6 +82,19 @@ font-size: 0.74rem;
 font-weight: bold;
 cursor: pointer;
 transition: all 0.2s;
+}
+
+.install-btn {
+background: #16a34a;
+color: #ffffff;
+border: 1px solid #86efac;
+padding: 5px 8px;
+border-radius: 6px;
+font-size: 0.74rem;
+font-weight: bold;
+cursor: pointer;
+transition: all 0.2s;
+display: none;
 }
 
 .admin-toggle-btn {
@@ -581,6 +600,7 @@ display: none;
 </div>
 </div>
 <div class="header-right">
+<button class="install-btn" id="btnInstalarApp" onclick="instalarPWA()" title="Instalar aplicativo">📲 Instalar</button>
 <button class="sync-btn" id="btnSyncStatus" onclick="carregarDaNuvem(true)" title="Atualizar dados da nuvem">☁️ Sync</button>
 <button class="admin-toggle-btn" id="btnToggleAdmin" onclick="pedirSenhaAdmin()">🔐 Admin</button>
 </div>
@@ -1045,6 +1065,100 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 
 <script>
+// --- CONFIGURAÇÃO PWA (APP INSTALÁVEL) ---
+var eventoInstalacaoPendente = null;
+
+function configurarPWA() {
+  try {
+    var baseUrl = window.location.href.split('?')[0];
+    var manifestData = {
+      name: "Império Real FC",
+      short_name: "Império Real",
+      start_url: baseUrl,
+      scope: "./",
+      display: "standalone",
+      background_color: "#0b1a30",
+      theme_color: "#0b1a30",
+      orientation: "portrait",
+      icons: [
+        {
+          src: "logo.png",
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "any"
+        },
+        {
+          src: "logo.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any"
+        }
+      ]
+    };
+
+    var manifestBlob = new Blob([JSON.stringify(manifestData)], { type: "application/manifest+json" });
+    var manifestUrl = URL.createObjectURL(manifestBlob);
+    var linkEl = document.getElementById("pwaManifestLink");
+    if (linkEl) linkEl.href = manifestUrl;
+
+    if ("serviceWorker" in navigator && (window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+      var swCode = [
+        "const CACHE_NAME = 'imperio-real-pwa-v1';",
+        "self.addEventListener('install', function(event) {",
+        "  self.skipWaiting();",
+        "});",
+        "self.addEventListener('activate', function(event) {",
+        "  event.waitUntil(self.clients.claim());",
+        "});",
+        "self.addEventListener('fetch', function(event) {",
+        "  if (event.request.method !== 'GET') return;",
+        "  event.respondWith(",
+        "    fetch(event.request).catch(function() {",
+        "      return caches.match(event.request);",
+        "    })",
+        "  );",
+        "});"
+      ].join("\n");
+
+      var swBlob = new Blob([swCode], { type: "application/javascript" });
+      var swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(function(err) {
+        console.log("SW info:", err);
+      });
+    }
+  } catch (e) {}
+}
+
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  eventoInstalacaoPendente = e;
+  var btnInst = document.getElementById("btnInstalarApp");
+  if (btnInst) btnInst.style.display = "inline-block";
+});
+
+function instalarPWA() {
+  if (eventoInstalacaoPendente) {
+    eventoInstalacaoPendente.prompt();
+    eventoInstalacaoPendente.userChoice.then(function(choiceResult) {
+      if (choiceResult.outcome === "accepted") {
+        var btnInst = document.getElementById("btnInstalarApp");
+        if (btnInst) btnInst.style.display = "none";
+      }
+      eventoInstalacaoPendente = null;
+    });
+  } else {
+    alert("Para instalar o app:\n• Android/Chrome: toque nos 3 pontinhos (⋮) → 'Instalar aplicativo' ou 'Adicionar à tela inicial'.\n• iPhone/Safari: toque em Compartilhar → 'Adicionar à Tela de Início'.");
+  }
+}
+
+window.addEventListener("appinstalled", function() {
+  var btnInst = document.getElementById("btnInstalarApp");
+  if (btnInst) btnInst.style.display = "none";
+  eventoInstalacaoPendente = null;
+});
+
+configurarPWA();
+
 // Configuração JSONbin.io
 const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
 const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
@@ -1116,7 +1230,6 @@ function tocarApitoFimTempo() {
 }
 
 function executarSequenciaApito(ctx) {
-  // Sequência forte e prolongada (~3,2s): 4 pulsos firmes + apito final longo
   var pulsos = [
     { inicio: 0.00, duracao: 0.45, f1: 980, f2: 490 },
     { inicio: 0.55, duracao: 0.45, f1: 980, f2: 490 },
@@ -1794,7 +1907,6 @@ function iniciarIntervaloRelogio() {
   }, 1000);
 }
 
-// Destrava o áudio ao primeiro toque/clique em qualquer lugar da página
 ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(function(evNome) {
   document.addEventListener(evNome, function() {
     var ctx = obterAudioContext();
@@ -1807,7 +1919,6 @@ function iniciarIntervaloRelogio() {
   }, { passive: true });
 });
 
-// Ao voltar para a aba / desbloquear a tela, recalcula o tempo real e toca imediatamente se já zerou
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
     var ctx = obterAudioContext();
@@ -2686,7 +2797,6 @@ statusBt.style.color = '#15803d';
 }
 }
 
-// Ouvinte para Controle Remoto Bluetooth (2 botões) e Teclado Físico
 document.addEventListener('keydown', function(e) {
 var tagAtiva = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
 if (tagAtiva === 'input' || tagAtiva === 'textarea' || tagAtiva === 'select') return;
@@ -2698,7 +2808,6 @@ var tecla = e.key || '';
 var codigo = e.code || '';
 var statusBt = document.getElementById('btUltimoClique');
 
-// Controle BT / Enter para +1 Gol Vermelho
 if (
 tecla === 'AudioVolumeUp' ||
 tecla === 'VolumeUp' ||
@@ -2715,7 +2824,6 @@ statusBt.innerText = '🔴 +1 Vermelho!';
 statusBt.style.color = '#dc2626';
 }
 }
-// Controle BT para +1 Gol Azul
 else if (
 tecla === 'AudioVolumeDown' ||
 tecla === 'VolumeDown' ||
@@ -2732,7 +2840,6 @@ statusBt.innerText = '🔵 +1 Azul!';
 statusBt.style.color = '#2563eb';
 }
 }
-// Teclado: Caps Lock para +1 Gol Azul
 else if (tecla === 'CapsLock' || codigo === 'CapsLock') {
 e.preventDefault();
 adicionarGolAzul();
@@ -2742,7 +2849,6 @@ statusBt.innerText = '🔵 +1 Azul (Caps Lock)!';
 statusBt.style.color = '#2563eb';
 }
 }
-// Teclado: Shift Direito para -1 Gol Vermelho
 else if (codigo === 'ShiftRight') {
 e.preventDefault();
 diminuirGolVermelho();
@@ -2751,7 +2857,6 @@ statusBt.innerText = '🔴 -1 Vermelho (Shift Dir.)!';
 statusBt.style.color = '#dc2626';
 }
 }
-// Teclado: Shift Esquerdo para -1 Gol Azul
 else if (codigo === 'ShiftLeft') {
 e.preventDefault();
 diminuirGolAzul();
@@ -2760,7 +2865,6 @@ statusBt.innerText = '🔵 -1 Azul (Shift Esq.)!';
 statusBt.style.color = '#2563eb';
 }
 }
-// Teclado: Letras mapeadas para artilharia individual (usando e.code para maior precisão física)
 else if (!e.ctrlKey && !e.altKey && !e.metaKey) {
 var nomeJogador = null;
 if (codigo === 'KeyQ' || tecla.toLowerCase() === 'q') nomeJogador = 'Adailton';
@@ -2967,7 +3071,6 @@ vistosLower[chave] = true;
 listaNomes.push(nome.trim());
 }
 
-// 1. Todo o elenco cadastrado em ordem alfabética
 var elencoOrdenado = jogadoresElenco.slice().sort(function(a, b) {
 return (a.nome || '').localeCompare(b.nome || '');
 });
@@ -2975,12 +3078,10 @@ for (var i = 0; i < elencoOrdenado.length; i++) {
 adicionarSeNovo(elencoOrdenado[i].nome);
 }
 
-// 2. Nomes mapeados nas teclas caso algum não esteja no elenco
 for (var tecla in MAPA_LETRAS_ARTILHARIA) {
 adicionarSeNovo(MAPA_LETRAS_ARTILHARIA[tecla]);
 }
 
-// 3. Qualquer jogador que já tenha gol registrado na partida atual
 for (var jogChave in artilhariaAtual) {
 if (artilhariaAtual[jogChave] > 0) {
 adicionarSeNovo(jogChave);
