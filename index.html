@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1a30">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Império Real FC">
-<link id="pwaManifestLink" rel="manifest" href="">
-<link rel="apple-touch-icon" href="logo.png">
+<link id="pwaManifestLink" rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Imp%C3%A9rio%20Real%20FC%22%2C%22short_name%22%3A%22Imp%C3%A9rio%20Real%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b1a30%22%2C%22theme_color%22%3A%22%230b1a30%22%7D">
+<link id="appleIconLink" rel="apple-touch-icon" href="logo.png">
 <title>Império Real FC</title>
 <style>
 :root {
@@ -1065,13 +1066,54 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 
 <script>
-// --- CONFIGURAÇÃO PWA (APP INSTALÁVEL) ---
+// --- PWA EM ARQUIVO ÚNICO (ÍCONE CANVAS + MANIFESTO + SERVICE WORKER) ---
 var eventoInstalacaoPendente = null;
 
-function configurarPWA() {
+function gerarIconeDataUrl(tamanho) {
   try {
-    var baseUrl = window.location.href.split('?')[0];
-    var manifestData = {
+    var canvas = document.createElement("canvas");
+    canvas.width = tamanho;
+    canvas.height = tamanho;
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#0b1a30";
+    ctx.fillRect(0, 0, tamanho, tamanho);
+
+    ctx.strokeStyle = "#d4af37";
+    ctx.lineWidth = Math.max(4, Math.round(tamanho * 0.05));
+    ctx.strokeRect(
+      ctx.lineWidth / 2,
+      ctx.lineWidth / 2,
+      tamanho - ctx.lineWidth,
+      tamanho - ctx.lineWidth
+    );
+
+    ctx.fillStyle = "#d4af37";
+    ctx.font = "bold " + Math.round(tamanho * 0.34) + "px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("IR", tamanho / 2, tamanho * 0.44);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold " + Math.round(tamanho * 0.14) + "px Arial, sans-serif";
+    ctx.fillText("FC", tamanho / 2, tamanho * 0.72);
+
+    return canvas.toDataURL("image/png");
+  } catch (e) {
+    return "logo.png";
+  }
+}
+
+function configurarPWAUnico() {
+  try {
+    var icon192 = gerarIconeDataUrl(192);
+    var icon512 = gerarIconeDataUrl(512);
+    var baseUrl = window.location.href.split("?")[0];
+
+    var appleIcon = document.getElementById("appleIconLink");
+    if (appleIcon) appleIcon.href = icon192;
+
+    var manifestObj = {
       name: "Império Real FC",
       short_name: "Império Real",
       start_url: baseUrl,
@@ -1081,50 +1123,29 @@ function configurarPWA() {
       theme_color: "#0b1a30",
       orientation: "portrait",
       icons: [
-        {
-          src: "logo.png",
-          sizes: "192x192",
-          type: "image/png",
-          purpose: "any"
-        },
-        {
-          src: "logo.png",
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "any"
-        }
+        { src: icon192, sizes: "192x192", type: "image/png", purpose: "any" },
+        { src: icon512, sizes: "512x512", type: "image/png", purpose: "any" }
       ]
     };
 
-    var manifestBlob = new Blob([JSON.stringify(manifestData)], { type: "application/manifest+json" });
-    var manifestUrl = URL.createObjectURL(manifestBlob);
+    var manifestStr = JSON.stringify(manifestObj);
     var linkEl = document.getElementById("pwaManifestLink");
-    if (linkEl) linkEl.href = manifestUrl;
+    if (linkEl) {
+      linkEl.setAttribute("href", "data:application/manifest+json;charset=utf-8," + encodeURIComponent(manifestStr));
+    }
 
     if ("serviceWorker" in navigator && (window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
       var swCode = [
-        "const CACHE_NAME = 'imperio-real-pwa-v1';",
-        "self.addEventListener('install', function(event) {",
-        "  self.skipWaiting();",
-        "});",
-        "self.addEventListener('activate', function(event) {",
-        "  event.waitUntil(self.clients.claim());",
-        "});",
-        "self.addEventListener('fetch', function(event) {",
-        "  if (event.request.method !== 'GET') return;",
-        "  event.respondWith(",
-        "    fetch(event.request).catch(function() {",
-        "      return caches.match(event.request);",
-        "    })",
-        "  );",
+        "self.addEventListener('install', function(e) { e.waitUntil(self.skipWaiting()); });",
+        "self.addEventListener('activate', function(e) { e.waitUntil(self.clients.claim()); });",
+        "self.addEventListener('fetch', function(e) {",
+        "  if (e.request.method !== 'GET') return;",
+        "  e.respondWith(fetch(e.request).catch(function() { return caches.match(e.request); }));",
         "});"
       ].join("\n");
 
-      var swBlob = new Blob([swCode], { type: "application/javascript" });
-      var swUrl = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swUrl).catch(function(err) {
-        console.log("SW info:", err);
-      });
+      var swUrl = "data:application/javascript;charset=utf-8," + encodeURIComponent(swCode);
+      navigator.serviceWorker.register(swUrl).catch(function() {});
     }
   } catch (e) {}
 }
@@ -1147,7 +1168,7 @@ function instalarPWA() {
       eventoInstalacaoPendente = null;
     });
   } else {
-    alert("Para instalar o app:\n• Android/Chrome: toque nos 3 pontinhos (⋮) → 'Instalar aplicativo' ou 'Adicionar à tela inicial'.\n• iPhone/Safari: toque em Compartilhar → 'Adicionar à Tela de Início'.");
+    alert("No Chrome: toque nos 3 pontinhos (⋮) → 'Instalar aplicativo' ou 'Criar atalho' / 'Adicionar à tela inicial'.");
   }
 }
 
@@ -1157,7 +1178,7 @@ window.addEventListener("appinstalled", function() {
   eventoInstalacaoPendente = null;
 });
 
-configurarPWA();
+configurarPWAUnico();
 
 // Configuração JSONbin.io
 const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
