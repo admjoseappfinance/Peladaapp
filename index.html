@@ -1069,19 +1069,19 @@ Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do 
 <p id="pixModalDescricao" style="margin:0 0 8px 0; font-size:0.92rem; color:#334155;"></p>
 <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:10px; margin-bottom:10px;">
 <div style="font-size:0.82rem; color:#15803d; font-weight:bold;">Valor da Cota: <span style="font-size:1.1rem;">R$ 10,00</span></div>
-<div style="font-size:0.82rem; color:#334155; margin-top:3px;">Chave PIX (CPF): <b>123.809.494-50</b></div>
+<div style="font-size:0.82rem; color:#334155; margin-top:3px;">Chave PIX: <b>12380949450</b></div>
 </div>
 
 <label style="font-size:0.82rem;">PIX Copia e Cola (já com valor de R$ 10,00):</label>
 <div class="pix-code-box" id="pixCopiaColaTexto"></div>
 
 <div class="pix-aviso-wpp">
-📲 Quando efetivar o PIX, mande o comprovante no WhatsApp!
+📲 Quando efetivar o PIX, mande o comprovante direto do seu banco no WhatsApp.
 </div>
 
-<button type="button" class="action-btn" id="btnCopiarPixCopiaCola">📋 Copiar PIX Copia e Cola</button>
+<button type="button" class="action-btn" id="btnAbrirAppBancoPix" style="background:#16a34a; color:#ffffff;">🏦 Ir Direto para o App do Banco</button>
+<button type="button" class="action-btn" id="btnCopiarPixCopiaCola" style="margin-top:6px;">📋 Copiar PIX Copia e Cola</button>
 <button type="button" class="action-btn" id="btnCopiarChaveCpfPix" style="background:#0284c7; color:#ffffff; margin-top:6px;">🔑 Copiar Chave PIX (12380949450)</button>
-<a href="#" id="btnEnviarComprovanteWpp" class="whatsapp-btn" target="_blank" rel="noopener noreferrer" style="margin-top:8px;">📲 Enviar Comprovante no WhatsApp</a>
 <button type="button" class="action-btn" style="background:#64748b; color:#ffffff; margin-top:8px;" onclick="fecharModalPixJogo()">Fechar</button>
 </div>
 </div>
@@ -1156,6 +1156,7 @@ const CHAVE_PIX_CLUBE = "12380949450";
 const NOME_RECEBEDOR_PIX = "IMPERIO REAL FC";
 const CIDADE_RECEBEDOR_PIX = "CEARA MIRIM";
 const VALOR_COTA_JOGO = 10.00;
+const DEEP_LINK_BANCO_PIX = "pix://";
 
 function formatarCampoEMV(id, valor) {
   var str = String(valor || "");
@@ -1207,13 +1208,55 @@ function gerarPayloadPixCopiaECola(valorNumerico, identificadorTx) {
   return semCrc + calcularCRC16(semCrc);
 }
 
+function copiarTextoSeguro(texto) {
+  if (!texto) return Promise.resolve(false);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(texto).then(function() {
+      return true;
+    }).catch(function() {
+      return copiarViaTextarea(texto);
+    });
+  }
+  return Promise.resolve(copiarViaTextarea(texto));
+}
+
+function copiarViaTextarea(texto) {
+  try {
+    var ta = document.createElement("textarea");
+    ta.value = texto;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    var ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return Boolean(ok);
+  } catch (e) {
+    return false;
+  }
+}
+
+function direcionarParaAppDoBanco(payloadPix) {
+  copiarTextoSeguro(payloadPix).then(function() {
+    var inicio = Date.now();
+    window.location.href = DEEP_LINK_BANCO_PIX + "?payload=" + encodeURIComponent(payloadPix);
+
+    setTimeout(function() {
+      if (!document.hidden && Date.now() - inicio < 1800) {
+        alert("Código PIX Copia e Cola (R$ 10,00) copiado! Se o app do banco não abrir sozinho, abra seu banco e cole na área PIX.");
+      }
+    }, 1200);
+  });
+}
+
 function abrirModalPixJogo(nomeJogador, jogoObj) {
   var modal = document.getElementById("modalPixJogo");
   var descEl = document.getElementById("pixModalDescricao");
   var codeEl = document.getElementById("pixCopiaColaTexto");
+  var btnAbrirBanco = document.getElementById("btnAbrirAppBancoPix");
   var btnCopiaCola = document.getElementById("btnCopiarPixCopiaCola");
   var btnCopiaChave = document.getElementById("btnCopiarChaveCpfPix");
-  var btnWpp = document.getElementById("btnEnviarComprovanteWpp");
 
   var nomeJogo = jogoObj ? jogoObj.nome : "Jogo";
   var dataFormatada = (jogoObj && jogoObj.data) ? jogoObj.data.split("-").reverse().join("/") : "";
@@ -1226,53 +1269,28 @@ function abrirModalPixJogo(nomeJogador, jogoObj) {
     codeEl.textContent = payloadPix;
   }
 
-  // Copia automaticamente o código PIX Copia e Cola ao abrir
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(payloadPix).catch(function() {});
-  }
+  copiarTextoSeguro(payloadPix);
 
-  // Tenta abrir o app do banco via deep link se o navegador suportar
-  try {
-    var iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = "pix://pagar?payload=" + encodeURIComponent(payloadPix);
-    document.body.appendChild(iframe);
-    setTimeout(function() {
-      if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
-    }, 800);
-  } catch (e) {}
+  if (btnAbrirBanco) {
+    btnAbrirBanco.onclick = function() {
+      direcionarParaAppDoBanco(payloadPix);
+    };
+  }
 
   if (btnCopiaCola) {
     btnCopiaCola.onclick = function() {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(payloadPix).then(function() {
-          alert("Código PIX Copia e Cola (R$ 10,00) copiado! Abra o app do seu banco, vá em PIX → Copia e Cola e cole. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
-        }, function() {
-          alert("Copie o código PIX na caixa acima. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
-        });
-      } else {
-        alert("Copie o código PIX na caixa acima. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
-      }
+      copiarTextoSeguro(payloadPix).then(function() {
+        alert("Código PIX Copia e Cola (R$ 10,00) copiado!");
+      });
     };
   }
 
   if (btnCopiaChave) {
     btnCopiaChave.onclick = function() {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(CHAVE_PIX_CLUBE).then(function() {
-          alert("Chave PIX (CPF: 12380949450) copiada! Valor: R$ 10,00. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
-        });
-      }
+      copiarTextoSeguro(CHAVE_PIX_CLUBE).then(function() {
+        alert("Chave PIX (12380949450) copiada! Valor: R$ 10,00.");
+      });
     };
-  }
-
-  if (btnWpp) {
-    var msgComprovante = "⚽ *Comprovante PIX - Império Real FC*\n" +
-      "Jogador: *" + nomeJogador + "*\n" +
-      "Jogo: *" + nomeJogo + "*" + (dataFormatada ? " (" + dataFormatada + ")" : "") + "\n" +
-      "Valor: *R$ 10,00*\n" +
-      "Segue o comprovante do pagamento:";
-    btnWpp.href = "https://wa.me/?text=" + encodeURIComponent(msgComprovante);
   }
 
   if (modal) modal.style.display = "flex";
@@ -1885,7 +1903,6 @@ info.innerHTML =
 var actionsDiv = document.createElement('div');
 actionsDiv.className = 'confirm-actions-group';
 
-// Botão Pagar Jogo ao lado do botão Confirmar
 var btnPagar = document.createElement('button');
 btnPagar.type = 'button';
 if (isGol) {
