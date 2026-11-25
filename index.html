@@ -479,8 +479,8 @@ gap: 8px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-gap: 10px;
-padding: 12px;
+gap: 8px;
+padding: 11px;
 border-radius: 10px;
 border: 1.5px solid #cbd5e1;
 background: #ffffff;
@@ -499,14 +499,19 @@ opacity: 0.9;
 cursor: not-allowed;
 }
 
+.confirm-player-info {
+flex: 1;
+min-width: 0;
+}
+
 .confirm-player-nome {
-font-size: 1.05rem;
+font-size: 1.02rem;
 font-weight: bold;
 color: var(--primary-navy);
 }
 
 .confirm-player-sub {
-font-size: 0.8rem;
+font-size: 0.78rem;
 color: #64748b;
 margin-top: 2px;
 }
@@ -516,17 +521,50 @@ color: #15803d;
 font-weight: bold;
 }
 
+.confirm-actions-group {
+display: flex;
+align-items: center;
+gap: 6px;
+flex-shrink: 0;
+flex-wrap: wrap;
+justify-content: flex-end;
+}
+
+.btn-pagar-jogo {
+background: #0284c7;
+color: #ffffff;
+border: none;
+border-radius: 8px;
+padding: 9px 10px;
+font-size: 0.82rem;
+font-weight: bold;
+cursor: pointer;
+white-space: nowrap;
+}
+
+.btn-pagar-jogo.pago {
+background: #dcfce7;
+color: #15803d;
+border: 1.5px solid #16a34a;
+}
+
+.btn-pagar-jogo.isento {
+background: #f3e8ff;
+color: #6b21a8;
+border: 1.5px solid #c084fc;
+cursor: default;
+}
+
 .btn-confirmar-nome {
 background: #16a34a;
 color: #ffffff;
 border: none;
 border-radius: 8px;
-padding: 10px 14px;
-font-size: 0.92rem;
+padding: 9px 11px;
+font-size: 0.84rem;
 font-weight: bold;
 cursor: pointer;
-min-width: 118px;
-flex-shrink: 0;
+min-width: 96px;
 }
 
 .btn-confirmado-nome {
@@ -534,12 +572,11 @@ background: #dcfce7;
 color: #15803d;
 border: 1.5px solid #16a34a;
 border-radius: 8px;
-padding: 10px 14px;
-font-size: 0.9rem;
+padding: 9px 11px;
+font-size: 0.82rem;
 font-weight: bold;
 cursor: pointer;
-min-width: 118px;
-flex-shrink: 0;
+min-width: 96px;
 }
 
 .btn-confirmado-travado {
@@ -547,12 +584,36 @@ background: #e2e8f0;
 color: #334155;
 border: 1.5px solid #94a3b8;
 border-radius: 8px;
-padding: 10px 14px;
-font-size: 0.86rem;
+padding: 9px 11px;
+font-size: 0.8rem;
 font-weight: bold;
 cursor: not-allowed;
-min-width: 118px;
-flex-shrink: 0;
+min-width: 96px;
+}
+
+.pix-code-box {
+font-family: monospace;
+font-size: 0.78rem;
+background: #f8fafc;
+border: 1.5px solid #cbd5e1;
+border-radius: 8px;
+padding: 10px;
+word-break: break-all;
+color: #0b1a30;
+margin: 8px 0;
+max-height: 92px;
+overflow-y: auto;
+}
+
+.pix-aviso-wpp {
+background: #fef9c3;
+border: 1.5px solid #eab308;
+color: #854d0e;
+border-radius: 8px;
+padding: 10px 12px;
+font-size: 0.88rem;
+font-weight: bold;
+margin: 10px 0;
 }
 
 .link-gerado-box {
@@ -1001,6 +1062,30 @@ Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do 
 <div id="listaHistoricoPartidas"></div>
 </div>
 
+<!-- Modal Pagamento PIX do Jogo -->
+<div class="modal" id="modalPixJogo">
+<div class="modal-content">
+<h3 style="margin-top:0; color:var(--primary-navy);">💸 Pagar Jogo via PIX</h3>
+<p id="pixModalDescricao" style="margin:0 0 8px 0; font-size:0.92rem; color:#334155;"></p>
+<div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:10px; margin-bottom:10px;">
+<div style="font-size:0.82rem; color:#15803d; font-weight:bold;">Valor da Cota: <span style="font-size:1.1rem;">R$ 10,00</span></div>
+<div style="font-size:0.82rem; color:#334155; margin-top:3px;">Chave PIX (CPF): <b>123.809.494-50</b></div>
+</div>
+
+<label style="font-size:0.82rem;">PIX Copia e Cola (já com valor de R$ 10,00):</label>
+<div class="pix-code-box" id="pixCopiaColaTexto"></div>
+
+<div class="pix-aviso-wpp">
+📲 Quando efetivar o PIX, mande o comprovante no WhatsApp!
+</div>
+
+<button type="button" class="action-btn" id="btnCopiarPixCopiaCola">📋 Copiar PIX Copia e Cola</button>
+<button type="button" class="action-btn" id="btnCopiarChaveCpfPix" style="background:#0284c7; color:#ffffff; margin-top:6px;">🔑 Copiar Chave PIX (12380949450)</button>
+<a href="#" id="btnEnviarComprovanteWpp" class="whatsapp-btn" target="_blank" rel="noopener noreferrer" style="margin-top:8px;">📲 Enviar Comprovante no WhatsApp</a>
+<button type="button" class="action-btn" style="background:#64748b; color:#ffffff; margin-top:8px;" onclick="fecharModalPixJogo()">Fechar</button>
+</div>
+</div>
+
 <!-- Modal Editar Convocados -->
 <div class="modal" id="modalEditarLista">
 <div class="modal-content">
@@ -1066,6 +1151,138 @@ Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do 
 </div>
 
 <script>
+// --- CONFIGURAÇÃO PIX ---
+const CHAVE_PIX_CLUBE = "12380949450";
+const NOME_RECEBEDOR_PIX = "IMPERIO REAL FC";
+const CIDADE_RECEBEDOR_PIX = "CEARA MIRIM";
+const VALOR_COTA_JOGO = 10.00;
+
+function formatarCampoEMV(id, valor) {
+  var str = String(valor || "");
+  var tam = str.length < 10 ? "0" + str.length : String(str.length);
+  return id + tam + str;
+}
+
+function calcularCRC16(payload) {
+  var crc = 0xFFFF;
+  for (var i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (var j = 0; j < 8; j++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+      } else {
+        crc = (crc << 1) & 0xFFFF;
+      }
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function gerarPayloadPixCopiaECola(valorNumerico, identificadorTx) {
+  var gui = formatarCampoEMV("00", "br.gov.bcb.pix");
+  var chave = formatarCampoEMV("01", CHAVE_PIX_CLUBE);
+  var merchantAccount = formatarCampoEMV("26", gui + chave);
+
+  var txidLimpo = String(identificadorTx || "IMPERIOREAL")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .substring(0, 20) || "IMPERIOREAL";
+
+  var valorFormatado = Number(valorNumerico || VALOR_COTA_JOGO).toFixed(2);
+  var additionalData = formatarCampoEMV("05", txidLimpo);
+
+  var semCrc =
+    formatarCampoEMV("00", "01") +
+    merchantAccount +
+    formatarCampoEMV("52", "0000") +
+    formatarCampoEMV("53", "986") +
+    formatarCampoEMV("54", valorFormatado) +
+    formatarCampoEMV("58", "BR") +
+    formatarCampoEMV("59", NOME_RECEBEDOR_PIX.substring(0, 25)) +
+    formatarCampoEMV("60", CIDADE_RECEBEDOR_PIX.substring(0, 15)) +
+    formatarCampoEMV("62", additionalData) +
+    "6304";
+
+  return semCrc + calcularCRC16(semCrc);
+}
+
+function abrirModalPixJogo(nomeJogador, jogoObj) {
+  var modal = document.getElementById("modalPixJogo");
+  var descEl = document.getElementById("pixModalDescricao");
+  var codeEl = document.getElementById("pixCopiaColaTexto");
+  var btnCopiaCola = document.getElementById("btnCopiarPixCopiaCola");
+  var btnCopiaChave = document.getElementById("btnCopiarChaveCpfPix");
+  var btnWpp = document.getElementById("btnEnviarComprovanteWpp");
+
+  var nomeJogo = jogoObj ? jogoObj.nome : "Jogo";
+  var dataFormatada = (jogoObj && jogoObj.data) ? jogoObj.data.split("-").reverse().join("/") : "";
+  var payloadPix = gerarPayloadPixCopiaECola(VALOR_COTA_JOGO, "JOGO" + (jogoObj ? jogoObj.id : ""));
+
+  if (descEl) {
+    descEl.innerHTML = "Jogador: <b>" + nomeJogador + "</b><br>Partida: <b>" + nomeJogo + "</b>" + (dataFormatada ? " (" + dataFormatada + ")" : "");
+  }
+  if (codeEl) {
+    codeEl.textContent = payloadPix;
+  }
+
+  // Copia automaticamente o código PIX Copia e Cola ao abrir
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(payloadPix).catch(function() {});
+  }
+
+  // Tenta abrir o app do banco via deep link se o navegador suportar
+  try {
+    var iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = "pix://pagar?payload=" + encodeURIComponent(payloadPix);
+    document.body.appendChild(iframe);
+    setTimeout(function() {
+      if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 800);
+  } catch (e) {}
+
+  if (btnCopiaCola) {
+    btnCopiaCola.onclick = function() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payloadPix).then(function() {
+          alert("Código PIX Copia e Cola (R$ 10,00) copiado! Abra o app do seu banco, vá em PIX → Copia e Cola e cole. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
+        }, function() {
+          alert("Copie o código PIX na caixa acima. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
+        });
+      } else {
+        alert("Copie o código PIX na caixa acima. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
+      }
+    };
+  }
+
+  if (btnCopiaChave) {
+    btnCopiaChave.onclick = function() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(CHAVE_PIX_CLUBE).then(function() {
+          alert("Chave PIX (CPF: 12380949450) copiada! Valor: R$ 10,00. Quando efetivar o PIX, mande o comprovante no WhatsApp!");
+        });
+      }
+    };
+  }
+
+  if (btnWpp) {
+    var msgComprovante = "⚽ *Comprovante PIX - Império Real FC*\n" +
+      "Jogador: *" + nomeJogador + "*\n" +
+      "Jogo: *" + nomeJogo + "*" + (dataFormatada ? " (" + dataFormatada + ")" : "") + "\n" +
+      "Valor: *R$ 10,00*\n" +
+      "Segue o comprovante do pagamento:";
+    btnWpp.href = "https://wa.me/?text=" + encodeURIComponent(msgComprovante);
+  }
+
+  if (modal) modal.style.display = "flex";
+}
+
+function fecharModalPixJogo() {
+  var modal = document.getElementById("modalPixJogo");
+  if (modal) modal.style.display = "none";
+}
+
 // --- PWA EM ARQUIVO ÚNICO ---
 var eventoInstalacaoPendente = null;
 
@@ -1201,7 +1418,6 @@ function linkBloqueadoPorHorario(jogo) {
   var mes = parseInt(partes[1], 10) - 1;
   var dia = parseInt(partes[2], 10);
   if (isNaN(ano) || isNaN(mes) || isNaN(dia)) return false;
-  // Limite: 12:00:00 do dia do jogo no horário local
   var limiteMeioDia = new Date(ano, mes, dia, 12, 0, 0, 0);
   return Date.now() >= limiteMeioDia.getTime();
 }
@@ -1589,7 +1805,7 @@ avisoBloqueioEl.style.display = 'none';
 
 if (instrucaoEl) {
 instrucaoEl.textContent = (bloqueadoPorHora && !temPermissaoPosMeioDia)
-? 'Prazo de confirmação encerrado às 12:00 do dia do jogo:'
+? 'Prazo de confirmação encerrado às 12:00 do dia do jogo (você ainda pode pagar pelo botão Pagar Jogo):'
 : 'Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do dia do jogo:';
 }
 
@@ -1618,6 +1834,24 @@ var nome = typeof p === 'string' ? p : p.nome;
 var estaConfirmado = typeof p === 'string' ? false : Boolean(p.confirmado);
 var donoDevice = (typeof p === 'object' && p.confirmadoPorDispositivo) ? p.confirmadoPorDispositivo : null;
 
+var isGol = ehGoleiro(p);
+if (!isGol) {
+for (var idxEl = 0; idxEl < jogadoresElenco.length; idxEl++) {
+if (jogadoresElenco[idxEl].nome.toLowerCase() === nome.toLowerCase() && ehGoleiro(jogadoresElenco[idxEl])) {
+isGol = true;
+break;
+}
+}
+}
+
+var jaPagoNoSistema = false;
+for (var k = 0; k < transacoes.length; k++) {
+if (transacoes[k].jogoId == jogo.id && transacoes[k].tipo === 'pagamento' && transacoes[k].jogador && transacoes[k].jogador.toLowerCase() === nome.toLowerCase()) {
+jaPagoNoSistema = true;
+break;
+}
+}
+
 var confirmouNesteAparelho = estaConfirmado && donoDevice === ID_DISPOSITIVO_ATUAL;
 var confirmadoPorOutro = estaConfirmado && donoDevice && donoDevice !== ID_DISPOSITIVO_ATUAL;
 
@@ -1643,9 +1877,38 @@ subTexto = 'Presença confirmada';
 }
 
 var info = document.createElement('div');
+info.className = 'confirm-player-info';
 info.innerHTML =
 '<div class="confirm-player-nome">' + nome + '</div>' +
 '<div class="confirm-player-sub">' + subTexto + '</div>';
+
+var actionsDiv = document.createElement('div');
+actionsDiv.className = 'confirm-actions-group';
+
+// Botão Pagar Jogo ao lado do botão Confirmar
+var btnPagar = document.createElement('button');
+btnPagar.type = 'button';
+if (isGol) {
+btnPagar.className = 'btn-pagar-jogo isento';
+btnPagar.textContent = '🧤 Isento';
+btnPagar.onclick = function(ev) {
+if (ev) ev.stopPropagation();
+};
+} else if (jaPagoNoSistema) {
+btnPagar.className = 'btn-pagar-jogo pago';
+btnPagar.textContent = '✓ Pago';
+btnPagar.onclick = function(ev) {
+if (ev) ev.stopPropagation();
+abrirModalPixJogo(nome, jogo);
+};
+} else {
+btnPagar.className = 'btn-pagar-jogo';
+btnPagar.textContent = '💸 Pagar Jogo';
+btnPagar.onclick = function(ev) {
+if (ev) ev.stopPropagation();
+abrirModalPixJogo(nome, jogo);
+};
+}
 
 var btn = document.createElement('button');
 btn.type = 'button';
@@ -1700,8 +1963,11 @@ renderizarTelaConfirmacaoLink();
 row.onclick = alternar;
 btn.onclick = alternar;
 
+actionsDiv.appendChild(btnPagar);
+actionsDiv.appendChild(btn);
+
 row.appendChild(info);
-row.appendChild(btn);
+row.appendChild(actionsDiv);
 listaEl.appendChild(row);
 })(i);
 }
