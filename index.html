@@ -1080,7 +1080,6 @@ Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do 
 </div>
 
 <button type="button" class="action-btn" id="btnAbrirAppBancoPix" style="background:#16a34a; color:#ffffff;">🏦 Ir Direto para o App do Banco</button>
-<button type="button" class="action-btn" id="btnCopiarPixCopiaCola" style="margin-top:6px;">📋 Copiar PIX Copia e Cola</button>
 <button type="button" class="action-btn" id="btnCopiarChaveCpfPix" style="background:#0284c7; color:#ffffff; margin-top:6px;">🔑 Copiar Chave PIX (12380949450)</button>
 <button type="button" class="action-btn" style="background:#64748b; color:#ffffff; margin-top:8px;" onclick="fecharModalPixJogo()">Fechar</button>
 </div>
@@ -1255,7 +1254,6 @@ function abrirModalPixJogo(nomeJogador, jogoObj) {
   var descEl = document.getElementById("pixModalDescricao");
   var codeEl = document.getElementById("pixCopiaColaTexto");
   var btnAbrirBanco = document.getElementById("btnAbrirAppBancoPix");
-  var btnCopiaCola = document.getElementById("btnCopiarPixCopiaCola");
   var btnCopiaChave = document.getElementById("btnCopiarChaveCpfPix");
 
   var nomeJogo = jogoObj ? jogoObj.nome : "Jogo";
@@ -1274,14 +1272,6 @@ function abrirModalPixJogo(nomeJogador, jogoObj) {
   if (btnAbrirBanco) {
     btnAbrirBanco.onclick = function() {
       direcionarParaAppDoBanco(payloadPix);
-    };
-  }
-
-  if (btnCopiaCola) {
-    btnCopiaCola.onclick = function() {
-      copiarTextoSeguro(payloadPix).then(function() {
-        alert("Código PIX Copia e Cola (R$ 10,00) copiado!");
-      });
     };
   }
 
