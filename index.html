@@ -636,6 +636,24 @@ color: var(--primary-navy);
 margin: 6px 0;
 }
 
+.btn-acessar-confirmacao-jogo {
+width: 100%;
+margin-top: 12px;
+padding: 11px 12px;
+background: #16a34a;
+color: #ffffff;
+border: none;
+border-radius: 8px;
+font-weight: bold;
+font-size: 0.9rem;
+cursor: pointer;
+transition: background 0.2s;
+}
+
+.btn-acessar-confirmacao-jogo:active {
+background: #15803d;
+}
+
 body.modo-jogador [data-admin-only],
 body.modo-jogador [data-juiz-only] {
 display: none !important;
@@ -1745,6 +1763,16 @@ url.searchParams.set('confirmar', String(jogoId));
 return url.toString();
 }
 
+function abrirConfirmacaoDoJogoNoApp(jogoId) {
+jogoConfirmacaoLinkId = String(jogoId);
+try {
+var url = new URL(window.location.href);
+url.searchParams.set('confirmar', String(jogoId));
+window.history.replaceState({}, '', url.toString());
+} catch (e) {}
+renderizarTelaConfirmacaoLink();
+}
+
 function exibirBoxLinkJogo(jogoId) {
 var box = document.getElementById('boxLinkJogoGerado');
 var txt = document.getElementById('textoLinkJogoGerado');
@@ -2648,25 +2676,51 @@ var confirmados = convocados.filter(function(p) {
 return typeof p !== 'string' && Boolean(p.confirmado);
 });
 
-var html = '<div class="report-box">';
-html += '<h4 style="color:var(--primary-navy); margin:0;">⚽ ' + proximoJogo.nome + '</h4>';
-html += '<p style="color:#64748b; margin:4px 0 12px 0; font-size:0.88rem;">📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + confirmados.length + '</b></p>';
+var box = document.createElement('div');
+box.className = 'report-box';
+
+var titulo = document.createElement('h4');
+titulo.style.cssText = 'color:var(--primary-navy); margin:0;';
+titulo.textContent = '⚽ ' + proximoJogo.nome;
+
+var meta = document.createElement('p');
+meta.style.cssText = 'color:#64748b; margin:4px 0 12px 0; font-size:0.88rem;';
+meta.innerHTML = '📅 Data: <b>' + proximoJogo.data.split('-').reverse().join('/') + '</b> | ✅ Confirmados: <b>' + confirmados.length + '</b>';
+
+box.appendChild(titulo);
+box.appendChild(meta);
 
 if (confirmados.length === 0) {
-html += '<p style="margin:0; font-size:0.9rem; color:#64748b;"><i>Nenhum jogador confirmou presença neste jogo ainda.</i></p>';
+var vazio = document.createElement('p');
+vazio.style.cssText = 'margin:0; font-size:0.9rem; color:#64748b;';
+vazio.innerHTML = '<i>Nenhum jogador confirmou presença neste jogo ainda.</i>';
+box.appendChild(vazio);
 } else {
-html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+var tagsWrap = document.createElement('div');
+tagsWrap.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px;';
 for (var i = 0; i < confirmados.length; i++) {
 var p = confirmados[i];
 var nome = typeof p === 'string' ? p : p.nome;
 var nivel = typeof p === 'string' ? 'prata' : (p.nivel || 'prata');
-html += '<span class="player-tag ' + obterClasseNivel(nivel) + '" style="font-size:0.84rem; padding:5px 10px; box-shadow: 0 0 0 2px #16a34a;">✓ ' + nome + '</span>';
+var spanTag = document.createElement('span');
+spanTag.className = 'player-tag ' + obterClasseNivel(nivel);
+spanTag.style.cssText = 'font-size:0.84rem; padding:5px 10px; box-shadow: 0 0 0 2px #16a34a;';
+spanTag.textContent = '✓ ' + nome;
+tagsWrap.appendChild(spanTag);
 }
-html += '</div>';
+box.appendChild(tagsWrap);
 }
-html += '</div>';
 
-container.innerHTML = html;
+var btnAbrirConf = document.createElement('button');
+btnAbrirConf.type = 'button';
+btnAbrirConf.className = 'btn-acessar-confirmacao-jogo';
+btnAbrirConf.textContent = '✅ Abrir Confirmação de Presença';
+btnAbrirConf.onclick = function() {
+abrirConfirmacaoDoJogoNoApp(proximoJogo.id);
+};
+box.appendChild(btnAbrirConf);
+
+container.appendChild(box);
 }
 
 function renderizarPartidasPublicas() {
