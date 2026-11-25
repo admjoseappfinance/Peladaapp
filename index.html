@@ -444,6 +444,17 @@ font-size: 0.88rem;
 margin-top: 4px;
 }
 
+.confirm-bloqueio-aviso {
+background: #fef2f2;
+border: 1.5px solid #fca5a5;
+color: #991b1b;
+border-radius: 8px;
+padding: 10px 12px;
+margin-bottom: 12px;
+font-size: 0.88rem;
+font-weight: bold;
+}
+
 .confirm-resumo-bar {
 display: flex;
 justify-content: space-between;
@@ -482,8 +493,10 @@ border-color: #16a34a;
 background: #f0fdf4;
 }
 
-.confirm-player-row.bloqueado-outro {
-opacity: 0.92;
+.confirm-player-row.bloqueado-outro,
+.confirm-player-row.bloqueado-prazo {
+opacity: 0.9;
+cursor: not-allowed;
 }
 
 .confirm-player-nome {
@@ -617,13 +630,15 @@ display: none;
 <div class="confirm-link-meta" id="confLinkMetaJogo"></div>
 </div>
 
+<div id="confLinkBloqueioAviso" class="confirm-bloqueio-aviso" style="display:none;"></div>
+
 <div class="confirm-resumo-bar">
 <span id="confLinkContagem">✅ Confirmados: 0</span>
 <button type="button" class="sync-btn" style="color:#0b1a30; border-color:#cbd5e1; background:#ffffff;" onclick="carregarDaNuvem(true)">🔄 Atualizar</button>
 </div>
 
-<p style="margin:0 0 10px 0; font-size:0.9rem; color:#334155;">
-Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirmou neste aparelho pode desmarcar (ou o Admin):
+<p style="margin:0 0 10px 0; font-size:0.9rem; color:#334155;" id="confLinkInstrucao">
+Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do dia do jogo:
 </p>
 
 <div class="confirm-player-list" id="confLinkListaJogadores"></div>
@@ -690,7 +705,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 <button class="action-btn" id="btnSalvarJogo">Salvar Jogo e Gerar Link</button>
 
 <div id="boxLinkJogoGerado" class="link-gerado-box" style="display:none;">
-<b>🔗 Link de Confirmação do Jogo:</b>
+<b>🔗 Link de Confirmação do Jogo (válido até 12:00 do dia):</b>
 <div class="link-gerado-url" id="textoLinkJogoGerado"></div>
 <div style="display:flex; gap:8px;">
 <button type="button" class="action-btn" style="margin:0;" id="btnCopiarLinkGerado">📋 Copiar Link</button>
@@ -816,7 +831,7 @@ Toque no seu nome na lista abaixo para confirmar sua presença. Só quem confirm
 </div>
 
 <div id="relatorioAdminCompleto" style="display:none; margin-top: 14px; padding-top: 12px; border-top: 2px solid var(--gold-accent);" data-admin-only>
-<h4 style="margin:0 0 8px 0; color:var(--primary-navy);">Resumo Completo (Admin)</h4>
+<h4 style="margin:0 0 8px 0; color:var(--primary-navy);">Resumo Completo (Admin / ADM Pro)</h4>
 <p style="margin:4px 0; font-size:0.9rem;">Total Arrecadado: <span id="resumoEntradas" class="positive">R$ 0,00</span></p>
 <div style="font-weight:bold; font-size:0.88rem; margin-top:8px;">Detalhamento de Saídas:</div>
 <div id="listaDetalheSaidas"></div>
@@ -1169,10 +1184,27 @@ const JSONBIN_ID = "6afc443cac6210605a8e8f9d";
 const JSONBIN_KEY = "$2a$10$PgMPhbik9T.tZhBBQUI1C.GeMpnvyzb6QiY8cfXpIfb./FUPQ0XQG";
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 
-var nivelAcesso = 'jogador';
+var nivelAcesso = 'jogador'; // 'jogador' | 'juiz' | 'admin' | 'adm_pro'
 var jogoConfirmacaoLinkId = null;
 var subtelaFinanceiroAtiva = 'relatorio';
 var subtelaElencoRankingAtiva = 'artilharia';
+
+function ehAdminOuPro() {
+  return nivelAcesso === 'admin' || nivelAcesso === 'adm_pro';
+}
+
+function linkBloqueadoPorHorario(jogo) {
+  if (!jogo || !jogo.data) return false;
+  var partes = String(jogo.data).split('-');
+  if (partes.length !== 3) return false;
+  var ano = parseInt(partes[0], 10);
+  var mes = parseInt(partes[1], 10) - 1;
+  var dia = parseInt(partes[2], 10);
+  if (isNaN(ano) || isNaN(mes) || isNaN(dia)) return false;
+  // Limite: 12:00:00 do dia do jogo no horário local
+  var limiteMeioDia = new Date(ano, mes, dia, 12, 0, 0, 0);
+  return Date.now() >= limiteMeioDia.getTime();
+}
 
 const MAPA_LETRAS_ARTILHARIA = {
   'q': 'Adailton',
@@ -1339,7 +1371,8 @@ var ID_DISPOSITIVO_ATUAL = obterIdDispositivoLocal();
 function atualizarLabelPerfil() {
 var lbl = document.getElementById('labelPerfilTopo');
 if (!lbl) return;
-if (nivelAcesso === 'admin') lbl.textContent = 'PAINEL ADMINISTRATIVO';
+if (nivelAcesso === 'adm_pro') lbl.textContent = 'PAINEL ADM PRO';
+else if (nivelAcesso === 'admin') lbl.textContent = 'PAINEL ADMINISTRATIVO';
 else if (nivelAcesso === 'juiz') lbl.textContent = 'MODO JUIZ';
 else lbl.textContent = 'PORTAL DO CLUBE';
 }
@@ -1347,7 +1380,7 @@ else lbl.textContent = 'PORTAL DO CLUBE';
 function abrirFinanceiroHub(secao) {
 switchTab('financeiro');
 var alvo = secao;
-if (nivelAcesso !== 'admin' && alvo !== 'relatorio') {
+if (!ehAdminOuPro() && alvo !== 'relatorio') {
 alvo = 'relatorio';
 }
 subtelaFinanceiroAtiva = alvo;
@@ -1385,7 +1418,7 @@ subtelaFinanceiroAtiva = null;
 function abrirElencoRankingHub(secao) {
 switchTab('ranking');
 var alvo = secao;
-if (nivelAcesso !== 'admin' && alvo === 'jogadores') {
+if (!ehAdminOuPro() && alvo === 'jogadores') {
 alvo = 'artilharia';
 }
 subtelaElencoRankingAtiva = alvo;
@@ -1518,20 +1551,47 @@ if (tela) tela.style.display = 'block';
 
 var tituloEl = document.getElementById('confLinkTituloJogo');
 var metaEl = document.getElementById('confLinkMetaJogo');
+var avisoBloqueioEl = document.getElementById('confLinkBloqueioAviso');
+var instrucaoEl = document.getElementById('confLinkInstrucao');
 var contagemEl = document.getElementById('confLinkContagem');
 var listaEl = document.getElementById('confLinkListaJogadores');
 
 if (!jogo) {
 if (tituloEl) tituloEl.textContent = 'Jogo não encontrado';
 if (metaEl) metaEl.textContent = 'Verifique se o link enviado no grupo está atualizado.';
+if (avisoBloqueioEl) avisoBloqueioEl.style.display = 'none';
 if (contagemEl) contagemEl.textContent = '✅ Confirmados: 0';
 if (listaEl) listaEl.innerHTML = '<i>Nenhuma lista disponível para este link.</i>';
 return;
 }
 
 var dataFormatada = jogo.data ? jogo.data.split('-').reverse().join('/') : 'Data a definir';
+var bloqueadoPorHora = linkBloqueadoPorHorario(jogo);
+var temPermissaoPosMeioDia = ehAdminOuPro();
+
 if (tituloEl) tituloEl.textContent = '⚽ ' + jogo.nome;
-if (metaEl) metaEl.textContent = '📅 ' + dataFormatada;
+if (metaEl) metaEl.textContent = '📅 ' + dataFormatada + ' • Limite de confirmação: 12:00 do dia';
+
+if (avisoBloqueioEl) {
+if (bloqueadoPorHora && !temPermissaoPosMeioDia) {
+avisoBloqueioEl.style.display = 'block';
+avisoBloqueioEl.textContent = '🔒 Confirmações encerradas às 12:00 do dia do jogo. Somente Admin / ADM Pro pode alterar após esse horário.';
+} else if (bloqueadoPorHora && temPermissaoPosMeioDia) {
+avisoBloqueioEl.style.display = 'block';
+avisoBloqueioEl.style.background = '#fffbeb';
+avisoBloqueioEl.style.borderColor = '#f59e0b';
+avisoBloqueioEl.style.color = '#92400e';
+avisoBloqueioEl.textContent = '🔓 Horário após 12:00: alteração liberada porque você está em modo ' + (nivelAcesso === 'adm_pro' ? 'ADM Pro' : 'Admin') + '.';
+} else {
+avisoBloqueioEl.style.display = 'none';
+}
+}
+
+if (instrucaoEl) {
+instrucaoEl.textContent = (bloqueadoPorHora && !temPermissaoPosMeioDia)
+? 'Prazo de confirmação encerrado às 12:00 do dia do jogo:'
+: 'Toque no seu nome na lista abaixo para confirmar sua presença até as 12:00 do dia do jogo:';
+}
 
 var convocados = jogo.convocados || [];
 var confirmadosCount = 0;
@@ -1560,19 +1620,23 @@ var donoDevice = (typeof p === 'object' && p.confirmadoPorDispositivo) ? p.confi
 
 var confirmouNesteAparelho = estaConfirmado && donoDevice === ID_DISPOSITIVO_ATUAL;
 var confirmadoPorOutro = estaConfirmado && donoDevice && donoDevice !== ID_DISPOSITIVO_ATUAL;
-var podeDesmarcar = !estaConfirmado || confirmouNesteAparelho || (nivelAcesso === 'admin');
+
+var bloqueadoPrazoJogador = bloqueadoPorHora && !temPermissaoPosMeioDia;
+var podeAlterarEsteItem = !bloqueadoPrazoJogador && (!estaConfirmado || confirmouNesteAparelho || temPermissaoPosMeioDia);
 
 var row = document.createElement('div');
 row.className = 'confirm-player-row' +
 (estaConfirmado ? ' confirmado' : '') +
-(!podeDesmarcar ? ' bloqueado-outro' : '');
+(bloqueadoPrazoJogador ? ' bloqueado-prazo' : (!podeAlterarEsteItem ? ' bloqueado-outro' : ''));
 
-var subTexto = 'Toque para confirmar presença';
-if (confirmouNesteAparelho) {
+var subTexto = 'Toque para confirmar presença (até 12:00)';
+if (bloqueadoPrazoJogador) {
+subTexto = estaConfirmado ? 'Presença confirmada (encerrado às 12:00)' : 'Encerrado às 12:00 do dia do jogo';
+} else if (confirmouNesteAparelho) {
 subTexto = 'Confirmado neste aparelho (toque para desmarcar)';
 } else if (confirmadoPorOutro) {
-subTexto = nivelAcesso === 'admin'
-? 'Confirmado em outro aparelho (Admin pode desmarcar)'
+subTexto = temPermissaoPosMeioDia
+? 'Confirmado em outro aparelho (' + (nivelAcesso === 'adm_pro' ? 'ADM Pro' : 'Admin') + ' pode desmarcar)'
 : 'Confirmado em outro aparelho (somente quem confirmou pode desmarcar)';
 } else if (estaConfirmado) {
 subTexto = 'Presença confirmada';
@@ -1585,10 +1649,13 @@ info.innerHTML =
 
 var btn = document.createElement('button');
 btn.type = 'button';
-if (!estaConfirmado) {
+if (bloqueadoPrazoJogador) {
+btn.className = 'btn-confirmado-travado';
+btn.textContent = estaConfirmado ? 'Confirmado 🔒' : 'Encerrado 🔒';
+} else if (!estaConfirmado) {
 btn.className = 'btn-confirmar-nome';
 btn.textContent = 'Confirmar';
-} else if (podeDesmarcar) {
+} else if (podeAlterarEsteItem) {
 btn.className = 'btn-confirmado-nome';
 btn.textContent = 'Confirmado ✓';
 } else {
@@ -1598,12 +1665,17 @@ btn.textContent = 'Confirmado 🔒';
 
 var alternar = function(ev) {
 if (ev) ev.stopPropagation();
+if (bloqueadoPrazoJogador) {
+alert('O link de confirmação funciona apenas até as 12:00 do dia do jogo.');
+return;
+}
+
 var alvo = jogo.convocados[idx];
 var jaConf = typeof alvo === 'string' ? false : Boolean(alvo.confirmado);
 var devResp = (typeof alvo === 'object' && alvo.confirmadoPorDispositivo) ? alvo.confirmadoPorDispositivo : null;
 
-if (jaConf && devResp && devResp !== ID_DISPOSITIVO_ATUAL && nivelAcesso !== 'admin') {
-alert('Apenas quem confirmou a presença de ' + nome + ' (ou o Admin) pode desmarcar.');
+if (jaConf && devResp && devResp !== ID_DISPOSITIVO_ATUAL && !temPermissaoPosMeioDia) {
+alert('Apenas quem confirmou a presença de ' + nome + ' (ou o Admin / ADM Pro) pode desmarcar.');
 return;
 }
 
@@ -1721,8 +1793,22 @@ async function salvarNaNuvem() {
 
 function pedirSenhaAdmin() {
 if (nivelAcesso === 'jogador') {
-var senha = prompt("Digite a senha de acesso (Admin ou Juiz):");
-if (senha === "1571") {
+var senha = prompt("Digite a senha de acesso (Admin, ADM Pro ou Juiz):");
+if (senha === null) return;
+var senhaLimpa = senha.trim().toLowerCase();
+
+if (senhaLimpa === "admpro" || senha === "7777") {
+nivelAcesso = 'adm_pro';
+document.body.className = '';
+atualizarLabelPerfil();
+var btn = document.getElementById('btnToggleAdmin');
+btn.classList.add('ativo');
+btn.innerText = '👑 ADM Pro';
+renderizarTelaConfirmacaoLink();
+atualizarRelatorio();
+alert('Modo ADM Pro ativado!');
+if (!jogoConfirmacaoLinkId) switchTab('jogos');
+} else if (senha === "1571") {
 nivelAcesso = 'admin';
 document.body.className = '';
 atualizarLabelPerfil();
@@ -1730,6 +1816,7 @@ var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '🔓 Admin';
 renderizarTelaConfirmacaoLink();
+atualizarRelatorio();
 alert('Área Administrativa Total desbloqueada!');
 if (!jogoConfirmacaoLinkId) switchTab('jogos');
 } else if (senha === "0101") {
@@ -1740,9 +1827,10 @@ var btn = document.getElementById('btnToggleAdmin');
 btn.classList.add('ativo');
 btn.innerText = '⚽ Juiz';
 renderizarTelaConfirmacaoLink();
+atualizarRelatorio();
 alert('Modo Juiz liberado (Sorteio e Cronômetro)!');
 if (!jogoConfirmacaoLinkId) switchTab('cronometro');
-} else if (senha !== null) {
+} else {
 alert('Senha incorreta!');
 }
 } else {
@@ -1753,6 +1841,7 @@ var btn = document.getElementById('btnToggleAdmin');
 btn.classList.remove('ativo');
 btn.innerText = '🔐 Admin';
 renderizarTelaConfirmacaoLink();
+atualizarRelatorio();
 if (subtelaFinanceiroAtiva && subtelaFinanceiroAtiva !== 'relatorio') {
 abrirFinanceiroHub('relatorio');
 }
@@ -2404,7 +2493,7 @@ exibirBoxLinkJogo(jogo.id);
 var url = gerarLinkConfirmacaoJogo(jogo.id);
 if (navigator.clipboard && navigator.clipboard.writeText) {
 navigator.clipboard.writeText(url).then(function() {
-alert('Link de confirmação copiado:\n' + url);
+alert('Link de confirmação copiado (válido até 12:00 do dia):\n' + url);
 }, function() {
 alert('Link de confirmação:\n' + url);
 });
@@ -2740,7 +2829,7 @@ if (btnWpp) btnWpp.href = 'https://wa.me/?text=' + encodeURIComponent(textoWpp);
 
 var divAdminComp = document.getElementById('relatorioAdminCompleto');
 if (divAdminComp) {
-divAdminComp.style.display = (nivelAcesso === 'admin') ? 'block' : 'none';
+divAdminComp.style.display = ehAdminOuPro() ? 'block' : 'none';
 }
 }
 
@@ -3230,7 +3319,7 @@ var url = txt ? txt.textContent : '';
 var jId = box ? box.getAttribute('data-jogo-id') : '';
 var jogoObj = jogos.find(function(j) { return String(j.id) === String(jId); });
 var nomeJ = jogoObj ? jogoObj.nome : 'Jogo';
-var msg = '⚽ *' + nomeJ + '*\nEntre no link, clique no seu nome e confirme sua presença:\n' + url;
+var msg = '⚽ *' + nomeJ + '*\nConfirme sua presença até as *12:00* do dia do jogo:\n' + url;
 window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener,noreferrer');
 };
 }
